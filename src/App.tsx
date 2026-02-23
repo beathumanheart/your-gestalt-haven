@@ -14,13 +14,11 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import Index from "./pages/Index";
 import OfferAgreement from "./pages/OfferAgreement";
 import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
-/**
- * Wraps children with LanguageProvider that reads :lang from the URL.
- * Also stores language choice.
- */
 const LangLayout = ({ children }: { children: React.ReactNode }) => {
   const { lang } = useParams();
 
@@ -49,6 +47,10 @@ const App = () => (
               </LangLayout>
             }
           />
+
+          {/* Admin routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminDashboard />} />
 
           {/* Language-prefixed routes */}
           <Route

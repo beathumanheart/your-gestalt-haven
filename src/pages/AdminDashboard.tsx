@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Calendar, Clock, List, Settings } from "lucide-react";
 import AvailabilityManager from "@/components/admin/AvailabilityManager";
@@ -14,12 +14,17 @@ const AdminDashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("bookings");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setLoading(false);
     });
-    supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
     return () => subscription.unsubscribe();
   }, []);
 
@@ -33,9 +38,16 @@ const AdminDashboard = () => {
     });
   }, [session]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse font-body text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
   if (!session) {
-    navigate("/admin/login");
-    return null;
+    return <Navigate to="/admin/login" replace />;
   }
 
   if (isAdmin === null) {

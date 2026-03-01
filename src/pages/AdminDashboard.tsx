@@ -19,13 +19,34 @@ const AdminDashboard = () => {
   useEffect(() => {
     let isMounted = true;
 
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        window.setTimeout(resolve, ms);
+      });
+
     const initializeSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const retryDelays = [0, 150, 350, 700];
+      let resolvedSession: Session | null = null;
+
+      for (const delay of retryDelays) {
+        if (delay > 0) {
+          await wait(delay);
+        }
+
+        const {
+          data: { session: fetchedSession },
+        } = await supabase.auth.getSession();
+
+        if (!isMounted) return;
+
+        if (fetchedSession) {
+          resolvedSession = fetchedSession;
+          break;
+        }
+      }
 
       if (!isMounted) return;
-      setSession(session);
+      setSession(resolvedSession);
       setLoading(false);
     };
 
@@ -36,6 +57,9 @@ const AdminDashboard = () => {
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!isMounted) return;
       setSession(nextSession);
+      if (nextSession) {
+        setLoading(false);
+      }
     });
 
     return () => {

@@ -56,10 +56,10 @@ const BookingConfirmation = ({ booking, t, onReset }: Props) => {
             href={booking.google_meet_link}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 font-body text-sm text-primary hover:underline pt-2"
+            className="flex items-center gap-3 font-body text-sm text-primary hover:underline pt-2 border-t border-border mt-2"
           >
             <Video className="w-4 h-4 shrink-0" />
-            {t.confirmMeetLink}
+            Join Video Session →
           </a>
         )}
       </div>

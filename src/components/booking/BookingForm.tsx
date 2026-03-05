@@ -60,11 +60,27 @@ const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
 
       if (error) throw error;
 
-      onBooked({
-        ...data,
-        sessionTypeName: booking.sessionTypeName,
-        durationMinutes: booking.durationMinutes,
-      });
+      // Process booking: generate meeting link + send confirmation email
+      try {
+        const { data: processResult } = await supabase.functions.invoke("process-booking", {
+          body: { bookingId: data.id },
+        });
+
+        onBooked({
+          ...data,
+          google_meet_link: processResult?.meetLink || null,
+          sessionTypeName: booking.sessionTypeName,
+          durationMinutes: booking.durationMinutes,
+        });
+      } catch (processErr) {
+        console.error("Process booking error (non-fatal):", processErr);
+        // Still show confirmation even if email/link fails
+        onBooked({
+          ...data,
+          sessionTypeName: booking.sessionTypeName,
+          durationMinutes: booking.durationMinutes,
+        });
+      }
     } catch (err) {
       console.error("Booking error:", err);
       setGeneralError(t.errorGeneral);

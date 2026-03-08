@@ -59,11 +59,15 @@ const BookingWidget = () => {
     if (!confirmed?.id) return;
     setCancelling(true);
     try {
-      const { error } = await supabase
-        .from("bookings")
-        .update({ status: "cancelled" })
-        .eq("id", confirmed.id);
+      const { data: result, error } = await supabase.functions.invoke("process-booking", {
+        body: {
+          action: "cancel",
+          bookingId: confirmed.id,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+      });
       if (error) throw error;
+      if (!result?.success) throw new Error(result?.error || "Cancel failed");
       toast.success(t.cancelledSuccess);
       setConfirmed(null);
       setBooking({});

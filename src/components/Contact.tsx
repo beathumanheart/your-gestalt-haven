@@ -32,7 +32,7 @@ const Contact = () => {
           <a href={t.signalUrl} target="_blank" rel="noopener noreferrer" className="text-foreground font-medium underline underline-offset-2 hover:text-primary transition-colors">{t.signalLabel}</a>
           {" or "}
           <span className="text-foreground font-medium">{t.sessionLabel}</span>
-          <span className="text-muted-foreground text-xs ml-1 break-all">({t.sessionUrl})</span>
+          <span className="text-muted-foreground text-xs ml-1 break-all">({t.sessionId})</span>
         </p>
       </div>
     </section>

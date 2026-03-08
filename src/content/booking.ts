@@ -161,7 +161,7 @@ export const bookingRU: BookingContent = {
   signalLabel: "Signal",
   signalUrl: "https://signal.me/#eu/54EL7BMiWPJCsLFzC0PY4J6uP4Ds7eu4cL243diq7MXIk1-L8oJGyIcY05eV_gCN",
   sessionLabel: "Session",
-  sessionUrl: "https://getsession.org/",
+  sessionId: "05e95070d5641f3eaefb760ff151e043e5cc27df1bed974b575d98c32e1cc56c2e",
   orText: ", ",
   back: "Назад",
   next: "Далее",

@@ -3,8 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { bookingEN, bookingRU } from "@/content/booking";
 import { useSessionTypes } from "@/hooks/useAvailability";
 import SessionTypeSelector from "./SessionTypeSelector";
-import DateSelector from "./DateSelector";
-import TimeSlotSelector from "./TimeSlotSelector";
+import DateTimeSelector from "./DateTimeSelector";
 import BookingForm from "./BookingForm";
 import BookingConfirmation from "./BookingConfirmation";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
@@ -20,7 +19,7 @@ export interface BookingData {
   notes: string;
 }
 
-const STEPS = ["session", "date", "time", "details"] as const;
+const STEPS = ["session", "datetime", "details"] as const;
 type Step = typeof STEPS[number];
 
 const BookingWidget = () => {
@@ -33,13 +32,12 @@ const BookingWidget = () => {
   const [confirmed, setConfirmed] = useState<any>(null);
 
   const stepIndex = STEPS.indexOf(step);
-  const stepLabels = [t.stepSession, t.stepDate, t.stepTime, t.stepDetails];
+  const stepLabels = [t.stepSession, t.stepDateTime, t.stepDetails];
 
   const canNext = () => {
     switch (step) {
       case "session": return !!booking.sessionTypeId;
-      case "date": return !!booking.date;
-      case "time": return !!booking.timeSlot;
+      case "datetime": return !!booking.date && !!booking.timeSlot;
       default: return false;
     }
   };
@@ -115,21 +113,14 @@ const BookingWidget = () => {
           />
         )}
 
-        {step === "date" && (
-          <DateSelector
-            selected={booking.date}
-            t={t}
-            onSelect={(d) => setBooking({ ...booking, date: d, timeSlot: undefined })}
-          />
-        )}
-
-        {step === "time" && booking.date && (
-          <TimeSlotSelector
-            date={booking.date}
+        {step === "datetime" && (
+          <DateTimeSelector
+            selectedDate={booking.date}
+            selectedTime={booking.timeSlot}
             durationMinutes={booking.durationMinutes || 30}
-            selected={booking.timeSlot}
             t={t}
-            onSelect={(slot) => setBooking({ ...booking, timeSlot: slot })}
+            onSelectDate={(d) => setBooking({ ...booking, date: d, timeSlot: undefined })}
+            onSelectTime={(slot) => setBooking({ ...booking, timeSlot: slot })}
           />
         )}
 

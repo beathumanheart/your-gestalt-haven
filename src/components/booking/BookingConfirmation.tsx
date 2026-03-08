@@ -1,5 +1,6 @@
+import { useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarDays, Clock, Mail, Video, CheckCircle } from "lucide-react";
+import { CalendarDays, Clock, Mail, Video, CheckCircle, Globe } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 
 interface Props {
@@ -8,8 +9,31 @@ interface Props {
   onReset: () => void;
 }
 
+function getUserTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return "UTC";
+  }
+}
+
+function formatTimezone(tz: string): string {
+  try {
+    const offset = new Intl.DateTimeFormat("en", {
+      timeZone: tz,
+      timeZoneName: "shortOffset",
+    })
+      .formatToParts(new Date())
+      .find((p) => p.type === "timeZoneName")?.value;
+    return `${tz.replace(/_/g, " ")} (${offset || ""})`;
+  } catch {
+    return tz;
+  }
+}
+
 const BookingConfirmation = ({ booking, t, onReset }: Props) => {
   const startDate = parseISO(booking.start_time);
+  const timezone = useMemo(() => getUserTimezone(), []);
 
   return (
     <div className="card-organic p-6 md:p-10 text-center">
@@ -45,6 +69,13 @@ const BookingConfirmation = ({ booking, t, onReset }: Props) => {
           </span>
         </div>
         <div className="flex items-center gap-3 font-body text-sm">
+          <Globe className="w-4 h-4 text-primary shrink-0" />
+          <span className="text-muted-foreground">{t.confirmTimezone}:</span>
+          <span className="text-foreground font-medium ml-auto text-xs">
+            {formatTimezone(timezone)}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 font-body text-sm">
           <Mail className="w-4 h-4 text-primary shrink-0" />
           <span className="text-muted-foreground">{t.confirmEmail}:</span>
           <span className="text-foreground font-medium ml-auto truncate max-w-[160px]">
@@ -59,7 +90,7 @@ const BookingConfirmation = ({ booking, t, onReset }: Props) => {
             className="flex items-center gap-3 font-body text-sm text-primary hover:underline pt-2 border-t border-border mt-2"
           >
             <Video className="w-4 h-4 shrink-0" />
-            Join Video Session →
+            {t.confirmMeetLink} →
           </a>
         )}
       </div>

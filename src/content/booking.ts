@@ -11,17 +11,16 @@ export interface BookingContent {
   subtitle: string;
   // Steps
   stepSession: string;
-  stepDate: string;
-  stepTime: string;
+  stepDateTime: string;
   stepDetails: string;
   // Session type
   selectSession: string;
   minutes: string;
-  // Date
+  // Date & Time
   selectDate: string;
-  // Time
   selectTime: string;
   noSlots: string;
+  timezone: string;
   // Form
   yourName: string;
   yourEmail: string;
@@ -37,6 +36,7 @@ export interface BookingContent {
   confirmDate: string;
   confirmTime: string;
   confirmDuration: string;
+  confirmTimezone: string;
   confirmEmail: string;
   confirmMeetLink: string;
   bookAnother: string;
@@ -63,19 +63,19 @@ export const bookingEN: BookingContent = {
   title2: "Begin?",
   subtitle: "The first step is often the hardest. I'm here to make it as easy as possible.",
   stepSession: "Session",
-  stepDate: "Date",
-  stepTime: "Time",
+  stepDateTime: "Date & Time",
   stepDetails: "Details",
   selectSession: "Choose your session type",
   minutes: "min",
   selectDate: "Pick a date",
   selectTime: "Choose a time",
   noSlots: "No available times on this date. Please try another day.",
+  timezone: "Timezone",
   yourName: "Your name",
   yourEmail: "Your email",
   namePlaceholder: "Full name",
   emailPlaceholder: "email@example.com",
-  notesLabel: "Notes (optional)",
+  notesLabel: "Your enquiry or expectations (optional)",
   notesPlaceholder: "Anything you'd like to share before our session...",
   bookButton: "Confirm Booking",
   booking: "Booking...",
@@ -84,8 +84,9 @@ export const bookingEN: BookingContent = {
   confirmDate: "Date",
   confirmTime: "Time",
   confirmDuration: "Duration",
+  confirmTimezone: "Timezone",
   confirmEmail: "Confirmation sent to",
-  confirmMeetLink: "Join via Google Meet",
+  confirmMeetLink: "Join Video Session",
   bookAnother: "Book another session",
   errorGeneral: "Something went wrong. Please try again.",
   errorNameRequired: "Name is required",
@@ -107,19 +108,19 @@ export const bookingRU: BookingContent = {
   title2: "начать?",
   subtitle: "Первый шаг — часто самый сложный. Я сделаю всё, чтобы это было проще.",
   stepSession: "Сессия",
-  stepDate: "Дата",
-  stepTime: "Время",
+  stepDateTime: "Дата и время",
   stepDetails: "Данные",
   selectSession: "Выберите тип сессии",
   minutes: "мин",
   selectDate: "Выберите дату",
   selectTime: "Выберите время",
   noSlots: "Нет свободных слотов на эту дату. Попробуйте другой день.",
+  timezone: "Часовой пояс",
   yourName: "Ваше имя",
   yourEmail: "Ваш email",
   namePlaceholder: "Полное имя",
   emailPlaceholder: "email@example.com",
-  notesLabel: "Заметки (необязательно)",
+  notesLabel: "Ваш запрос или ожидания (необязательно)",
   notesPlaceholder: "Что-нибудь, чем хотите поделиться до сессии...",
   bookButton: "Подтвердить запись",
   booking: "Запись...",
@@ -128,8 +129,9 @@ export const bookingRU: BookingContent = {
   confirmDate: "Дата",
   confirmTime: "Время",
   confirmDuration: "Длительность",
+  confirmTimezone: "Часовой пояс",
   confirmEmail: "Подтверждение отправлено на",
-  confirmMeetLink: "Подключиться через Google Meet",
+  confirmMeetLink: "Присоединиться к видеосессии",
   bookAnother: "Записаться ещё раз",
   errorGeneral: "Что-то пошло не так. Попробуйте ещё раз.",
   errorNameRequired: "Имя обязательно",

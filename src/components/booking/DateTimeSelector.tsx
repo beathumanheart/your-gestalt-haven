@@ -42,11 +42,9 @@ const DateTimeSelector = ({
   selectedDate,
   selectedTime,
   durationMinutes,
-  timezone,
   t,
   onSelectDate,
   onSelectTime,
-  onTimezoneChange,
 }: Props) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -54,6 +52,8 @@ const DateTimeSelector = ({
   const [displayMonth, setDisplayMonth] = useState(new Date());
   const { availableDays } = useAvailableDates(displayMonth);
   const { slots, loading: loadingSlots } = useAvailableSlots(selectedDate, durationMinutes);
+
+  const timezone = useMemo(() => getUserTimezone(), []);
 
   const isDateAvailable = (date: Date) =>
     availableDays.has(format(date, "yyyy-MM-dd"));
@@ -70,8 +70,11 @@ const DateTimeSelector = ({
 
   return (
     <div className="space-y-4">
-      {/* Timezone dropdown */}
-      <TimezoneSelector value={timezone} onChange={onTimezoneChange} />
+      {/* Timezone display */}
+      <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
+        <Globe className="w-3.5 h-3.5" />
+        <span>{t.timezone}: {formatTimezone(timezone)}</span>
+      </div>
 
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
         {/* Calendar — fixed width, no shrink */}

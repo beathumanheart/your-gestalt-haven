@@ -65,6 +65,14 @@ const App = () => (
             }
           />
           <Route
+            path="/:lang/booking-cancelled"
+            element={
+              <LangLayout>
+                <BookingCancelled />
+              </LangLayout>
+            }
+          />
+          <Route
             path="/:lang/offer-agreement"
             element={
               <LangLayout>

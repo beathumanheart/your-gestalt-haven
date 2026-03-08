@@ -11,7 +11,26 @@ function generateJitsiLink(bookingId: string): string {
   return `https://meet.jit.si/${roomName}`;
 }
 
-function getSupabase() {
+function formatTimeWithTz(date: Date, tz: string): { time24: string; tzLabel: string } {
+  const cityName = tz.split("/").pop()?.replace(/_/g, " ") || tz;
+  // Compute GMT offset
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "shortOffset" }).formatToParts(date);
+    const offsetPart = parts.find(p => p.type === "timeZoneName")?.value || "";
+    // offsetPart is like "GMT+1" or "GMT-5"
+    return {
+      time24: date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: tz }),
+      tzLabel: `${cityName}, ${offsetPart}`,
+    };
+  } catch {
+    return {
+      time24: date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false }),
+      tzLabel: cityName,
+    };
+  }
+}
+
+
   return createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -29,12 +48,9 @@ async function sendCancellationEmail(booking: any, timezone: string) {
   const dateStr = startDate.toLocaleDateString("en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
-  const timeStr = startDate.toLocaleTimeString("en-US", {
-    hour: "2-digit", minute: "2-digit", hour12: true,
-  });
-  const sessionName = booking.session_types?.name || "Session";
   const tz = timezone || "UTC";
-  const cityName = tz.split("/").pop()?.replace(/_/g, " ") || tz;
+  const { time24, tzLabel } = formatTimeWithTz(startDate, tz);
+  const sessionName = booking.session_types?.name || "Session";
 
   const siteUrl = Deno.env.get("SITE_URL") || "https://humanheart.life";
 
@@ -54,7 +70,7 @@ async function sendCancellationEmail(booking: any, timezone: string) {
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Session</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right; font-weight: 600;">${sessionName}</td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Date</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${dateStr}</td></tr>
-          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${timeStr} <span style="color: #7a7067; font-size: 12px;">${cityName}</span></td></tr>
+          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;"><strong>${time24}</strong> <span style="color: #7a7067; font-size: 12px;">${tzLabel}</span></td></tr>
         </table>
       </div>
       <div style="text-align: center; margin: 28px 0;">
@@ -228,13 +244,10 @@ Deno.serve(async (req) => {
       const dateStr = startDate.toLocaleDateString("en-US", {
         weekday: "long", year: "numeric", month: "long", day: "numeric",
       });
-      const timeStr = startDate.toLocaleTimeString("en-US", {
-        hour: "2-digit", minute: "2-digit", hour12: true,
-      });
       const sessionName = booking.session_types?.name || "Session";
       const duration = booking.session_types?.duration_minutes || 30;
       const tz = timezone || "UTC";
-      const cityName = tz.split("/").pop()?.replace(/_/g, " ") || tz;
+      const { time24, tzLabel } = formatTimeWithTz(startDate, tz);
 
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const siteUrl = Deno.env.get("SITE_URL") || "https://humanheart.life";
@@ -256,7 +269,7 @@ Deno.serve(async (req) => {
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Session</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right; font-weight: 600;">${sessionName}</td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Date</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${dateStr}</td></tr>
-          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${timeStr} <span style="color: #7a7067; font-size: 12px;">${cityName}</span></td></tr>
+          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;"><strong>${time24}</strong> <span style="color: #7a7067; font-size: 12px;">${tzLabel}</span></td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Duration</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${duration} min</td></tr>
         </table>
       </div>

@@ -109,6 +109,7 @@ export const bookingEN: BookingContent = {
   orText: " or ",
   back: "Back",
   next: "Next",
+  optional: "optional",
 };
 
 export const bookingRU: BookingContent = {

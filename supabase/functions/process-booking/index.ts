@@ -11,7 +11,26 @@ function generateJitsiLink(bookingId: string): string {
   return `https://meet.jit.si/${roomName}`;
 }
 
-function getSupabase() {
+function formatTimeWithTz(date: Date, tz: string): { time24: string; tzLabel: string } {
+  const cityName = tz.split("/").pop()?.replace(/_/g, " ") || tz;
+  // Compute GMT offset
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "shortOffset" }).formatToParts(date);
+    const offsetPart = parts.find(p => p.type === "timeZoneName")?.value || "";
+    // offsetPart is like "GMT+1" or "GMT-5"
+    return {
+      time24: date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: tz }),
+      tzLabel: `${cityName}, ${offsetPart}`,
+    };
+  } catch {
+    return {
+      time24: date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false }),
+      tzLabel: cityName,
+    };
+  }
+}
+
+
   return createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!

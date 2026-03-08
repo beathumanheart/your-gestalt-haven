@@ -58,8 +58,6 @@ const DateTimeSelector = ({
   const { availableDays } = useAvailableDates(displayMonth);
   const { slots, loading: loadingSlots } = useAvailableSlots(selectedDate, durationMinutes);
 
-  const timezone = useMemo(() => getUserTimezone(), []);
-
   const isDateAvailable = (date: Date) =>
     availableDays.has(format(date, "yyyy-MM-dd"));
 

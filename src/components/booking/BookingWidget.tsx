@@ -16,7 +16,6 @@ export interface BookingData {
   durationMinutes: number;
   date: Date;
   timeSlot: string; // HH:mm
-  timezone: string;
   clientName: string;
   clientEmail: string;
   notes: string;

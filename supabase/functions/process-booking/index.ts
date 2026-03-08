@@ -99,9 +99,8 @@ Deno.serve(async (req) => {
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Session</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right; font-weight: 600;">${sessionName}</td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Date</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${dateStr}</td></tr>
-          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${timeStr}</td></tr>
+          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${timeStr} <span style="color: #7a7067; font-size: 12px;">(${tz.replace(/_/g, " ")})</span></td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Duration</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${duration} min</td></tr>
-          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Timezone</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${tz.replace(/_/g, " ")}</td></tr>
         </table>
       </div>
       <div style="text-align: center; margin: 28px 0;">

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { format, addMinutes, parse } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
-import { CalendarDays, Clock, User, Mail, Globe, ChevronLeft } from "lucide-react";
+import { CalendarDays, Clock, User, Mail, ChevronLeft } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { BookingData } from "./BookingWidget";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
@@ -91,10 +91,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           <span className="flex items-center gap-1">
             <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             {booking.timeSlot} · {booking.durationMinutes} min
-          </span>
-          <span className="flex items-center gap-1">
-            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            {formatTimezone(timezone)}
+            <span className="text-muted-foreground/70 text-xs">({formatTimezone(timezone)})</span>
           </span>
         </div>
       </div>

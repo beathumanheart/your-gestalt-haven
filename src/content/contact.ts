@@ -36,7 +36,9 @@ export const contactEN: ContactContent = {
   telegramUrl: "https://t.me/humanheartbeat",
   signalLabel: "Signal",
   signalUrl: "https://signal.me/#eu/54EL7BMiWPJCsLFzC0PY4J6uP4Ds7eu4cL243diq7MXIk1-L8oJGyIcY05eV_gCN",
-  orText: " or ",
+  sessionLabel: "Session",
+  sessionId: "05e95070d5641f3eaefb760ff151e043e5cc27df1bed974b575d98c32e1cc56c2e",
+  orText: ", ",
   calendlyUrl: "https://calendly.com/beathumanheart/30min",
 };
 

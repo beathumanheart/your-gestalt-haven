@@ -80,35 +80,35 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
       {/* Summary */}
       <div className="bg-muted/50 rounded-xl p-4 space-y-2">
         <div className="flex items-center gap-2 text-sm font-body">
-          <User className="w-4 h-4 text-primary" />
+          <User className="w-4 h-4 text-primary shrink-0" />
           <span className="text-foreground font-medium">{booking.sessionTypeName}</span>
         </div>
-        <div className="flex items-center gap-4 text-sm font-body text-muted-foreground flex-wrap">
+        <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-body text-muted-foreground flex-wrap">
           <span className="flex items-center gap-1">
-            <CalendarDays className="w-4 h-4" />
+            <CalendarDays className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             {format(booking.date, "MMM d, yyyy")}
           </span>
           <span className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             {booking.timeSlot} · {booking.durationMinutes} min
           </span>
           <span className="flex items-center gap-1">
-            <Globe className="w-4 h-4" />
+            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             {formatTimezone(timezone)}
           </span>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="font-body text-sm text-foreground mb-1.5 block">{t.yourName}</label>
+          <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.yourName}</label>
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={booking.clientName || ""}
               onChange={(e) => onChange({ clientName: e.target.value })}
               placeholder={t.namePlaceholder}
-              className="pl-9"
+              className="pl-9 text-sm sm:text-base h-11 sm:h-12 font-body"
               maxLength={100}
             />
           </div>
@@ -116,7 +116,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
         </div>
 
         <div>
-          <label className="font-body text-sm text-foreground mb-1.5 block">{t.yourEmail}</label>
+          <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.yourEmail}</label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -124,7 +124,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
               value={booking.clientEmail || ""}
               onChange={(e) => onChange({ clientEmail: e.target.value })}
               placeholder={t.emailPlaceholder}
-              className="pl-9"
+              className="pl-9 text-sm sm:text-base h-11 sm:h-12 font-body"
               maxLength={255}
             />
           </div>
@@ -132,14 +132,14 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
         </div>
 
         <div>
-          <label className="font-body text-sm text-foreground mb-1.5 block">{t.notesLabel} <span className="text-muted-foreground font-normal">(optional)</span></label>
+          <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.notesLabel} <span className="text-muted-foreground font-normal">(optional)</span></label>
           <textarea
             value={booking.notes || ""}
             onChange={(e) => onChange({ notes: e.target.value })}
             placeholder={t.notesPlaceholder}
             maxLength={1000}
             rows={3}
-            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-none"
+            className="flex w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm sm:text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-none"
           />
         </div>
 
@@ -147,7 +147,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           <p className="text-destructive text-sm font-body">{generalError}</p>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pt-1">
           <button
             type="button"
             onClick={onBack}
@@ -159,7 +159,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           <button
             type="submit"
             disabled={submitting}
-            className="flex-1 btn-primary text-sm py-3 disabled:opacity-60"
+            className="flex-1 btn-primary text-sm sm:text-base py-3 disabled:opacity-60"
           >
             {submitting ? t.booking : t.bookButton}
           </button>

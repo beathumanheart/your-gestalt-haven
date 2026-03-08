@@ -142,10 +142,10 @@ const DateTimeSelector = ({
                 <button
                   key={slot.start}
                   onClick={() => onSelectTime(slot.start)}
-                  className={`py-2.5 px-3 rounded-lg border-2 font-body text-sm font-medium transition-all duration-200 ${
+                  className={`py-2.5 px-3 rounded-lg border font-body text-sm font-medium transition-all duration-200 ${
                     selectedTime === slot.start
-                      ? "border-primary bg-primary/10 text-foreground shadow-soft"
-                      : "border-border text-foreground hover:border-primary/40 hover:bg-muted/50"
+                      ? "bg-primary text-primary-foreground border-primary font-bold shadow-md"
+                      : "border-primary/40 bg-primary/15 text-foreground hover:bg-primary/25"
                   }`}
                 >
                   {slot.start}

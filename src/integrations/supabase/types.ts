@@ -75,6 +75,7 @@ export type Database = {
         Row: {
           client_email: string
           client_name: string
+          client_timezone: string | null
           created_at: string
           end_time: string
           google_meet_link: string | null
@@ -88,6 +89,7 @@ export type Database = {
         Insert: {
           client_email: string
           client_name: string
+          client_timezone?: string | null
           created_at?: string
           end_time: string
           google_meet_link?: string | null
@@ -101,6 +103,7 @@ export type Database = {
         Update: {
           client_email?: string
           client_name?: string
+          client_timezone?: string | null
           created_at?: string
           end_time?: string
           google_meet_link?: string | null

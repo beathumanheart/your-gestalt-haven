@@ -223,7 +223,7 @@ async function sendCancellationEmails(booking: any, timezone: string) {
   return clientOk;
 }
 
-async function handleCancel(bookingId: string, timezone: string) {
+async function handleCancel(bookingId: string, _timezone: string) {
   const supabase = getSupabase();
 
   const { data: booking, error: fetchErr } = await supabase
@@ -242,7 +242,8 @@ async function handleCancel(bookingId: string, timezone: string) {
 
   if (cancelError) return { success: false, error: "Failed to cancel" };
 
-  const emailSent = await sendCancellationEmails(booking, timezone);
+  // Use stored timezone from booking, not the cancel request
+  const emailSent = await sendCancellationEmails(booking, booking.client_timezone || _timezone);
   return { success: true, emailSent };
 }
 
@@ -314,6 +315,7 @@ Deno.serve(async (req) => {
         client_name: clientName, client_email: clientEmail,
         start_time: startTime, end_time: endTime,
         notes: notes || null, status: "confirmed",
+        client_timezone: timezone || "UTC",
       })
       .select("*, session_types(name, duration_minutes)")
       .single();

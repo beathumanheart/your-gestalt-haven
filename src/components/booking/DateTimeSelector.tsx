@@ -4,16 +4,19 @@ import { cn } from "@/lib/utils";
 import { useAvailableDates } from "@/hooks/useAvailableDates";
 import { useAvailableSlots } from "@/hooks/useAvailability";
 import { format } from "date-fns";
-import { Clock, Globe } from "lucide-react";
+import { Clock } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
+import TimezoneSelector from "./TimezoneSelector";
 
 interface Props {
   selectedDate?: Date;
   selectedTime?: string;
   durationMinutes: number;
+  timezone: string;
   t: BookingContent;
   onSelectDate: (date: Date) => void;
   onSelectTime: (slot: string) => void;
+  onTimezoneChange: (tz: string) => void;
 }
 
 export function getUserTimezone(): string {

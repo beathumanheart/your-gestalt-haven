@@ -21,6 +21,8 @@ export interface BookingContent {
   selectTime: string;
   noSlots: string;
   timezone: string;
+  availableLabel: string;
+  unavailableLabel: string;
   // Form
   yourName: string;
   yourEmail: string;
@@ -40,6 +42,8 @@ export interface BookingContent {
   confirmEmail: string;
   confirmMeetLink: string;
   bookAnother: string;
+  cancelBooking: string;
+  cancelledSuccess: string;
   // Errors
   errorGeneral: string;
   errorNameRequired: string;
@@ -71,11 +75,13 @@ export const bookingEN: BookingContent = {
   selectTime: "Choose a time",
   noSlots: "No available times on this date. Please try another day.",
   timezone: "Timezone",
+  availableLabel: "Available",
+  unavailableLabel: "Unavailable",
   yourName: "Your name",
   yourEmail: "Your email",
-  namePlaceholder: "Full name",
+  namePlaceholder: "Preferred name",
   emailPlaceholder: "email@example.com",
-  notesLabel: "Your enquiry or expectations (optional)",
+  notesLabel: "Your enquiry",
   notesPlaceholder: "Anything you'd like to share before our session...",
   bookButton: "Confirm Booking",
   booking: "Booking...",
@@ -88,6 +94,8 @@ export const bookingEN: BookingContent = {
   confirmEmail: "Confirmation sent to",
   confirmMeetLink: "Join Video Session",
   bookAnother: "Book another session",
+  cancelBooking: "Cancel booking",
+  cancelledSuccess: "Booking cancelled successfully.",
   errorGeneral: "Something went wrong. Please try again.",
   errorNameRequired: "Name is required",
   errorEmailRequired: "Email is required",
@@ -116,11 +124,13 @@ export const bookingRU: BookingContent = {
   selectTime: "Выберите время",
   noSlots: "Нет свободных слотов на эту дату. Попробуйте другой день.",
   timezone: "Часовой пояс",
+  availableLabel: "Доступно",
+  unavailableLabel: "Недоступно",
   yourName: "Ваше имя",
   yourEmail: "Ваш email",
-  namePlaceholder: "Полное имя",
+  namePlaceholder: "Предпочитаемое имя",
   emailPlaceholder: "email@example.com",
-  notesLabel: "Ваш запрос или ожидания (необязательно)",
+  notesLabel: "Ваш запрос",
   notesPlaceholder: "Что-нибудь, чем хотите поделиться до сессии...",
   bookButton: "Подтвердить запись",
   booking: "Запись...",
@@ -133,6 +143,8 @@ export const bookingRU: BookingContent = {
   confirmEmail: "Подтверждение отправлено на",
   confirmMeetLink: "Присоединиться к видеосессии",
   bookAnother: "Записаться ещё раз",
+  cancelBooking: "Отменить запись",
+  cancelledSuccess: "Запись успешно отменена.",
   errorGeneral: "Что-то пошло не так. Попробуйте ещё раз.",
   errorNameRequired: "Имя обязательно",
   errorEmailRequired: "Email обязателен",

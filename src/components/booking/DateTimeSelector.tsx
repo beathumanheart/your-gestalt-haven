@@ -16,7 +16,7 @@ interface Props {
   onSelectTime: (slot: string) => void;
 }
 
-function getUserTimezone(): string {
+export function getUserTimezone(): string {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   } catch {
@@ -24,7 +24,7 @@ function getUserTimezone(): string {
   }
 }
 
-function formatTimezone(tz: string): string {
+export function formatTimezone(tz: string): string {
   try {
     const offset = new Intl.DateTimeFormat("en", {
       timeZone: tz,
@@ -76,18 +76,18 @@ const DateTimeSelector = ({
         <span>{t.timezone}: {formatTimezone(timezone)}</span>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Calendar */}
-        <div className="flex-shrink-0">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+        {/* Calendar — fixed width, no shrink */}
+        <div className="flex-shrink-0 w-full sm:w-auto">
           <p className="font-body text-sm text-muted-foreground mb-3">{t.selectDate}</p>
           <div className="flex items-center gap-4 mb-3">
             <span className="flex items-center gap-1.5 text-xs font-body text-muted-foreground">
               <span className="w-3 h-3 rounded-full bg-primary/20 border border-primary/40 inline-block" />
-              Available
+              {t.availableLabel}
             </span>
             <span className="flex items-center gap-1.5 text-xs font-body text-muted-foreground">
               <span className="w-3 h-3 rounded-full bg-muted inline-block" />
-              Unavailable
+              {t.unavailableLabel}
             </span>
           </div>
           <Calendar
@@ -109,7 +109,7 @@ const DateTimeSelector = ({
           />
         </div>
 
-        {/* Time slots */}
+        {/* Time slots — fills remaining space, scrollable */}
         <div className="flex-1 min-w-0">
           <p className="font-body text-sm text-muted-foreground mb-3">{t.selectTime}</p>
 

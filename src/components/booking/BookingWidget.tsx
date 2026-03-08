@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { bookingEN, bookingRU } from "@/content/booking";
 import { useSessionTypes } from "@/hooks/useAvailability";
+import { supabase } from "@/integrations/supabase/client";
 import SessionTypeSelector from "./SessionTypeSelector";
 import DateTimeSelector from "./DateTimeSelector";
 import BookingForm from "./BookingForm";
 import BookingConfirmation from "./BookingConfirmation";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { toast } from "sonner";
 
 export interface BookingData {
   sessionTypeId: string;
@@ -30,6 +32,7 @@ const BookingWidget = () => {
   const [step, setStep] = useState<Step>("session");
   const [booking, setBooking] = useState<Partial<BookingData>>({});
   const [confirmed, setConfirmed] = useState<any>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   const stepIndex = STEPS.indexOf(step);
   const stepLabels = [t.stepSession, t.stepDateTime, t.stepDetails];
@@ -52,12 +55,33 @@ const BookingWidget = () => {
     if (idx > 0) setStep(STEPS[idx - 1]);
   };
 
+  const handleCancel = async () => {
+    if (!confirmed?.id) return;
+    setCancelling(true);
+    try {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: "cancelled" })
+        .eq("id", confirmed.id);
+      if (error) throw error;
+      toast.success(t.cancelledSuccess);
+      setConfirmed(null);
+      setBooking({});
+      setStep("session");
+    } catch (err) {
+      console.error("Cancel error:", err);
+      toast.error(t.errorGeneral);
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   if (confirmed) {
     return <BookingConfirmation booking={confirmed} t={t} onReset={() => {
       setConfirmed(null);
       setBooking({});
       setStep("session");
-    }} />;
+    }} onCancel={handleCancel} />;
   }
 
   return (

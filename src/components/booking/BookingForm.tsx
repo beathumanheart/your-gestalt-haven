@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { format, addMinutes, parse } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
-import { CalendarDays, Clock, User, Mail, Globe } from "lucide-react";
+import { CalendarDays, Clock, User, Mail, Globe, ChevronLeft } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { BookingData } from "./BookingWidget";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
@@ -12,9 +12,10 @@ interface Props {
   t: BookingContent;
   onBooked: (result: any) => void;
   onChange: (fields: Partial<BookingData>) => void;
+  onBack: () => void;
 }
 
-const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
+const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState("");
@@ -146,13 +147,23 @@ const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
           <p className="text-destructive text-sm font-body">{generalError}</p>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full btn-primary text-sm py-3 disabled:opacity-60"
-        >
-          {submitting ? t.booking : t.bookButton}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center gap-1 font-body text-sm text-muted-foreground hover:text-foreground transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            {t.back}
+          </button>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="flex-1 btn-primary text-sm py-3 disabled:opacity-60"
+          >
+            {submitting ? t.booking : t.bookButton}
+          </button>
+        </div>
       </form>
     </div>
   );

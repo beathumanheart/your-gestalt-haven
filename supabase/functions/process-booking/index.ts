@@ -391,7 +391,7 @@ Deno.serve(async (req) => {
 </body></html>`;
 
       const icsContent = generateIcs(booking, meetLink, sessionName);
-      const icsBase64 = btoa(icsContent);
+      const icsBase64 = btoa(unescape(encodeURIComponent(icsContent)));
 
       try {
         const [clientOk, therapistOk] = await Promise.all([

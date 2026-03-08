@@ -31,8 +31,9 @@ export function formatTimezone(tz: string): string {
       timeZoneName: "shortOffset",
     })
       .formatToParts(new Date())
-      .find((p) => p.type === "timeZoneName")?.value;
-    return `${tz.replace(/_/g, " ")} (${offset || ""})`;
+      .find((p) => p.type === "timeZoneName")?.value || "";
+    const city = tz.split("/").pop()?.replace(/_/g, " ") || tz;
+    return `${city}, ${offset}`;
   } catch {
     return tz;
   }

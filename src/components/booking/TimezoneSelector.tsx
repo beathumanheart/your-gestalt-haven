@@ -52,7 +52,7 @@ const COMMON_TIMEZONES = [
 
 function getAllTimezones(): string[] {
   try {
-    return Intl.supportedValuesOf("timeZone");
+    return (Intl as any).supportedValuesOf("timeZone") as string[];
   } catch {
     return COMMON_TIMEZONES;
   }

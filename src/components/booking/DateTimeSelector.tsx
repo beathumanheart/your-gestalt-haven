@@ -75,11 +75,8 @@ const DateTimeSelector = ({
 
   return (
     <div className="space-y-4">
-      {/* Timezone display */}
-      <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
-        <Globe className="w-3.5 h-3.5" />
-        <span>{t.timezone}: {formatTimezone(timezone)}</span>
-      </div>
+      {/* Timezone dropdown */}
+      <TimezoneSelector value={timezone} onChange={onTimezoneChange} />
 
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
         {/* Calendar — fixed width, no shrink */}

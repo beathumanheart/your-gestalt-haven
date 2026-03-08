@@ -145,9 +145,11 @@ const BookingWidget = () => {
             selectedDate={booking.date}
             selectedTime={booking.timeSlot}
             durationMinutes={booking.durationMinutes || 30}
+            timezone={booking.timezone || initialTz}
             t={t}
             onSelectDate={(d) => setBooking({ ...booking, date: d, timeSlot: undefined })}
             onSelectTime={(slot) => setBooking({ ...booking, timeSlot: slot })}
+            onTimezoneChange={(tz) => setBooking({ ...booking, timezone: tz, timeSlot: undefined })}
           />
         )}
 

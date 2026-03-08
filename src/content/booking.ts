@@ -55,6 +55,8 @@ export interface BookingContent {
   telegramUrl: string;
   signalLabel: string;
   signalUrl: string;
+  sessionLabel: string;
+  sessionUrl: string;
   orText: string;
   // Navigation
   back: string;

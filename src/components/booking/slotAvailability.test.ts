@@ -232,12 +232,12 @@ describe("generateSlots – slot availability logic", () => {
 });
 
 describe("formatTimezone", () => {
-  it("replaces underscores and includes offset", () => {
-    // Just test the pure function logic
+  it("shows city name and offset without brackets", () => {
     const tz = "America/New_York";
     const formatted = formatTimezoneTestable(tz);
-    expect(formatted).toContain("America/New York");
-    expect(formatted).toMatch(/\(.*\)/);
+    expect(formatted).toContain("New York");
+    expect(formatted).toMatch(/GMT[+-]\d/);
+    expect(formatted).not.toContain("(");
   });
 
   it("handles simple timezone", () => {
@@ -253,8 +253,9 @@ function formatTimezoneTestable(tz: string): string {
       timeZoneName: "shortOffset",
     })
       .formatToParts(new Date())
-      .find((p) => p.type === "timeZoneName")?.value;
-    return `${tz.replace(/_/g, " ")} (${offset || ""})`;
+      .find((p) => p.type === "timeZoneName")?.value || "";
+    const city = tz.split("/").pop()?.replace(/_/g, " ") || tz;
+    return `${city}, ${offset}`;
   } catch {
     return tz;
   }

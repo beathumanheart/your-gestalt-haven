@@ -162,6 +162,7 @@ Deno.serve(async (req) => {
       const url = new URL(req.url);
       const action = url.searchParams.get("action");
       const id = url.searchParams.get("id");
+      const redirect = url.searchParams.get("redirect") || "https://humanheart.life";
       
       if (action === "cancel" && id) {
         try {
@@ -169,21 +170,22 @@ Deno.serve(async (req) => {
           const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
           const supabase = createClient(supabaseUrl, serviceRoleKey);
           
-          await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
+          const { error: cancelError } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
           
-          return new Response(`
-<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Booking Cancelled</title></head>
-<body style="font-family: Georgia, serif; background: #faf8f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;">
-  <div style="background: white; border-radius: 16px; padding: 48px; text-align: center; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-    <h1 style="color: #4a4035; font-size: 24px; font-weight: 400;">Booking Cancelled</h1>
-    <p style="color: #7a7067; font-size: 16px;">Your booking has been successfully cancelled.</p>
-  </div>
-</body></html>`, {
-            headers: { ...corsHeaders, "Content-Type": "text/html" },
+          const redirectUrl = cancelError
+            ? `${redirect}/en/booking-cancelled?success=false`
+            : `${redirect}/en/booking-cancelled?success=true`;
+          
+          return new Response(null, {
+            status: 302,
+            headers: { ...corsHeaders, Location: redirectUrl },
           });
         } catch (cancelErr) {
           console.error("Cancel error:", cancelErr);
+          return new Response(null, {
+            status: 302,
+            headers: { ...corsHeaders, Location: `${redirect}/en/booking-cancelled?success=false` },
+          });
         }
       }
     }

@@ -1,37 +1,17 @@
 import { useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarDays, Clock, Mail, Video, CheckCircle, Globe } from "lucide-react";
+import { CalendarDays, Clock, Mail, Video, CheckCircle, Globe, XCircle } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
+import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
 
 interface Props {
   booking: any;
   t: BookingContent;
   onReset: () => void;
+  onCancel: () => void;
 }
 
-function getUserTimezone(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
-  } catch {
-    return "UTC";
-  }
-}
-
-function formatTimezone(tz: string): string {
-  try {
-    const offset = new Intl.DateTimeFormat("en", {
-      timeZone: tz,
-      timeZoneName: "shortOffset",
-    })
-      .formatToParts(new Date())
-      .find((p) => p.type === "timeZoneName")?.value;
-    return `${tz.replace(/_/g, " ")} (${offset || ""})`;
-  } catch {
-    return tz;
-  }
-}
-
-const BookingConfirmation = ({ booking, t, onReset }: Props) => {
+const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
   const startDate = parseISO(booking.start_time);
   const timezone = useMemo(() => getUserTimezone(), []);
 
@@ -95,9 +75,15 @@ const BookingConfirmation = ({ booking, t, onReset }: Props) => {
         )}
       </div>
 
-      <button onClick={onReset} className="font-body text-sm text-primary hover:underline underline-offset-2">
-        {t.bookAnother}
-      </button>
+      <div className="flex items-center justify-center gap-6">
+        <button onClick={onReset} className="font-body text-sm text-primary hover:underline underline-offset-2">
+          {t.bookAnother}
+        </button>
+        <button onClick={onCancel} className="font-body text-sm text-destructive hover:underline underline-offset-2 flex items-center gap-1">
+          <XCircle className="w-3.5 h-3.5" />
+          {t.cancelBooking}
+        </button>
+      </div>
     </div>
   );
 };

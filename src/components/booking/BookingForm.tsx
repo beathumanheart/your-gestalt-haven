@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format, addMinutes, parse } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
-import { CalendarDays, Clock, User, Mail } from "lucide-react";
+import { CalendarDays, Clock, User, Mail, Globe } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { BookingData } from "./BookingWidget";
+import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
 
 interface Props {
   booking: BookingData;
@@ -17,6 +18,7 @@ const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState("");
+  const timezone = useMemo(() => getUserTimezone(), []);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -44,7 +46,6 @@ const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
       );
       const endTime = format(endDate, "yyyy-MM-dd'T'HH:mm:ss");
 
-      // Use edge function to create booking (bypasses RLS select issue)
       const { data: result, error } = await supabase.functions.invoke("process-booking", {
         body: {
           sessionTypeId: booking.sessionTypeId,
@@ -53,6 +54,7 @@ const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
           startTime,
           endTime,
           notes: booking.notes?.trim() || null,
+          timezone,
         },
       });
 
@@ -80,7 +82,7 @@ const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
           <User className="w-4 h-4 text-primary" />
           <span className="text-foreground font-medium">{booking.sessionTypeName}</span>
         </div>
-        <div className="flex items-center gap-4 text-sm font-body text-muted-foreground">
+        <div className="flex items-center gap-4 text-sm font-body text-muted-foreground flex-wrap">
           <span className="flex items-center gap-1">
             <CalendarDays className="w-4 h-4" />
             {format(booking.date, "MMM d, yyyy")}
@@ -88,6 +90,10 @@ const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
           <span className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
             {booking.timeSlot} · {booking.durationMinutes} min
+          </span>
+          <span className="flex items-center gap-1">
+            <Globe className="w-4 h-4" />
+            {formatTimezone(timezone)}
           </span>
         </div>
       </div>

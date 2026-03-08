@@ -154,6 +154,7 @@ const BookingWidget = () => {
             t={t}
             onBooked={(result) => setConfirmed(result)}
             onChange={(fields) => setBooking({ ...booking, ...fields })}
+            onBack={goBack}
           />
         )}
       </div>

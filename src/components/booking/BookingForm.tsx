@@ -147,13 +147,23 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           <p className="text-destructive text-sm font-body">{generalError}</p>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full btn-primary text-sm py-3 disabled:opacity-60"
-        >
-          {submitting ? t.booking : t.bookButton}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center gap-1 font-body text-sm text-muted-foreground hover:text-foreground transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            {t.back}
+          </button>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="flex-1 btn-primary text-sm py-3 disabled:opacity-60"
+          >
+            {submitting ? t.booking : t.bookButton}
+          </button>
+        </div>
       </form>
     </div>
   );

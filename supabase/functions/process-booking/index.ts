@@ -315,6 +315,7 @@ Deno.serve(async (req) => {
         client_name: clientName, client_email: clientEmail,
         start_time: startTime, end_time: endTime,
         notes: notes || null, status: "confirmed",
+        client_timezone: timezone || "UTC",
       })
       .select("*, session_types(name, duration_minutes)")
       .single();

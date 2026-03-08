@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { sessionTypeId, clientName, clientEmail, startTime, endTime, notes } = body;
+    const { sessionTypeId, clientName, clientEmail, startTime, endTime, notes, timezone } = body;
 
     if (!sessionTypeId || !clientName || !clientEmail || !startTime || !endTime) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
@@ -77,31 +77,40 @@ Deno.serve(async (req) => {
       });
       const sessionName = booking.session_types?.name || "Session";
       const duration = booking.session_types?.duration_minutes || 30;
+      const tz = timezone || "UTC";
+
+      // Cancel link — points to edge function
+      const cancelUrl = `${supabaseUrl}/functions/v1/process-booking?action=cancel&id=${booking.id}`;
 
       const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
-<body style="font-family: Georgia, 'Times New Roman', serif; background: #faf8f5; margin: 0; padding: 40px 20px;">
-  <div style="max-width: 560px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+<body style="font-family: Georgia, 'Times New Roman', serif; background: #ffffff; margin: 0; padding: 40px 20px;">
+  <div style="max-width: 560px; margin: 0 auto; background: #faf8f5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
     <div style="background: linear-gradient(135deg, #4a7c5f 0%, #5a9470 100%); padding: 32px; text-align: center;">
       <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 400;">Booking Confirmed ✓</h1>
     </div>
     <div style="padding: 32px;">
       <p style="color: #4a4035; font-size: 16px; line-height: 1.6;">Hi <strong>${booking.client_name}</strong>,</p>
       <p style="color: #4a4035; font-size: 16px; line-height: 1.6;">Your session has been confirmed. Here are the details:</p>
-      <div style="background: #f5f2ee; border-radius: 12px; padding: 20px; margin: 24px 0;">
+      <div style="background: #f0ede8; border-radius: 12px; padding: 20px; margin: 24px 0;">
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Session</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right; font-weight: 600;">${sessionName}</td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Date</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${dateStr}</td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${timeStr}</td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Duration</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${duration} min</td></tr>
+          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Timezone</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${tz.replace(/_/g, " ")}</td></tr>
         </table>
       </div>
       <div style="text-align: center; margin: 28px 0;">
         <a href="${meetLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join Video Session →</a>
       </div>
       <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5;">Save this link — you'll use it to join the session at the scheduled time.</p>
+      <hr style="border: none; border-top: 1px solid #e5e0da; margin: 24px 0;" />
+      <p style="color: #a09890; font-size: 12px; text-align: center; line-height: 1.5;">
+        Need to cancel? <a href="${cancelUrl}" style="color: #b04040; text-decoration: underline;">Cancel this booking</a>
+      </p>
     </div>
   </div>
 </body>
@@ -145,6 +154,37 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
+    // Handle GET cancellation requests
+    if (req.method === "GET") {
+      const url = new URL(req.url);
+      const action = url.searchParams.get("action");
+      const id = url.searchParams.get("id");
+      
+      if (action === "cancel" && id) {
+        try {
+          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+          const supabase = createClient(supabaseUrl, serviceRoleKey);
+          
+          await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
+          
+          return new Response(`
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Booking Cancelled</title></head>
+<body style="font-family: Georgia, serif; background: #faf8f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;">
+  <div style="background: white; border-radius: 16px; padding: 48px; text-align: center; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+    <h1 style="color: #4a4035; font-size: 24px; font-weight: 400;">Booking Cancelled</h1>
+    <p style="color: #7a7067; font-size: 16px;">Your booking has been successfully cancelled.</p>
+  </div>
+</body></html>`, {
+            headers: { ...corsHeaders, "Content-Type": "text/html" },
+          });
+        } catch (cancelErr) {
+          console.error("Cancel error:", cancelErr);
+        }
+      }
+    }
+    
     console.error("process-booking error:", err);
     return new Response(JSON.stringify({ error: "Internal error" }), {
       status: 500,

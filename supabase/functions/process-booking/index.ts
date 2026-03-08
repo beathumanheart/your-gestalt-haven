@@ -70,7 +70,7 @@ async function sendCancellationEmail(booking: any, timezone: string) {
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Session</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right; font-weight: 600;">${sessionName}</td></tr>
           <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Date</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${dateStr}</td></tr>
-          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${timeStr} <span style="color: #7a7067; font-size: 12px;">${cityName}</span></td></tr>
+          <tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">Time</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;"><strong>${time24}</strong> <span style="color: #7a7067; font-size: 12px;">${tzLabel}</span></td></tr>
         </table>
       </div>
       <div style="text-align: center; margin: 28px 0;">

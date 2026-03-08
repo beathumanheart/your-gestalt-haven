@@ -79,7 +79,9 @@ const DateTimeSelector = ({
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
         {/* Calendar — fixed width, no shrink */}
         <div className="flex-shrink-0 w-full sm:w-auto">
-          <p className="font-body text-sm text-muted-foreground mb-3">{t.selectDate}</p>
+          <p className="font-body text-sm text-muted-foreground mb-3">
+            {selectedDate ? format(selectedDate, "EEEE, MMMM d, yyyy") : t.selectDate}
+          </p>
           <div className="flex items-center gap-4 mb-3">
             <span className="flex items-center gap-1.5 text-xs font-body text-muted-foreground">
               <span className="w-3 h-3 rounded-full bg-primary/20 border border-primary/40 inline-block" />

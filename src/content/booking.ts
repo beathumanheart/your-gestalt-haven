@@ -59,6 +59,7 @@ export interface BookingContent {
   // Navigation
   back: string;
   next: string;
+  optional: string;
 }
 
 export const bookingEN: BookingContent = {
@@ -108,6 +109,7 @@ export const bookingEN: BookingContent = {
   orText: " or ",
   back: "Back",
   next: "Next",
+  optional: "optional",
 };
 
 export const bookingRU: BookingContent = {
@@ -157,4 +159,5 @@ export const bookingRU: BookingContent = {
   orText: " или ",
   back: "Назад",
   next: "Далее",
+  optional: "необязательно",
 };

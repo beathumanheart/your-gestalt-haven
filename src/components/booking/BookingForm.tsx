@@ -132,7 +132,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
         </div>
 
         <div>
-          <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.notesLabel} <span className="text-muted-foreground font-normal">(optional)</span></label>
+          <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.notesLabel} <span className="text-muted-foreground font-normal">({t.optional})</span></label>
           <textarea
             value={booking.notes || ""}
             onChange={(e) => onChange({ notes: e.target.value })}

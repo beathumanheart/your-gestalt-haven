@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarDays, Clock, Mail, Video, CheckCircle, Globe, XCircle } from "lucide-react";
+import { CalendarDays, Clock, Mail, Video, CheckCircle, XCircle } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
 

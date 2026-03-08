@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { format, addMinutes, parse } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
-import { CalendarDays, Clock, User, Mail, Globe, ChevronLeft } from "lucide-react";
+import { CalendarDays, Clock, User, Mail, ChevronLeft } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { BookingData } from "./BookingWidget";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";

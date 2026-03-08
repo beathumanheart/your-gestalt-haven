@@ -17,6 +17,8 @@ export interface ContactContent {
   telegramUrl: string;
   signalLabel: string;
   signalUrl: string;
+  sessionLabel: string;
+  sessionId: string;
   orText: string;
   /** Calendly embed URL. */
   calendlyUrl: string;

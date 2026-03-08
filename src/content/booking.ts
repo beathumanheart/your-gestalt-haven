@@ -55,6 +55,8 @@ export interface BookingContent {
   telegramUrl: string;
   signalLabel: string;
   signalUrl: string;
+  sessionLabel: string;
+  sessionId: string;
   orText: string;
   // Navigation
   back: string;
@@ -106,7 +108,9 @@ export const bookingEN: BookingContent = {
   telegramUrl: "https://t.me/humanheartbeat",
   signalLabel: "Signal",
   signalUrl: "https://signal.me/#eu/54EL7BMiWPJCsLFzC0PY4J6uP4Ds7eu4cL243diq7MXIk1-L8oJGyIcY05eV_gCN",
-  orText: " or ",
+  sessionLabel: "Session",
+  sessionId: "05e95070d5641f3eaefb760ff151e043e5cc27df1bed974b575d98c32e1cc56c2e",
+  orText: ", ",
   back: "Back",
   next: "Next",
   optional: "optional",
@@ -156,7 +160,9 @@ export const bookingRU: BookingContent = {
   telegramUrl: "https://t.me/humanheartbeat",
   signalLabel: "Signal",
   signalUrl: "https://signal.me/#eu/54EL7BMiWPJCsLFzC0PY4J6uP4Ds7eu4cL243diq7MXIk1-L8oJGyIcY05eV_gCN",
-  orText: " или ",
+  sessionLabel: "Session",
+  sessionId: "05e95070d5641f3eaefb760ff151e043e5cc27df1bed974b575d98c32e1cc56c2e",
+  orText: ", ",
   back: "Назад",
   next: "Далее",
   optional: "необязательно",

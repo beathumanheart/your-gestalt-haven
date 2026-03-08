@@ -1,5 +1,4 @@
-import { useState, useMemo } from "react";
-import { getUserTimezone } from "./DateTimeSelector";
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { bookingEN, bookingRU } from "@/content/booking";
 import { useSessionTypes } from "@/hooks/useAvailability";
@@ -17,7 +16,6 @@ export interface BookingData {
   durationMinutes: number;
   date: Date;
   timeSlot: string; // HH:mm
-  timezone: string;
   clientName: string;
   clientEmail: string;
   notes: string;
@@ -32,8 +30,7 @@ const BookingWidget = () => {
   const { sessionTypes, loading: loadingTypes } = useSessionTypes();
 
   const [step, setStep] = useState<Step>("session");
-  const initialTz = useMemo(() => getUserTimezone(), []);
-  const [booking, setBooking] = useState<Partial<BookingData>>({ timezone: initialTz });
+  const [booking, setBooking] = useState<Partial<BookingData>>({});
   const [confirmed, setConfirmed] = useState<any>(null);
   const [cancelling, setCancelling] = useState(false);
 
@@ -145,11 +142,9 @@ const BookingWidget = () => {
             selectedDate={booking.date}
             selectedTime={booking.timeSlot}
             durationMinutes={booking.durationMinutes || 30}
-            timezone={booking.timezone || initialTz}
             t={t}
             onSelectDate={(d) => setBooking({ ...booking, date: d, timeSlot: undefined })}
             onSelectTime={(slot) => setBooking({ ...booking, timeSlot: slot })}
-            onTimezoneChange={(tz) => setBooking({ ...booking, timezone: tz, timeSlot: undefined })}
           />
         )}
 

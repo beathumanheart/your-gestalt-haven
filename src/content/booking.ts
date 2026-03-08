@@ -56,7 +56,7 @@ export interface BookingContent {
   signalLabel: string;
   signalUrl: string;
   sessionLabel: string;
-  sessionUrl: string;
+  sessionId: string;
   orText: string;
   // Navigation
   back: string;

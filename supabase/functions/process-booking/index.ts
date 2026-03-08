@@ -201,7 +201,7 @@ async function sendCancellationEmails(booking: any, timezone: string) {
 </body></html>`;
 
   const cancelIcs = generateCancelIcs(booking, sessionName);
-  const icsBase64 = btoa(cancelIcs);
+  const icsBase64 = btoa(unescape(encodeURIComponent(cancelIcs)));
 
   const subject = `Booking Cancelled: ${sessionName} on ${dateStr}`;
 

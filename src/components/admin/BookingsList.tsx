@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO } from "date-fns";
 import { CalendarDays, Mail, User, XCircle, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 
 const BookingsList = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -21,7 +22,22 @@ const BookingsList = () => {
   useEffect(() => { fetchBookings(); }, []);
 
   const updateStatus = async (id: string, status: string) => {
-    await supabase.from("bookings").update({ status }).eq("id", id);
+    if (status === "cancelled") {
+      // Route through edge function to send cancellation emails
+      try {
+        const { data: result, error } = await supabase.functions.invoke("process-booking", {
+          body: { action: "cancel", bookingId: id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+        });
+        if (error) throw error;
+        if (!result?.success) throw new Error(result?.error || "Cancel failed");
+        toast.success("Booking cancelled and notification sent");
+      } catch (err) {
+        console.error("Admin cancel error:", err);
+        toast.error("Failed to cancel booking");
+      }
+    } else {
+      await supabase.from("bookings").update({ status }).eq("id", id);
+    }
     fetchBookings();
   };
 

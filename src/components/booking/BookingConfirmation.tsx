@@ -38,7 +38,7 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
           <Clock className="w-4 h-4 text-primary shrink-0" />
           <span className="text-muted-foreground">{t.confirmTime}:</span>
           <span className="text-foreground font-medium ml-auto">
-            {format(startDate, "HH:mm")}
+            {format(startDate, "HH:mm")} <span className="text-muted-foreground font-normal text-xs">({formatTimezone(timezone)})</span>
           </span>
         </div>
         <div className="flex items-center gap-3 font-body text-sm">
@@ -46,13 +46,6 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
           <span className="text-muted-foreground">{t.confirmDuration}:</span>
           <span className="text-foreground font-medium ml-auto">
             {booking.durationMinutes} min
-          </span>
-        </div>
-        <div className="flex items-center gap-3 font-body text-sm">
-          <Globe className="w-4 h-4 text-primary shrink-0" />
-          <span className="text-muted-foreground">{t.confirmTimezone}:</span>
-          <span className="text-foreground font-medium ml-auto text-xs">
-            {formatTimezone(timezone)}
           </span>
         </div>
         <div className="flex items-center gap-3 font-body text-sm">

@@ -45,9 +45,11 @@ const DateTimeSelector = ({
   selectedDate,
   selectedTime,
   durationMinutes,
+  timezone,
   t,
   onSelectDate,
   onSelectTime,
+  onTimezoneChange,
 }: Props) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);

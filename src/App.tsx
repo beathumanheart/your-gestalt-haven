@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminResetPassword from "./pages/AdminResetPassword";
+import BookingCancelled from "./pages/BookingCancelled";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,14 @@ const App = () => (
             element={
               <LangLayout>
                 <Index />
+              </LangLayout>
+            }
+          />
+          <Route
+            path="/:lang/booking-cancelled"
+            element={
+              <LangLayout>
+                <BookingCancelled />
               </LangLayout>
             }
           />

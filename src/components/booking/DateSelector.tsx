@@ -56,7 +56,7 @@ const DateSelector = ({ selected, t, onSelect }: Props) => {
             unavailable: unavailableModifier,
           }}
           modifiersClassNames={{
-            available: "!bg-primary/10 !text-foreground font-medium hover:!bg-primary/20 border border-primary/30",
+            available: "!bg-primary/15 !text-foreground font-semibold hover:!bg-primary/25 border border-primary/40 rounded-lg",
             unavailable: "!text-muted-foreground/40",
           }}
           className={cn("p-3 pointer-events-auto rounded-xl border border-border")}

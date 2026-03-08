@@ -12,6 +12,7 @@ interface Props {
   t: BookingContent;
   onBooked: (result: any) => void;
   onChange: (fields: Partial<BookingData>) => void;
+  onBack: () => void;
 }
 
 const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {

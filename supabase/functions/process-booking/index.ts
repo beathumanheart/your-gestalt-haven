@@ -63,11 +63,11 @@ Deno.serve(async (req) => {
       .update({ google_meet_link: meetLink })
       .eq("id", booking.id);
 
-    // Send confirmation email via Resend
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    // Send confirmation email via Brevo
+    const brevoApiKey = Deno.env.get("BREVO_API_KEY");
     let emailSent = false;
 
-    if (resendApiKey) {
+    if (brevoApiKey) {
       const startDate = new Date(booking.start_time);
       const dateStr = startDate.toLocaleDateString("en-US", {
         weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -117,31 +117,33 @@ Deno.serve(async (req) => {
 </html>`;
 
       try {
-        const fromEmail = Deno.env.get("SENDER_EMAIL") || "noreply@resend.dev";
-        const res = await fetch("https://api.resend.com/emails", {
+        const senderEmail = Deno.env.get("SENDER_EMAIL") || "noreply@gestaltspace.com";
+        const senderName = Deno.env.get("SENDER_NAME") || "Gestalt Space";
+
+        const res = await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${resendApiKey}`,
+            "api-key": brevoApiKey,
           },
           body: JSON.stringify({
-            from: `Gestalt Space <${fromEmail}>`,
-            to: [booking.client_email],
+            sender: { name: senderName, email: senderEmail },
+            to: [{ email: booking.client_email, name: booking.client_name }],
             subject: `Booking Confirmed: ${sessionName} on ${dateStr}`,
-            html: emailHtml,
+            htmlContent: emailHtml,
           }),
         });
         if (res.ok) {
           emailSent = true;
           console.log("Confirmation email sent to", booking.client_email);
         } else {
-          console.error("Resend error:", await res.text());
+          console.error("Brevo error:", await res.text());
         }
       } catch (emailErr) {
         console.error("Email sending failed:", emailErr);
       }
     } else {
-      console.warn("RESEND_API_KEY not set — skipping email");
+      console.warn("BREVO_API_KEY not set — skipping email");
     }
 
     return new Response(

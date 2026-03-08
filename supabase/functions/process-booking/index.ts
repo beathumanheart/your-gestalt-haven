@@ -244,13 +244,10 @@ Deno.serve(async (req) => {
       const dateStr = startDate.toLocaleDateString("en-US", {
         weekday: "long", year: "numeric", month: "long", day: "numeric",
       });
-      const timeStr = startDate.toLocaleTimeString("en-US", {
-        hour: "2-digit", minute: "2-digit", hour12: true,
-      });
       const sessionName = booking.session_types?.name || "Session";
       const duration = booking.session_types?.duration_minutes || 30;
       const tz = timezone || "UTC";
-      const cityName = tz.split("/").pop()?.replace(/_/g, " ") || tz;
+      const { time24, tzLabel } = formatTimeWithTz(startDate, tz);
 
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const siteUrl = Deno.env.get("SITE_URL") || "https://humanheart.life";

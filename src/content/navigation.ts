@@ -39,7 +39,7 @@ export const navigationEN: NavigationContent = {
   footerContact: "Contact",
   footerOfferAgreement: "Offer Agreement",
   footerRights: "All rights reserved.",
-  footerEmail: "beathumanheart@gmail.com",
+  footerEmail: "be@humanheart.life",
 };
 
 export const navigationRU: NavigationContent = {

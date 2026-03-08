@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { format, addMinutes, parse } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState("");
-  const timezone = useMemo(() => getUserTimezone(), []);
+  const timezone = booking.timezone || getUserTimezone();
 
   const validate = () => {
     const errs: Record<string, string> = {};

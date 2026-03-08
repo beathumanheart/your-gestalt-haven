@@ -159,4 +159,5 @@ export const bookingRU: BookingContent = {
   orText: " или ",
   back: "Назад",
   next: "Далее",
+  optional: "необязательно",
 };

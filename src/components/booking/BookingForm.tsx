@@ -60,6 +60,10 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
       });
 
       if (error) throw error;
+      if (result?.error) {
+        setGeneralError(result.error.includes("no longer available") ? "This time slot is no longer available. Please go back and choose another." : result.error);
+        return;
+      }
 
       onBooked({
         ...result?.booking,

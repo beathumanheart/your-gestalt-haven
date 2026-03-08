@@ -68,17 +68,11 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
       windows = (rules || []).map((r) => ({ start: r.start_time, end: r.end_time }));
     }
 
-    // Fetch existing bookings for this date
-    const dayStart = `${dateStr}T00:00:00`;
-    const dayEnd = `${dateStr}T23:59:59`;
+    // Fetch existing bookings for this date using security definer function
     const { data: bookings } = await supabase
-      .from("bookings")
-      .select("start_time, end_time")
-      .gte("start_time", dayStart)
-      .lte("start_time", dayEnd)
-      .neq("status", "cancelled");
+      .rpc("get_booked_slots", { target_date: dateStr });
 
-    const bookedSlots = (bookings || []).map((b) => ({
+    const bookedSlots = (bookings || []).map((b: any) => ({
       start: parseISO(b.start_time),
       end: parseISO(b.end_time),
     }));

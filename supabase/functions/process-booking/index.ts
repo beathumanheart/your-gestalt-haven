@@ -80,7 +80,8 @@ Deno.serve(async (req) => {
       const tz = timezone || "UTC";
 
       // Cancel link — points to edge function
-      const cancelUrl = `${supabaseUrl}/functions/v1/process-booking?action=cancel&id=${booking.id}`;
+      const siteUrl = Deno.env.get("SITE_URL") || "https://humanheart.life";
+      const cancelUrl = `${supabaseUrl}/functions/v1/process-booking?action=cancel&id=${booking.id}&redirect=${encodeURIComponent(siteUrl)}`;
 
       const emailHtml = `
 <!DOCTYPE html>

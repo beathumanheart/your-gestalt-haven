@@ -56,5 +56,5 @@ export const navigationRU: NavigationContent = {
   footerContact: "Контакты",
   footerOfferAgreement: "Договор оферты",
   footerRights: "Все права защищены.",
-  footerEmail: "beathumanheart@gmail.com",
+  footerEmail: "be@humanheart.life",
 };

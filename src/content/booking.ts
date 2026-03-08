@@ -59,6 +59,7 @@ export interface BookingContent {
   // Navigation
   back: string;
   next: string;
+  optional: string;
 }
 
 export const bookingEN: BookingContent = {

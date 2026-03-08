@@ -91,7 +91,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           <span className="flex items-center gap-1">
             <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             {booking.timeSlot} · {booking.durationMinutes} min
-            <span className="text-muted-foreground/70 text-xs">({formatTimezone(timezone)})</span>
+            <span className="text-muted-foreground/70 text-xs">{formatTimezone(timezone)}</span>
           </span>
         </div>
       </div>

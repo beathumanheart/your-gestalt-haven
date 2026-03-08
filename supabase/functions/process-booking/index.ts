@@ -31,6 +31,22 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
+    // Check for overlapping bookings (server-side validation)
+    const { data: existing } = await supabase
+      .from("bookings")
+      .select("id")
+      .neq("status", "cancelled")
+      .lt("start_time", endTime)
+      .gt("end_time", startTime)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      return new Response(JSON.stringify({ error: "This time slot is no longer available" }), {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Create the booking using service role (bypasses RLS)
     const { data: booking, error: insertError } = await supabase
       .from("bookings")

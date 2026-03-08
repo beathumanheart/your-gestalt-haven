@@ -31,8 +31,7 @@ const BookingWidget = () => {
   const { sessionTypes, loading: loadingTypes } = useSessionTypes();
 
   const [step, setStep] = useState<Step>("session");
-  const initialTz = useMemo(() => getUserTimezone(), []);
-  const [booking, setBooking] = useState<Partial<BookingData>>({ timezone: initialTz });
+  const [booking, setBooking] = useState<Partial<BookingData>>({});
   const [confirmed, setConfirmed] = useState<any>(null);
   const [cancelling, setCancelling] = useState(false);
 

@@ -15,7 +15,7 @@ interface Props {
   onBack: () => void;
 }
 
-const BookingForm = ({ booking, t, onBooked, onChange }: Props) => {
+const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState("");

@@ -117,8 +117,8 @@ Deno.serve(async (req) => {
 </html>`;
 
       try {
-        const senderEmail = Deno.env.get("SENDER_EMAIL") || "noreply@gestaltspace.com";
-        const senderName = Deno.env.get("SENDER_NAME") || "Gestalt Space";
+        const senderEmail = Deno.env.get("SENDER_EMAIL") || "be@humanheart.life";
+        const senderName = Deno.env.get("SENDER_NAME") || "Human Heart Beat";
 
         const res = await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",

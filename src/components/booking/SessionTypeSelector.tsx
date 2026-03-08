@@ -50,18 +50,10 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, onSelect }: P
                   <p className="font-body text-sm text-muted-foreground mt-1">{st.description}</p>
                 )}
               </div>
-              <div className="flex items-center gap-3 ml-4">
-                <span className="flex items-center gap-1 font-body text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  {st.duration_minutes} {t.minutes}
-                </span>
-                {st.price != null && st.price > 0 && (
-                  <span className="font-body text-sm font-medium text-foreground">
-                    {st.currency === "EUR" ? "€" : st.currency === "RUB" ? "₽" : "$"}
-                    {st.price}
-                  </span>
-                )}
-              </div>
+              <span className="flex items-center gap-1 font-body text-sm text-muted-foreground ml-4">
+                <Clock className="w-4 h-4" />
+                {st.duration_minutes} {t.minutes}
+              </span>
             </div>
           </button>
         ))}

@@ -128,8 +128,8 @@ const SessionTypeManager = () => {
                       className="text-sm"
                     />
                   </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1">
+                    <div className="flex gap-2 flex-wrap">
+                    <div className="w-24">
                       <label className="font-body text-xs text-muted-foreground mb-1 block">Duration (min)</label>
                       <Input
                         type="number"
@@ -140,16 +140,52 @@ const SessionTypeManager = () => {
                         className="text-sm"
                       />
                     </div>
-                    <div className="w-24">
-                      <label className="font-body text-xs text-muted-foreground mb-1 block">Price</label>
-                      <Input
-                        type="number"
-                        value={t.price ?? ""}
-                        onChange={(e) => updateType(i, { price: e.target.value ? Number(e.target.value) : null })}
-                        placeholder="0"
-                        className="text-sm"
-                      />
+                    <div className="w-28">
+                      <label className="font-body text-xs text-muted-foreground mb-1 block">Pricing</label>
+                      <select
+                        value={t.pricing_type}
+                        onChange={(e) => updateType(i, { pricing_type: e.target.value as 'fixed' | 'solidarity' })}
+                        className="font-body text-sm bg-background border border-input rounded-md px-2 py-2 w-full h-10"
+                      >
+                        <option value="fixed">Fixed</option>
+                        <option value="solidarity">Solidarity</option>
+                      </select>
                     </div>
+                    {t.pricing_type === 'fixed' ? (
+                      <div className="w-24">
+                        <label className="font-body text-xs text-muted-foreground mb-1 block">Price</label>
+                        <Input
+                          type="number"
+                          value={t.price ?? ""}
+                          onChange={(e) => updateType(i, { price: e.target.value ? Number(e.target.value) : null })}
+                          placeholder="0"
+                          className="text-sm"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="w-20">
+                          <label className="font-body text-xs text-muted-foreground mb-1 block">Min</label>
+                          <Input
+                            type="number"
+                            value={t.min_price ?? ""}
+                            onChange={(e) => updateType(i, { min_price: e.target.value ? Number(e.target.value) : null })}
+                            placeholder="0"
+                            className="text-sm"
+                          />
+                        </div>
+                        <div className="w-20">
+                          <label className="font-body text-xs text-muted-foreground mb-1 block">Max</label>
+                          <Input
+                            type="number"
+                            value={t.max_price ?? ""}
+                            onChange={(e) => updateType(i, { max_price: e.target.value ? Number(e.target.value) : null })}
+                            placeholder="0"
+                            className="text-sm"
+                          />
+                        </div>
+                      </>
+                    )}
                     <div className="w-20">
                       <label className="font-body text-xs text-muted-foreground mb-1 block">Currency</label>
                       <select

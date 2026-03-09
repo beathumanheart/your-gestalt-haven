@@ -9,6 +9,7 @@ interface SessionType {
   description: string;
   duration_minutes: number;
   price: number | null;
+  show_price: boolean;
   currency: string;
   is_active: boolean;
   sort_order: number;
@@ -26,7 +27,7 @@ const SessionTypeManager = () => {
       .from("session_types")
       .select("*")
       .order("sort_order");
-    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD" })));
+    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true })));
     setLoading(false);
   };
 
@@ -38,6 +39,7 @@ const SessionTypeManager = () => {
       description: "",
       duration_minutes: 50,
       price: null,
+      show_price: true,
       currency: "USD",
       is_active: true,
       sort_order: types.length,
@@ -68,6 +70,7 @@ const SessionTypeManager = () => {
         price: t.price,
         currency: t.currency,
         is_active: t.is_active,
+        show_price: t.show_price,
         sort_order: i,
       };
       if (t.id && !t.isNew) {
@@ -161,6 +164,15 @@ const SessionTypeManager = () => {
                       className="rounded"
                     />
                     Active
+                  </label>
+                  <label className="flex items-center gap-1.5 font-body text-xs text-muted-foreground cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={t.show_price}
+                      onChange={(e) => updateType(i, { show_price: e.target.checked })}
+                      className="rounded"
+                    />
+                    Show Price
                   </label>
                   <button
                     onClick={() => removeType(i)}

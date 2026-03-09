@@ -70,6 +70,7 @@ const SessionTypeManager = () => {
         price: t.price,
         currency: t.currency,
         is_active: t.is_active,
+        show_price: t.show_price,
         sort_order: i,
       };
       if (t.id && !t.isNew) {

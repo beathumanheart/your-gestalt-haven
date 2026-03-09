@@ -99,7 +99,8 @@ async function generateJaasJwtToken(
   };
 
   try {
-    return await signJwt(payload, privateKey, apiKeyId);
+    const normalizedKid = apiKeyId.includes("/") ? apiKeyId : `${appId}/${apiKeyId}`;
+    return await signJwt(payload, privateKey, normalizedKid);
   } catch (err) {
     console.error("Failed to generate JaaS JWT:", err);
     return null;

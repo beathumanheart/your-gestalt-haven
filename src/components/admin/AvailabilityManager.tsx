@@ -57,6 +57,7 @@ const AvailabilityManager = () => {
         start_time: rule.start_time,
         end_time: rule.end_time,
         is_active: rule.is_active,
+        buffer_minutes: rule.buffer_minutes,
       };
       if (rule.id && !rule.isNew) {
         await supabase.from("availability_rules").update(data).eq("id", rule.id);

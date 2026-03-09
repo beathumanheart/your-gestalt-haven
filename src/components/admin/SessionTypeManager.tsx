@@ -27,7 +27,7 @@ const SessionTypeManager = () => {
       .from("session_types")
       .select("*")
       .order("sort_order");
-    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD" })));
+    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true })));
     setLoading(false);
   };
 

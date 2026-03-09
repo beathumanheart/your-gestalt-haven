@@ -13,9 +13,18 @@ const BookingsList = () => {
     const { data } = await supabase
       .from("bookings")
       .select("*, session_types(name, duration_minutes)")
-      .order("start_time", { ascending: false })
+      .order("start_time", { ascending: true })
       .limit(100);
-    setBookings(data || []);
+    
+    // Sort: confirmed first, then by start_time (upcoming first)
+    const sorted = (data || []).sort((a, b) => {
+      const statusOrder: Record<string, number> = { confirmed: 0, completed: 1, cancelled: 2 };
+      const statusDiff = (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
+      if (statusDiff !== 0) return statusDiff;
+      return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+    });
+    
+    setBookings(sorted);
     setLoading(false);
   };
 

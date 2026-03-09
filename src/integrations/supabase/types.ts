@@ -162,8 +162,11 @@ export type Database = {
           duration_minutes: number
           id: string
           is_active: boolean
+          max_price: number | null
+          min_price: number | null
           name: string
           price: number | null
+          pricing_type: string
           show_price: boolean
           sort_order: number
           updated_at: string
@@ -175,8 +178,11 @@ export type Database = {
           duration_minutes?: number
           id?: string
           is_active?: boolean
+          max_price?: number | null
+          min_price?: number | null
           name: string
           price?: number | null
+          pricing_type?: string
           show_price?: boolean
           sort_order?: number
           updated_at?: string
@@ -188,8 +194,11 @@ export type Database = {
           duration_minutes?: number
           id?: string
           is_active?: boolean
+          max_price?: number | null
+          min_price?: number | null
           name?: string
           price?: number | null
+          pricing_type?: string
           show_price?: boolean
           sort_order?: number
           updated_at?: string

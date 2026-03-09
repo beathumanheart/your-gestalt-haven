@@ -101,9 +101,9 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
           continue;
         }
 
-        // Check overlap with booked slots
+        // Check overlap with booked slots (including buffer time)
         const overlaps = bookedSlots.some(
-          (b) => isBefore(cursor, b.end) && isAfter(slotEnd, b.start)
+          (b) => isBefore(cursor, addMinutes(b.end, window.buffer_minutes)) && isAfter(slotEnd, b.start)
         );
 
         if (!overlaps) {

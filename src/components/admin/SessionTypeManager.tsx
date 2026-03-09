@@ -46,6 +46,9 @@ const SessionTypeManager = () => {
       currency: "USD",
       is_active: true,
       sort_order: types.length,
+      pricing_type: 'fixed',
+      min_price: null,
+      max_price: null,
       isNew: true,
     }]);
   };

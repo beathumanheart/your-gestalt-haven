@@ -129,8 +129,10 @@ async function generateJitsiLinks(
   if (clientToken && therapistToken && appId) {
     // JaaS links with JWT tokens
     const baseUrl = `https://8x8.vc/${appId}/${roomName}`;
+    // Client link: auto-knock on lobby so they wait for moderator approval
+    const clientConfig = "#config.prejoinConfig.enabled=true&config.lobby.autoKnock=true&config.disableModeratorIndicator=false";
     return {
-      clientLink: `${baseUrl}?jwt=${clientToken}`,
+      clientLink: `${baseUrl}?jwt=${clientToken}${clientConfig}`,
       therapistLink: `${baseUrl}?jwt=${therapistToken}`,
       roomName,
     };

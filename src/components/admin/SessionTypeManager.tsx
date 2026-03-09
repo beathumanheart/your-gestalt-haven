@@ -30,7 +30,7 @@ const SessionTypeManager = () => {
       .from("session_types")
       .select("*")
       .order("sort_order");
-    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true })));
+    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true, pricing_type: (t as any).pricing_type || 'fixed', min_price: (t as any).min_price ?? null, max_price: (t as any).max_price ?? null })));
     setLoading(false);
   };
 

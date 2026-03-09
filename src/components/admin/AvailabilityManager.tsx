@@ -11,6 +11,7 @@ interface Rule {
   start_time: string;
   end_time: string;
   is_active: boolean;
+  buffer_minutes: number;
   isNew?: boolean;
 }
 

@@ -94,6 +94,7 @@ async function generateJaasJwtToken(
         livestreaming: isModerator ? "true" : "false",
         "outbound-call": isModerator ? "true" : "false",
         transcription: isModerator ? "true" : "false",
+        "lobby": "true",
       },
     },
   };

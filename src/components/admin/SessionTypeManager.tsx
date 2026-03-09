@@ -9,6 +9,7 @@ interface SessionType {
   description: string;
   duration_minutes: number;
   price: number | null;
+  show_price: boolean;
   currency: string;
   is_active: boolean;
   sort_order: number;

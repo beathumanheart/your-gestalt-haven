@@ -165,6 +165,15 @@ const SessionTypeManager = () => {
                     />
                     Active
                   </label>
+                  <label className="flex items-center gap-1.5 font-body text-xs text-muted-foreground cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={t.show_price}
+                      onChange={(e) => updateType(i, { show_price: e.target.checked })}
+                      className="rounded"
+                    />
+                    Show Price
+                  </label>
                   <button
                     onClick={() => removeType(i)}
                     className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"

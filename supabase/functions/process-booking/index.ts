@@ -64,9 +64,10 @@ async function generateJaasJwtToken(
 ): Promise<string | null> {
   const appId = Deno.env.get("JAAS_APP_ID");
   const privateKey = Deno.env.get("JAAS_PRIVATE_KEY");
+  const apiKeyId = Deno.env.get("JAAS_API_KEY_ID");
   
-  if (!appId || !privateKey) {
-    console.warn("JaaS credentials not configured, falling back to public Jitsi");
+  if (!appId || !privateKey || !apiKeyId) {
+    console.warn("JaaS credentials not configured (missing appId, privateKey, or apiKeyId), falling back to public Jitsi");
     return null;
   }
 
@@ -98,7 +99,7 @@ async function generateJaasJwtToken(
   };
 
   try {
-    return await signJwt(payload, privateKey);
+    return await signJwt(payload, privateKey, apiKeyId);
   } catch (err) {
     console.error("Failed to generate JaaS JWT:", err);
     return null;

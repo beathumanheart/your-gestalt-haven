@@ -39,8 +39,8 @@ async function importPrivateKey(pem: string): Promise<CryptoKey> {
   );
 }
 
-async function signJwt(payload: object, privateKeyPem: string): Promise<string> {
-  const header = { alg: "RS256", typ: "JWT" };
+async function signJwt(payload: object, privateKeyPem: string, kid: string): Promise<string> {
+  const header = { alg: "RS256", typ: "JWT", kid };
   const headerB64 = textToBase64Url(JSON.stringify(header));
   const payloadB64 = textToBase64Url(JSON.stringify(payload));
   const signingInput = `${headerB64}.${payloadB64}`;

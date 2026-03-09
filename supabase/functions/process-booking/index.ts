@@ -526,6 +526,9 @@ Deno.serve(async (req) => {
       <div style="text-align: center; margin: 28px 0;">
         <a href="${therapistLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join as Moderator →</a>
       </div>
+      <div style="background: #fff8e1; border-radius: 8px; padding: 14px 16px; margin: 16px 0;">
+        <p style="color: #7a6520; font-size: 13px; margin: 0; line-height: 1.5;">🔒 <strong>Reminder:</strong> After joining, click the Security icon (shield) and enable <strong>"Lobby mode"</strong> to require your approval before the client can enter.</p>
+      </div>
     </div>
   </div>
 </body></html>`;

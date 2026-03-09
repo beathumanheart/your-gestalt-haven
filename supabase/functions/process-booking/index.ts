@@ -9,9 +9,137 @@ const corsHeaders = {
 const THERAPIST_EMAIL = "be@humanheart.life";
 const THERAPIST_NAME = "Human Heart Beat";
 
-function generateJitsiLink(bookingId: string): string {
-  const roomName = `session-${bookingId.slice(0, 8)}-${Date.now().toString(36)}`;
-  return `https://meet.jit.si/${roomName}`;
+// ── JaaS JWT Token Generation ──────────────────────────────────
+
+function base64UrlEncode(data: Uint8Array): string {
+  return btoa(String.fromCharCode(...data))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+function textToBase64Url(text: string): string {
+  return base64UrlEncode(new TextEncoder().encode(text));
+}
+
+async function importPrivateKey(pem: string): Promise<CryptoKey> {
+  const pemContents = pem
+    .replace(/-----BEGIN PRIVATE KEY-----/g, "")
+    .replace(/-----END PRIVATE KEY-----/g, "")
+    .replace(/\s/g, "");
+  
+  const binaryDer = Uint8Array.from(atob(pemContents), (c) => c.charCodeAt(0));
+  
+  return await crypto.subtle.importKey(
+    "pkcs8",
+    binaryDer,
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+}
+
+async function signJwt(payload: object, privateKeyPem: string): Promise<string> {
+  const header = { alg: "RS256", typ: "JWT" };
+  const headerB64 = textToBase64Url(JSON.stringify(header));
+  const payloadB64 = textToBase64Url(JSON.stringify(payload));
+  const signingInput = `${headerB64}.${payloadB64}`;
+  
+  const privateKey = await importPrivateKey(privateKeyPem);
+  const signature = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    privateKey,
+    new TextEncoder().encode(signingInput)
+  );
+  
+  const signatureB64 = base64UrlEncode(new Uint8Array(signature));
+  return `${signingInput}.${signatureB64}`;
+}
+
+async function generateJaasJwtToken(
+  roomName: string,
+  userName: string,
+  userEmail: string,
+  isModerator: boolean
+): Promise<string | null> {
+  const appId = Deno.env.get("JAAS_APP_ID");
+  const privateKey = Deno.env.get("JAAS_PRIVATE_KEY");
+  
+  if (!appId || !privateKey) {
+    console.warn("JaaS credentials not configured, falling back to public Jitsi");
+    return null;
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const exp = now + 3 * 60 * 60; // 3 hours
+
+  const payload = {
+    iss: "chat",
+    aud: "jitsi",
+    sub: appId,
+    room: roomName,
+    exp,
+    nbf: now - 60,
+    context: {
+      user: {
+        moderator: isModerator ? "true" : "false",
+        name: userName,
+        email: userEmail,
+        avatar: "",
+        id: userEmail,
+      },
+      features: {
+        recording: isModerator ? "true" : "false",
+        livestreaming: isModerator ? "true" : "false",
+        "outbound-call": isModerator ? "true" : "false",
+        transcription: isModerator ? "true" : "false",
+      },
+    },
+  };
+
+  try {
+    return await signJwt(payload, privateKey);
+  } catch (err) {
+    console.error("Failed to generate JaaS JWT:", err);
+    return null;
+  }
+}
+
+function generateRoomName(bookingId: string): string {
+  return `session-${bookingId.slice(0, 8)}-${Date.now().toString(36)}`;
+}
+
+async function generateJitsiLinks(
+  bookingId: string,
+  clientName: string,
+  clientEmail: string
+): Promise<{ clientLink: string; therapistLink: string; roomName: string }> {
+  const roomName = generateRoomName(bookingId);
+  const appId = Deno.env.get("JAAS_APP_ID");
+  
+  // Try to generate JaaS tokens
+  const [clientToken, therapistToken] = await Promise.all([
+    generateJaasJwtToken(roomName, clientName, clientEmail, false),
+    generateJaasJwtToken(roomName, THERAPIST_NAME, THERAPIST_EMAIL, true),
+  ]);
+
+  if (clientToken && therapistToken && appId) {
+    // JaaS links with JWT tokens
+    const baseUrl = `https://8x8.vc/${appId}/${roomName}`;
+    return {
+      clientLink: `${baseUrl}?jwt=${clientToken}`,
+      therapistLink: `${baseUrl}?jwt=${therapistToken}`,
+      roomName,
+    };
+  }
+
+  // Fallback to public Jitsi
+  const fallbackLink = `https://meet.jit.si/${roomName}`;
+  return {
+    clientLink: fallbackLink,
+    therapistLink: fallbackLink,
+    roomName,
+  };
 }
 
 function formatTimeWithTz(date: Date, tz: string): { time24: string; tzLabel: string } {

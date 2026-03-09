@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       availability_overrides: {
         Row: {
+          buffer_minutes: number
           created_at: string
           end_time: string | null
           id: string
@@ -25,6 +26,7 @@ export type Database = {
           start_time: string | null
         }
         Insert: {
+          buffer_minutes?: number
           created_at?: string
           end_time?: string | null
           id?: string
@@ -34,6 +36,7 @@ export type Database = {
           start_time?: string | null
         }
         Update: {
+          buffer_minutes?: number
           created_at?: string
           end_time?: string | null
           id?: string
@@ -46,6 +49,7 @@ export type Database = {
       }
       availability_rules: {
         Row: {
+          buffer_minutes: number
           created_at: string
           day_of_week: number
           end_time: string
@@ -54,6 +58,7 @@ export type Database = {
           start_time: string
         }
         Insert: {
+          buffer_minutes?: number
           created_at?: string
           day_of_week: number
           end_time: string
@@ -62,6 +67,7 @@ export type Database = {
           start_time: string
         }
         Update: {
+          buffer_minutes?: number
           created_at?: string
           day_of_week?: number
           end_time?: string

@@ -11,6 +11,7 @@ interface Rule {
   start_time: string;
   end_time: string;
   is_active: boolean;
+  buffer_minutes: number;
   isNew?: boolean;
 }
 
@@ -33,7 +34,7 @@ const AvailabilityManager = () => {
   useEffect(() => { fetchRules(); }, []);
 
   const addRule = () => {
-    setRules([...rules, { day_of_week: 1, start_time: "09:00", end_time: "17:00", is_active: true, isNew: true }]);
+    setRules([...rules, { day_of_week: 1, start_time: "09:00", end_time: "17:00", is_active: true, buffer_minutes: 0, isNew: true }]);
   };
 
   const removeRule = async (index: number) => {
@@ -56,6 +57,7 @@ const AvailabilityManager = () => {
         start_time: rule.start_time,
         end_time: rule.end_time,
         is_active: rule.is_active,
+        buffer_minutes: rule.buffer_minutes,
       };
       if (rule.id && !rule.isNew) {
         await supabase.from("availability_rules").update(data).eq("id", rule.id);
@@ -115,6 +117,18 @@ const AvailabilityManager = () => {
                   onChange={(e) => updateRule(i, { end_time: e.target.value })}
                   className="w-full sm:w-32 text-sm"
                 />
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Input
+                  type="number"
+                  min="0"
+                  max="120"
+                  value={rule.buffer_minutes}
+                  onChange={(e) => updateRule(i, { buffer_minutes: Number(e.target.value) })}
+                  className="w-20 text-sm"
+                />
+                <span className="text-muted-foreground text-sm whitespace-nowrap">min buffer</span>
               </div>
 
               <div className="flex items-center gap-3 ml-auto">

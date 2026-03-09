@@ -52,11 +52,11 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
       return;
     }
 
-    let windows: { start: string; end: string }[] = [];
+    let windows: { start: string; end: string; buffer_minutes: number }[] = [];
 
     if (override && override.is_available && override.start_time && override.end_time) {
       // Use override times
-      windows = [{ start: override.start_time, end: override.end_time }];
+      windows = [{ start: override.start_time, end: override.end_time, buffer_minutes: override.buffer_minutes || 0 }];
     } else {
       // Use regular availability rules
       const { data: rules } = await supabase
@@ -65,7 +65,7 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
         .eq("day_of_week", dayOfWeek)
         .eq("is_active", true);
 
-      windows = (rules || []).map((r) => ({ start: r.start_time, end: r.end_time }));
+      windows = (rules || []).map((r) => ({ start: r.start_time, end: r.end_time, buffer_minutes: r.buffer_minutes || 0 }));
     }
 
     // Fetch existing bookings for this date using security definer function
@@ -101,9 +101,9 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
           continue;
         }
 
-        // Check overlap with booked slots
+        // Check overlap with booked slots (including buffer time)
         const overlaps = bookedSlots.some(
-          (b) => isBefore(cursor, b.end) && isAfter(slotEnd, b.start)
+          (b) => isBefore(cursor, addMinutes(b.end, window.buffer_minutes)) && isAfter(slotEnd, b.start)
         );
 
         if (!overlaps) {

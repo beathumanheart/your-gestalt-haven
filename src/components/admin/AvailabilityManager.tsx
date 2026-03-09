@@ -119,6 +119,18 @@ const AvailabilityManager = () => {
                 />
               </div>
 
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Input
+                  type="number"
+                  min="0"
+                  max="120"
+                  value={rule.buffer_minutes}
+                  onChange={(e) => updateRule(i, { buffer_minutes: Number(e.target.value) })}
+                  className="w-20 text-sm"
+                />
+                <span className="text-muted-foreground text-sm whitespace-nowrap">min buffer</span>
+              </div>
+
               <div className="flex items-center gap-3 ml-auto">
                 <label className="flex items-center gap-2 font-body text-sm text-muted-foreground cursor-pointer">
                   <input

@@ -34,7 +34,7 @@ const AvailabilityManager = () => {
   useEffect(() => { fetchRules(); }, []);
 
   const addRule = () => {
-    setRules([...rules, { day_of_week: 1, start_time: "09:00", end_time: "17:00", is_active: true, isNew: true }]);
+    setRules([...rules, { day_of_week: 1, start_time: "09:00", end_time: "17:00", is_active: true, buffer_minutes: 0, isNew: true }]);
   };
 
   const removeRule = async (index: number) => {

@@ -455,8 +455,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    const meetLink = generateJitsiLink(booking.id);
-    await supabase.from("bookings").update({ google_meet_link: meetLink }).eq("id", booking.id);
+    // Generate separate JaaS links for client (non-moderator) and therapist (moderator)
+    const { clientLink, therapistLink } = await generateJitsiLinks(
+      booking.id,
+      booking.client_name,
+      booking.client_email
+    );
+    
+    // Store client link in DB (what client sees)
+    await supabase.from("bookings").update({ google_meet_link: clientLink }).eq("id", booking.id);
 
     // ── Send emails ──
     const brevoApiKey = Deno.env.get("BREVO_API_KEY");
@@ -480,7 +487,7 @@ Deno.serve(async (req) => {
         + row("Duration", `${duration} min`)
         + notesRow(booking.notes);
 
-      // Client confirmation email
+      // Client confirmation email (with client link - non-moderator)
       const clientHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
 <body style="font-family: Georgia, 'Times New Roman', serif; background: #ffffff; margin: 0; padding: 40px 20px;">
   <div style="max-width: 560px; margin: 0 auto; background: #faf8f5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -492,7 +499,7 @@ Deno.serve(async (req) => {
       <p style="color: #4a4035; font-size: 16px; line-height: 1.6;">Your session has been confirmed. Here are the details:</p>
       ${detailsTable(tableRows)}
       <div style="text-align: center; margin: 28px 0;">
-        <a href="${meetLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join Video Session →</a>
+        <a href="${clientLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join Video Session →</a>
       </div>
       <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5;">Save this link — you'll use it to join the session at the scheduled time.</p>
       <hr style="border: none; border-top: 1px solid #e5e0da; margin: 24px 0;" />
@@ -503,7 +510,7 @@ Deno.serve(async (req) => {
   </div>
 </body></html>`;
 
-      // Therapist notification email
+      // Therapist notification email (with therapist link - moderator)
       const therapistHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
 <body style="font-family: Georgia, 'Times New Roman', serif; background: #ffffff; margin: 0; padding: 40px 20px;">
   <div style="max-width: 560px; margin: 0 auto; background: #faf8f5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -514,13 +521,14 @@ Deno.serve(async (req) => {
       <p style="color: #4a4035; font-size: 16px; line-height: 1.6;"><strong>${booking.client_name}</strong> (${booking.client_email}) has booked a session.</p>
       ${detailsTable(tableRows)}
       <div style="text-align: center; margin: 28px 0;">
-        <a href="${meetLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join Video Session →</a>
+        <a href="${therapistLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join as Moderator →</a>
       </div>
     </div>
   </div>
 </body></html>`;
 
-      const icsContent = generateIcs(booking, meetLink, sessionName);
+      // Use therapist link in calendar invite
+      const icsContent = generateIcs(booking, therapistLink, sessionName);
       const icsBase64 = btoa(unescape(encodeURIComponent(icsContent)));
 
       try {

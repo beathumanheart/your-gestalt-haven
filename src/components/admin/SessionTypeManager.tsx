@@ -39,6 +39,7 @@ const SessionTypeManager = () => {
       description: "",
       duration_minutes: 50,
       price: null,
+      show_price: true,
       currency: "USD",
       is_active: true,
       sort_order: types.length,

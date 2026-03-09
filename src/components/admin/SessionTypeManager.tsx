@@ -13,6 +13,9 @@ interface SessionType {
   currency: string;
   is_active: boolean;
   sort_order: number;
+  pricing_type: 'fixed' | 'solidarity';
+  min_price: number | null;
+  max_price: number | null;
   isNew?: boolean;
 }
 

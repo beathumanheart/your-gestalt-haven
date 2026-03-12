@@ -512,7 +512,8 @@ Deno.serve(async (req) => {
       <div style="text-align: center; margin: 28px 0;">
         <a href="${clientLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join Video Session →</a>
       </div>
-      <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5;">Save this link — you'll use it to join the session at the scheduled time.</p>
+      <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5;">📅 A calendar invite (.ics) is attached — open it to add this session to your calendar.</p>
+      <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5; margin-top: 8px;">Save the video link above — you'll use it to join at the scheduled time.</p>
       <hr style="border: none; border-top: 1px solid #e5e0da; margin: 24px 0;" />
       <p style="color: #a09890; font-size: 12px; text-align: center; line-height: 1.5;">
         Need to cancel? <a href="${cancelUrl}" style="color: #b04040; text-decoration: underline;">Cancel this booking</a>

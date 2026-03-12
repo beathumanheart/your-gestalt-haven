@@ -184,16 +184,22 @@ function toIcsDateUtc(date: Date): string {
   return `${date.getUTCFullYear()}${pad2(date.getUTCMonth() + 1)}${pad2(date.getUTCDate())}T${pad2(date.getUTCHours())}${pad2(date.getUTCMinutes())}00Z`;
 }
 
-function generateIcs(booking: any, meetLink: string, sessionName: string): string {
+function generateIcs(booking: any, meetLink: string, sessionName: string, forClient = false): string {
   const start = new Date(booking.start_time);
   const end = new Date(booking.end_time);
   const now = new Date();
   const uid = `${booking.id}@humanheart.life`;
-  const description = [
-    `Client: ${booking.client_name} (${booking.client_email})`,
-    booking.notes ? `Enquiry: ${booking.notes}` : "",
-    `Video: ${meetLink}`,
-  ].filter(Boolean).join("\\n");
+  const description = forClient
+    ? [
+        `Session: ${sessionName}`,
+        booking.notes ? `Enquiry: ${booking.notes}` : "",
+        `Video: ${meetLink}`,
+      ].filter(Boolean).join("\\n")
+    : [
+        `Client: ${booking.client_name} (${booking.client_email})`,
+        booking.notes ? `Enquiry: ${booking.notes}` : "",
+        `Video: ${meetLink}`,
+      ].filter(Boolean).join("\\n");
 
   return [
     "BEGIN:VCALENDAR",
@@ -205,7 +211,7 @@ function generateIcs(booking: any, meetLink: string, sessionName: string): strin
     `DTSTAMP:${toIcsDateUtc(now)}`,
     `DTSTART:${toIcsDateUtc(start)}`,
     `DTEND:${toIcsDateUtc(end)}`,
-    `SUMMARY:${sessionName} — ${booking.client_name}`,
+    `SUMMARY:${sessionName}${forClient ? "" : ` — ${booking.client_name}`}`,
     `DESCRIPTION:${description}`,
     `URL:${meetLink}`,
     `ORGANIZER;CN=${THERAPIST_NAME}:mailto:${THERAPIST_EMAIL}`,
@@ -450,7 +456,7 @@ Deno.serve(async (req) => {
         notes: notes || null, status: "confirmed",
         client_timezone: timezone || "UTC",
       })
-      .select("*, session_types(name, duration_minutes)")
+      .select("*, session_types(name, duration_minutes, notification_email_1, notification_email_2, show_second_email)")
       .single();
 
     if (insertError || !booking) {
@@ -506,7 +512,8 @@ Deno.serve(async (req) => {
       <div style="text-align: center; margin: 28px 0;">
         <a href="${clientLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join Video Session →</a>
       </div>
-      <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5;">Save this link — you'll use it to join the session at the scheduled time.</p>
+      <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5;">📅 A calendar invite (.ics) is attached — open it to add this session to your calendar.</p>
+      <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5; margin-top: 8px;">Save the video link above — you'll use it to join at the scheduled time.</p>
       <hr style="border: none; border-top: 1px solid #e5e0da; margin: 24px 0;" />
       <p style="color: #a09890; font-size: 12px; text-align: center; line-height: 1.5;">
         Need to cancel? <a href="${cancelUrl}" style="color: #b04040; text-decoration: underline;">Cancel this booking</a>
@@ -535,9 +542,22 @@ Deno.serve(async (req) => {
   </div>
 </body></html>`;
 
-      // Use therapist link in calendar invite
-      const icsContent = generateIcs(booking, therapistLink, sessionName);
-      const icsBase64 = btoa(unescape(encodeURIComponent(icsContent)));
+      // Generate .ics for therapist and client
+      const therapistIcs = generateIcs(booking, therapistLink, sessionName, false);
+      const therapistIcsBase64 = btoa(unescape(encodeURIComponent(therapistIcs)));
+
+      const clientIcs = generateIcs(booking, clientLink, sessionName, true);
+      const clientIcsBase64 = btoa(unescape(encodeURIComponent(clientIcs)));
+
+      // Determine notification recipients
+      const sessionType = booking.session_types;
+      const notifEmail1 = sessionType?.notification_email_1 || THERAPIST_EMAIL;
+      const notifEmail2 = sessionType?.show_second_email && sessionType?.notification_email_2 ? sessionType.notification_email_2 : null;
+
+      const therapistRecipients = [{ email: notifEmail1, name: THERAPIST_NAME }];
+      if (notifEmail2) {
+        therapistRecipients.push({ email: notifEmail2, name: THERAPIST_NAME });
+      }
 
       try {
         const [clientOk, therapistOk] = await Promise.all([
@@ -545,12 +565,13 @@ Deno.serve(async (req) => {
             to: [{ email: booking.client_email, name: booking.client_name }],
             subject: `Booking Confirmed: ${sessionName} on ${dateStr}`,
             htmlContent: clientHtml,
+            attachment: [{ content: clientIcsBase64, name: "session.ics" }],
           }),
           sendEmail(brevoApiKey, {
-            to: [{ email: THERAPIST_EMAIL, name: THERAPIST_NAME }],
+            to: therapistRecipients,
             subject: `New Booking: ${sessionName} — ${booking.client_name} on ${dateStr}`,
             htmlContent: therapistHtml,
-            attachment: [{ content: icsBase64, name: "booking.ics" }],
+            attachment: [{ content: therapistIcsBase64, name: "booking.ics" }],
           }),
         ]);
         emailSent = clientOk;

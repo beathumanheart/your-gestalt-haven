@@ -16,6 +16,9 @@ interface SessionType {
   pricing_type: 'fixed' | 'solidarity';
   min_price: number | null;
   max_price: number | null;
+  notification_email_1: string;
+  notification_email_2: string;
+  show_second_email: boolean;
   isNew?: boolean;
 }
 
@@ -30,7 +33,7 @@ const SessionTypeManager = () => {
       .from("session_types")
       .select("*")
       .order("sort_order");
-    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true, pricing_type: (t as any).pricing_type || 'fixed', min_price: (t as any).min_price ?? null, max_price: (t as any).max_price ?? null })));
+    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true, pricing_type: (t as any).pricing_type || 'fixed', min_price: (t as any).min_price ?? null, max_price: (t as any).max_price ?? null, notification_email_1: (t as any).notification_email_1 || "", notification_email_2: (t as any).notification_email_2 || "", show_second_email: (t as any).show_second_email ?? false })));
     setLoading(false);
   };
 
@@ -49,6 +52,9 @@ const SessionTypeManager = () => {
       pricing_type: 'fixed',
       min_price: null,
       max_price: null,
+      notification_email_1: "",
+      notification_email_2: "",
+      show_second_email: false,
       isNew: true,
     }]);
   };
@@ -81,6 +87,9 @@ const SessionTypeManager = () => {
         pricing_type: t.pricing_type,
         min_price: t.pricing_type === 'solidarity' ? t.min_price : null,
         max_price: t.pricing_type === 'solidarity' ? t.max_price : null,
+        notification_email_1: t.notification_email_1 || null,
+        notification_email_2: t.notification_email_2 || null,
+        show_second_email: t.show_second_email,
       };
       if (t.id && !t.isNew) {
         await supabase.from("session_types").update(data).eq("id", t.id);
@@ -236,6 +245,37 @@ const SessionTypeManager = () => {
                   rows={2}
                   className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-none"
                 />
+              </div>
+              <div className="pl-7 space-y-2">
+                <label className="font-body text-xs text-muted-foreground block">Notification Emails</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Input
+                    type="email"
+                    value={t.notification_email_1}
+                    onChange={(e) => updateType(i, { notification_email_1: e.target.value })}
+                    placeholder="Primary notification email"
+                    className="text-sm"
+                  />
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="email"
+                      value={t.notification_email_2}
+                      onChange={(e) => updateType(i, { notification_email_2: e.target.value })}
+                      placeholder="Second notification email"
+                      className="text-sm"
+                      disabled={!t.show_second_email}
+                    />
+                    <label className="flex items-center gap-1.5 font-body text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={t.show_second_email}
+                        onChange={(e) => updateType(i, { show_second_email: e.target.checked })}
+                        className="rounded"
+                      />
+                      2nd email
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

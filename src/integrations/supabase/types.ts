@@ -165,9 +165,12 @@ export type Database = {
           max_price: number | null
           min_price: number | null
           name: string
+          notification_email_1: string | null
+          notification_email_2: string | null
           price: number | null
           pricing_type: string
           show_price: boolean
+          show_second_email: boolean
           sort_order: number
           updated_at: string
         }
@@ -181,9 +184,12 @@ export type Database = {
           max_price?: number | null
           min_price?: number | null
           name: string
+          notification_email_1?: string | null
+          notification_email_2?: string | null
           price?: number | null
           pricing_type?: string
           show_price?: boolean
+          show_second_email?: boolean
           sort_order?: number
           updated_at?: string
         }
@@ -197,9 +203,12 @@ export type Database = {
           max_price?: number | null
           min_price?: number | null
           name?: string
+          notification_email_1?: string | null
+          notification_email_2?: string | null
           price?: number | null
           pricing_type?: string
           show_price?: boolean
+          show_second_email?: boolean
           sort_order?: number
           updated_at?: string
         }

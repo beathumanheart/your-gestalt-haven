@@ -80,6 +80,7 @@ export type Database = {
       bookings: {
         Row: {
           client_email: string
+          client_email_2: string | null
           client_name: string
           client_timezone: string | null
           created_at: string
@@ -94,6 +95,7 @@ export type Database = {
         }
         Insert: {
           client_email: string
+          client_email_2?: string | null
           client_name: string
           client_timezone?: string | null
           created_at?: string
@@ -108,6 +110,7 @@ export type Database = {
         }
         Update: {
           client_email?: string
+          client_email_2?: string | null
           client_name?: string
           client_timezone?: string | null
           created_at?: string

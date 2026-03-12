@@ -52,6 +52,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           sessionTypeId: booking.sessionTypeId,
           clientName: booking.clientName.trim(),
           clientEmail: booking.clientEmail.trim().toLowerCase(),
+          clientEmail2: booking.clientEmail2?.trim().toLowerCase() || null,
           startTime,
           endTime,
           notes: booking.notes?.trim() || null,

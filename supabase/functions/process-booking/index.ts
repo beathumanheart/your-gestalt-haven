@@ -561,10 +561,16 @@ Deno.serve(async (req) => {
         therapistRecipients.push({ email: notifEmail2, name: THERAPIST_NAME });
       }
 
+      // Build client recipients list (primary + optional second email)
+      const clientRecipients = [{ email: booking.client_email, name: booking.client_name }];
+      if (booking.client_email_2) {
+        clientRecipients.push({ email: booking.client_email_2, name: booking.client_name });
+      }
+
       try {
         const [clientOk, therapistOk] = await Promise.all([
           sendEmail(brevoApiKey, {
-            to: [{ email: booking.client_email, name: booking.client_name }],
+            to: clientRecipients,
             subject: `Booking Confirmed: ${sessionName} on ${dateStr}`,
             htmlContent: clientHtml,
             attachment: [{ content: clientIcsBase64, name: "session.ics" }],

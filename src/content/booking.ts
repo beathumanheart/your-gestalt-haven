@@ -26,6 +26,8 @@ export interface BookingContent {
   // Form
   yourName: string;
   yourEmail: string;
+  yourEmail2: string;
+  email2Hint: string;
   namePlaceholder: string;
   emailPlaceholder: string;
   notesLabel: string;

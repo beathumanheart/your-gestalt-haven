@@ -453,6 +453,7 @@ Deno.serve(async (req) => {
       .insert({
         session_type_id: sessionTypeId,
         client_name: clientName, client_email: clientEmail,
+        client_email_2: clientEmail2 || null,
         start_time: startTime, end_time: endTime,
         notes: notes || null, status: "confirmed",
         client_timezone: timezone || "UTC",

@@ -52,6 +52,9 @@ const SessionTypeManager = () => {
       pricing_type: 'fixed',
       min_price: null,
       max_price: null,
+      notification_email_1: "",
+      notification_email_2: "",
+      show_second_email: false,
       isNew: true,
     }]);
   };

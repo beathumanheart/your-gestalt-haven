@@ -456,7 +456,7 @@ Deno.serve(async (req) => {
         notes: notes || null, status: "confirmed",
         client_timezone: timezone || "UTC",
       })
-      .select("*, session_types(name, duration_minutes)")
+      .select("*, session_types(name, duration_minutes, notification_email_1, notification_email_2, show_second_email)")
       .single();
 
     if (insertError || !booking) {

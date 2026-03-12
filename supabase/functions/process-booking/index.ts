@@ -213,6 +213,7 @@ function generateIcs(booking: any, meetLink: string, sessionName: string, forCli
     `DTEND:${toIcsDateUtc(end)}`,
     `SUMMARY:${sessionName}${forClient ? "" : ` — ${booking.client_name}`}`,
     `DESCRIPTION:${description}`,
+    `LOCATION:${meetLink}`,
     `URL:${meetLink}`,
     `ORGANIZER;CN=${THERAPIST_NAME}:mailto:${THERAPIST_EMAIL}`,
     `ATTENDEE;CN=${booking.client_name}:mailto:${booking.client_email}`,
@@ -426,7 +427,7 @@ Deno.serve(async (req) => {
     }
 
     // ── Booking creation ──
-    const { sessionTypeId, clientName, clientEmail, startTime, endTime, notes, timezone } = body;
+    const { sessionTypeId, clientName, clientEmail, clientEmail2, startTime, endTime, notes, timezone } = body;
 
     if (!sessionTypeId || !clientName || !clientEmail || !startTime || !endTime) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
@@ -452,6 +453,7 @@ Deno.serve(async (req) => {
       .insert({
         session_type_id: sessionTypeId,
         client_name: clientName, client_email: clientEmail,
+        client_email_2: clientEmail2 || null,
         start_time: startTime, end_time: endTime,
         notes: notes || null, status: "confirmed",
         client_timezone: timezone || "UTC",
@@ -559,10 +561,16 @@ Deno.serve(async (req) => {
         therapistRecipients.push({ email: notifEmail2, name: THERAPIST_NAME });
       }
 
+      // Build client recipients list (primary + optional second email)
+      const clientRecipients = [{ email: booking.client_email, name: booking.client_name }];
+      if (booking.client_email_2) {
+        clientRecipients.push({ email: booking.client_email_2, name: booking.client_name });
+      }
+
       try {
         const [clientOk, therapistOk] = await Promise.all([
           sendEmail(brevoApiKey, {
-            to: [{ email: booking.client_email, name: booking.client_name }],
+            to: clientRecipients,
             subject: `Booking Confirmed: ${sessionName} on ${dateStr}`,
             htmlContent: clientHtml,
             attachment: [{ content: clientIcsBase64, name: "session.ics" }],

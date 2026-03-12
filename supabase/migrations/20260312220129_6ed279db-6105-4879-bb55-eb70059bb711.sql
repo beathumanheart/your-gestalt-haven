@@ -1,0 +1,1 @@
+ALTER TABLE public.bookings ADD COLUMN client_email_2 text DEFAULT NULL;

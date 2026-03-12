@@ -26,6 +26,8 @@ export interface BookingContent {
   // Form
   yourName: string;
   yourEmail: string;
+  yourEmail2: string;
+  email2Hint: string;
   namePlaceholder: string;
   emailPlaceholder: string;
   notesLabel: string;
@@ -82,6 +84,8 @@ export const bookingEN: BookingContent = {
   unavailableLabel: "Unavailable",
   yourName: "Your name",
   yourEmail: "Your email",
+  yourEmail2: "Second email",
+  email2Hint: "Send confirmation to another address too",
   namePlaceholder: "Preferred name",
   emailPlaceholder: "email@example.com",
   notesLabel: "Your enquiry",
@@ -134,6 +138,8 @@ export const bookingRU: BookingContent = {
   unavailableLabel: "Недоступно",
   yourName: "Ваше имя",
   yourEmail: "Ваш email",
+  yourEmail2: "Второй email",
+  email2Hint: "Отправить подтверждение ещё на один адрес",
   namePlaceholder: "Предпочитаемое имя",
   emailPlaceholder: "email@example.com",
   notesLabel: "Ваш запрос",

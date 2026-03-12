@@ -14,10 +14,12 @@ export interface BookingData {
   sessionTypeId: string;
   sessionTypeName: string;
   durationMinutes: number;
+  showSecondEmail: boolean;
   date: Date;
   timeSlot: string; // HH:mm
   clientName: string;
   clientEmail: string;
+  clientEmail2: string;
   notes: string;
 }
 
@@ -137,6 +139,7 @@ const BookingWidget = () => {
               sessionTypeId: st.id,
               sessionTypeName: st.name,
               durationMinutes: st.duration_minutes,
+              showSecondEmail: st.show_second_email ?? false,
             })}
           />
         )}

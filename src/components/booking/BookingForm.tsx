@@ -133,6 +133,26 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           {errors.clientEmail && <p className="text-destructive text-xs mt-1">{errors.clientEmail}</p>}
         </div>
 
+        {booking.showSecondEmail && (
+          <div>
+            <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">
+              {t.yourEmail2} <span className="text-muted-foreground font-normal">({t.optional})</span>
+            </label>
+            <p className="font-body text-xs text-muted-foreground mb-1.5">{t.email2Hint}</p>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="email"
+                value={booking.clientEmail2 || ""}
+                onChange={(e) => onChange({ clientEmail2: e.target.value })}
+                placeholder={t.emailPlaceholder}
+                className="pl-9 text-sm sm:text-base h-11 sm:h-12 font-body"
+                maxLength={255}
+              />
+            </div>
+          </div>
+        )}
+
         <div>
           <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.notesLabel} <span className="text-muted-foreground font-normal">({t.optional})</span></label>
           <textarea

@@ -184,16 +184,22 @@ function toIcsDateUtc(date: Date): string {
   return `${date.getUTCFullYear()}${pad2(date.getUTCMonth() + 1)}${pad2(date.getUTCDate())}T${pad2(date.getUTCHours())}${pad2(date.getUTCMinutes())}00Z`;
 }
 
-function generateIcs(booking: any, meetLink: string, sessionName: string): string {
+function generateIcs(booking: any, meetLink: string, sessionName: string, forClient = false): string {
   const start = new Date(booking.start_time);
   const end = new Date(booking.end_time);
   const now = new Date();
   const uid = `${booking.id}@humanheart.life`;
-  const description = [
-    `Client: ${booking.client_name} (${booking.client_email})`,
-    booking.notes ? `Enquiry: ${booking.notes}` : "",
-    `Video: ${meetLink}`,
-  ].filter(Boolean).join("\\n");
+  const description = forClient
+    ? [
+        `Session: ${sessionName}`,
+        booking.notes ? `Enquiry: ${booking.notes}` : "",
+        `Video: ${meetLink}`,
+      ].filter(Boolean).join("\\n")
+    : [
+        `Client: ${booking.client_name} (${booking.client_email})`,
+        booking.notes ? `Enquiry: ${booking.notes}` : "",
+        `Video: ${meetLink}`,
+      ].filter(Boolean).join("\\n");
 
   return [
     "BEGIN:VCALENDAR",
@@ -205,7 +211,7 @@ function generateIcs(booking: any, meetLink: string, sessionName: string): strin
     `DTSTAMP:${toIcsDateUtc(now)}`,
     `DTSTART:${toIcsDateUtc(start)}`,
     `DTEND:${toIcsDateUtc(end)}`,
-    `SUMMARY:${sessionName} — ${booking.client_name}`,
+    `SUMMARY:${sessionName}${forClient ? "" : ` — ${booking.client_name}`}`,
     `DESCRIPTION:${description}`,
     `URL:${meetLink}`,
     `ORGANIZER;CN=${THERAPIST_NAME}:mailto:${THERAPIST_EMAIL}`,

@@ -213,6 +213,7 @@ function generateIcs(booking: any, meetLink: string, sessionName: string, forCli
     `DTEND:${toIcsDateUtc(end)}`,
     `SUMMARY:${sessionName}${forClient ? "" : ` — ${booking.client_name}`}`,
     `DESCRIPTION:${description}`,
+    `LOCATION:${meetLink}`,
     `URL:${meetLink}`,
     `ORGANIZER;CN=${THERAPIST_NAME}:mailto:${THERAPIST_EMAIL}`,
     `ATTENDEE;CN=${booking.client_name}:mailto:${booking.client_email}`,

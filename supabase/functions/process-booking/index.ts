@@ -427,7 +427,7 @@ Deno.serve(async (req) => {
     }
 
     // ── Booking creation ──
-    const { sessionTypeId, clientName, clientEmail, startTime, endTime, notes, timezone } = body;
+    const { sessionTypeId, clientName, clientEmail, clientEmail2, startTime, endTime, notes, timezone } = body;
 
     if (!sessionTypeId || !clientName || !clientEmail || !startTime || !endTime) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {

@@ -87,6 +87,9 @@ const SessionTypeManager = () => {
         pricing_type: t.pricing_type,
         min_price: t.pricing_type === 'solidarity' ? t.min_price : null,
         max_price: t.pricing_type === 'solidarity' ? t.max_price : null,
+        notification_email_1: t.notification_email_1 || null,
+        notification_email_2: t.notification_email_2 || null,
+        show_second_email: t.show_second_email,
       };
       if (t.id && !t.isNew) {
         await supabase.from("session_types").update(data).eq("id", t.id);

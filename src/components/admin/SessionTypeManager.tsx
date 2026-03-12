@@ -16,6 +16,9 @@ interface SessionType {
   pricing_type: 'fixed' | 'solidarity';
   min_price: number | null;
   max_price: number | null;
+  notification_email_1: string;
+  notification_email_2: string;
+  show_second_email: boolean;
   isNew?: boolean;
 }
 

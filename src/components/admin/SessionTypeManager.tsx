@@ -246,6 +246,37 @@ const SessionTypeManager = () => {
                   className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-none"
                 />
               </div>
+              <div className="pl-7 space-y-2">
+                <label className="font-body text-xs text-muted-foreground block">Notification Emails</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Input
+                    type="email"
+                    value={t.notification_email_1}
+                    onChange={(e) => updateType(i, { notification_email_1: e.target.value })}
+                    placeholder="Primary notification email"
+                    className="text-sm"
+                  />
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="email"
+                      value={t.notification_email_2}
+                      onChange={(e) => updateType(i, { notification_email_2: e.target.value })}
+                      placeholder="Second notification email"
+                      className="text-sm"
+                      disabled={!t.show_second_email}
+                    />
+                    <label className="flex items-center gap-1.5 font-body text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={t.show_second_email}
+                        onChange={(e) => updateType(i, { show_second_email: e.target.checked })}
+                        className="rounded"
+                      />
+                      2nd email
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>

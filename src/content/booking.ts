@@ -138,6 +138,8 @@ export const bookingRU: BookingContent = {
   unavailableLabel: "Недоступно",
   yourName: "Ваше имя",
   yourEmail: "Ваш email",
+  yourEmail2: "Второй email",
+  email2Hint: "Отправить подтверждение ещё на один адрес",
   namePlaceholder: "Предпочитаемое имя",
   emailPlaceholder: "email@example.com",
   notesLabel: "Ваш запрос",

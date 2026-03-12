@@ -541,9 +541,22 @@ Deno.serve(async (req) => {
   </div>
 </body></html>`;
 
-      // Use therapist link in calendar invite
-      const icsContent = generateIcs(booking, therapistLink, sessionName);
-      const icsBase64 = btoa(unescape(encodeURIComponent(icsContent)));
+      // Generate .ics for therapist and client
+      const therapistIcs = generateIcs(booking, therapistLink, sessionName, false);
+      const therapistIcsBase64 = btoa(unescape(encodeURIComponent(therapistIcs)));
+
+      const clientIcs = generateIcs(booking, clientLink, sessionName, true);
+      const clientIcsBase64 = btoa(unescape(encodeURIComponent(clientIcs)));
+
+      // Determine notification recipients
+      const sessionType = booking.session_types;
+      const notifEmail1 = sessionType?.notification_email_1 || THERAPIST_EMAIL;
+      const notifEmail2 = sessionType?.show_second_email && sessionType?.notification_email_2 ? sessionType.notification_email_2 : null;
+
+      const therapistRecipients = [{ email: notifEmail1, name: THERAPIST_NAME }];
+      if (notifEmail2) {
+        therapistRecipients.push({ email: notifEmail2, name: THERAPIST_NAME });
+      }
 
       try {
         const [clientOk, therapistOk] = await Promise.all([
@@ -551,12 +564,13 @@ Deno.serve(async (req) => {
             to: [{ email: booking.client_email, name: booking.client_name }],
             subject: `Booking Confirmed: ${sessionName} on ${dateStr}`,
             htmlContent: clientHtml,
+            attachment: [{ content: clientIcsBase64, name: "session.ics" }],
           }),
           sendEmail(brevoApiKey, {
-            to: [{ email: THERAPIST_EMAIL, name: THERAPIST_NAME }],
+            to: therapistRecipients,
             subject: `New Booking: ${sessionName} — ${booking.client_name} on ${dateStr}`,
             htmlContent: therapistHtml,
-            attachment: [{ content: icsBase64, name: "booking.ics" }],
+            attachment: [{ content: therapistIcsBase64, name: "booking.ics" }],
           }),
         ]);
         emailSent = clientOk;

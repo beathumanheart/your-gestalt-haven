@@ -84,6 +84,8 @@ export const bookingEN: BookingContent = {
   unavailableLabel: "Unavailable",
   yourName: "Your name",
   yourEmail: "Your email",
+  yourEmail2: "Second email",
+  email2Hint: "Send confirmation to another address too",
   namePlaceholder: "Preferred name",
   emailPlaceholder: "email@example.com",
   notesLabel: "Your enquiry",

@@ -81,7 +81,9 @@ const SessionTypeManager = () => {
       const t = types[i];
       const data = {
         name: t.name,
+        name_ru: t.name_ru || null,
         description: t.description || null,
+        description_ru: t.description_ru || null,
         duration_minutes: t.duration_minutes,
         price: t.pricing_type === 'solidarity' ? null : t.price,
         currency: t.currency,

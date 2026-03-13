@@ -159,8 +159,8 @@ export const servicesRU: ServicesContent = {
   },
 
   sessionDetailsTitle: "Как проходит терапия",
-  online: { label: "Онлайн", description: "За сессию" },
-  duration: { label: "50 минут", description: "Одна сессия" },
+  online: { label: "Онлайн", description: "" },
+  duration: { label: "50 минут", description: "" },
   paymentNote: "Оплата в течение 24ч. Перевод, Wise, Revolut или крипта.",
 
   slidingTitle: "Гибкая стоимость — по вашим возможностям",

@@ -47,7 +47,9 @@ const DescriptionBlock = ({ text }: { text: string }) => {
   );
 };
 
-const SessionTypeSelector = ({ sessionTypes, loading, selected, t, onSelect }: Props) => {
+const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onSelect }: Props) => {
+  const getName = (st: any) => (language === "ru" && st.name_ru) ? st.name_ru : st.name;
+  const getDescription = (st: any) => (language === "ru" && st.description_ru) ? st.description_ru : st.description;
   if (loading) {
     return (
       <div className="space-y-4">

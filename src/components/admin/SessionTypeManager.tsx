@@ -135,11 +135,20 @@ const SessionTypeManager = () => {
                 <GripVertical className="w-4 h-4 text-muted-foreground mt-2.5 shrink-0" />
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-body text-xs text-muted-foreground mb-1 block">Name</label>
+                    <label className="font-body text-xs text-muted-foreground mb-1 block">Name (EN)</label>
                     <Input
                       value={t.name}
                       onChange={(e) => updateType(i, { name: e.target.value })}
                       placeholder="e.g. Individual Session"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-body text-xs text-muted-foreground mb-1 block">Name (RU)</label>
+                    <Input
+                      value={t.name_ru}
+                      onChange={(e) => updateType(i, { name_ru: e.target.value })}
+                      placeholder="e.g. Индивидуальная сессия"
                       className="text-sm"
                     />
                   </div>

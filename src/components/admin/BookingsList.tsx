@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO } from "date-fns";
-import { CalendarDays, Mail, User, XCircle, CheckCircle } from "lucide-react";
+import { CalendarDays, Mail, User, XCircle, CheckCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const BookingsList = () => {

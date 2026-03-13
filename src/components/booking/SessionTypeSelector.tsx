@@ -85,7 +85,7 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onS
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="font-display text-lg font-medium text-foreground">{st.name}</h3>
+                <h3 className="font-display text-lg font-medium text-foreground">{getName(st)}</h3>
               </div>
               <div className="flex flex-col items-end gap-1 ml-4">
                 <span className="flex items-center gap-1 font-body text-sm text-muted-foreground">

@@ -44,7 +44,9 @@ const SessionTypeManager = () => {
   const addType = () => {
     setTypes([...types, {
       name: "",
+      name_ru: "",
       description: "",
+      description_ru: "",
       duration_minutes: 50,
       price: null,
       show_price: true,

@@ -251,15 +251,27 @@ const SessionTypeManager = () => {
                   </button>
                 </div>
               </div>
-              <div className="pl-7">
-                <label className="font-body text-xs text-muted-foreground mb-1 block">Description</label>
-                <textarea
-                  value={t.description}
-                  onChange={(e) => updateType(i, { description: e.target.value })}
-                  placeholder="Session description — use multiple lines for paragraphs. Formatting (line breaks) will be preserved for the client."
-                  rows={5}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-y"
-                />
+              <div className="pl-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-body text-xs text-muted-foreground mb-1 block">Description (EN)</label>
+                  <textarea
+                    value={t.description}
+                    onChange={(e) => updateType(i, { description: e.target.value })}
+                    placeholder="Session description — use multiple lines for paragraphs."
+                    rows={4}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-y"
+                  />
+                </div>
+                <div>
+                  <label className="font-body text-xs text-muted-foreground mb-1 block">Description (RU)</label>
+                  <textarea
+                    value={t.description_ru}
+                    onChange={(e) => updateType(i, { description_ru: e.target.value })}
+                    placeholder="Описание сессии — переносы строк сохраняются."
+                    rows={4}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-y"
+                  />
+                </div>
               </div>
               <div className="pl-7 space-y-2">
                 <label className="font-body text-xs text-muted-foreground block">Notification Emails</label>

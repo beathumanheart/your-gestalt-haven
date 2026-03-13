@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Clock, ChevronDown } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
+import type { Language } from "@/contexts/LanguageContext";
 
 interface Props {
   sessionTypes: any[];
   loading: boolean;
   selected?: string;
   t: BookingContent;
+  language: Language;
   onSelect: (st: any) => void;
 }
 
@@ -45,7 +47,9 @@ const DescriptionBlock = ({ text }: { text: string }) => {
   );
 };
 
-const SessionTypeSelector = ({ sessionTypes, loading, selected, t, onSelect }: Props) => {
+const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onSelect }: Props) => {
+  const getName = (st: any) => (language === "ru" && st.name_ru) ? st.name_ru : st.name;
+  const getDescription = (st: any) => (language === "ru" && st.description_ru) ? st.description_ru : st.description;
   if (loading) {
     return (
       <div className="space-y-4">
@@ -81,7 +85,7 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, onSelect }: P
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="font-display text-lg font-medium text-foreground">{st.name}</h3>
+                <h3 className="font-display text-lg font-medium text-foreground">{getName(st)}</h3>
               </div>
               <div className="flex flex-col items-end gap-1 ml-4">
                 <span className="flex items-center gap-1 font-body text-sm text-muted-foreground">
@@ -103,7 +107,7 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, onSelect }: P
                 )}
               </div>
             </div>
-            {st.description && <DescriptionBlock text={st.description} />}
+            {getDescription(st) && <DescriptionBlock text={getDescription(st)} />}
           </button>
         ))}
       </div>

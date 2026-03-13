@@ -162,12 +162,14 @@ export type Database = {
           created_at: string
           currency: string | null
           description: string | null
+          description_ru: string | null
           duration_minutes: number
           id: string
           is_active: boolean
           max_price: number | null
           min_price: number | null
           name: string
+          name_ru: string | null
           notification_email_1: string | null
           notification_email_2: string | null
           price: number | null
@@ -181,12 +183,14 @@ export type Database = {
           created_at?: string
           currency?: string | null
           description?: string | null
+          description_ru?: string | null
           duration_minutes?: number
           id?: string
           is_active?: boolean
           max_price?: number | null
           min_price?: number | null
           name: string
+          name_ru?: string | null
           notification_email_1?: string | null
           notification_email_2?: string | null
           price?: number | null
@@ -200,12 +204,14 @@ export type Database = {
           created_at?: string
           currency?: string | null
           description?: string | null
+          description_ru?: string | null
           duration_minutes?: number
           id?: string
           is_active?: boolean
           max_price?: number | null
           min_price?: number | null
           name?: string
+          name_ru?: string | null
           notification_email_1?: string | null
           notification_email_2?: string | null
           price?: number | null

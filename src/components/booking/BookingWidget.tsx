@@ -134,10 +134,11 @@ const BookingWidget = () => {
             loading={loadingTypes}
             selected={booking.sessionTypeId}
             t={t}
+            language={language}
             onSelect={(st) => setBooking({
               ...booking,
               sessionTypeId: st.id,
-              sessionTypeName: st.name,
+              sessionTypeName: (language === "ru" && st.name_ru) ? st.name_ru : st.name,
               durationMinutes: st.duration_minutes,
               showSecondEmail: st.show_second_email ?? false,
             })}

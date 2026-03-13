@@ -6,7 +6,9 @@ import { Plus, Trash2, Save, GripVertical } from "lucide-react";
 interface SessionType {
   id?: string;
   name: string;
+  name_ru: string;
   description: string;
+  description_ru: string;
   duration_minutes: number;
   price: number | null;
   show_price: boolean;
@@ -33,7 +35,7 @@ const SessionTypeManager = () => {
       .from("session_types")
       .select("*")
       .order("sort_order");
-    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true, pricing_type: (t as any).pricing_type || 'fixed', min_price: (t as any).min_price ?? null, max_price: (t as any).max_price ?? null, notification_email_1: (t as any).notification_email_1 || "", notification_email_2: (t as any).notification_email_2 || "", show_second_email: (t as any).show_second_email ?? false })));
+    setTypes((data || []).map(t => ({ ...t, description: t.description || "", description_ru: (t as any).description_ru || "", name_ru: (t as any).name_ru || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true, pricing_type: (t as any).pricing_type || 'fixed', min_price: (t as any).min_price ?? null, max_price: (t as any).max_price ?? null, notification_email_1: (t as any).notification_email_1 || "", notification_email_2: (t as any).notification_email_2 || "", show_second_email: (t as any).show_second_email ?? false })));
     setLoading(false);
   };
 
@@ -42,7 +44,9 @@ const SessionTypeManager = () => {
   const addType = () => {
     setTypes([...types, {
       name: "",
+      name_ru: "",
       description: "",
+      description_ru: "",
       duration_minutes: 50,
       price: null,
       show_price: true,
@@ -77,7 +81,9 @@ const SessionTypeManager = () => {
       const t = types[i];
       const data = {
         name: t.name,
+        name_ru: t.name_ru || null,
         description: t.description || null,
+        description_ru: t.description_ru || null,
         duration_minutes: t.duration_minutes,
         price: t.pricing_type === 'solidarity' ? null : t.price,
         currency: t.currency,
@@ -129,11 +135,20 @@ const SessionTypeManager = () => {
                 <GripVertical className="w-4 h-4 text-muted-foreground mt-2.5 shrink-0" />
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-body text-xs text-muted-foreground mb-1 block">Name</label>
+                    <label className="font-body text-xs text-muted-foreground mb-1 block">Name (EN)</label>
                     <Input
                       value={t.name}
                       onChange={(e) => updateType(i, { name: e.target.value })}
                       placeholder="e.g. Individual Session"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-body text-xs text-muted-foreground mb-1 block">Name (RU)</label>
+                    <Input
+                      value={t.name_ru}
+                      onChange={(e) => updateType(i, { name_ru: e.target.value })}
+                      placeholder="e.g. Индивидуальная сессия"
                       className="text-sm"
                     />
                   </div>
@@ -236,15 +251,27 @@ const SessionTypeManager = () => {
                   </button>
                 </div>
               </div>
-              <div className="pl-7">
-                <label className="font-body text-xs text-muted-foreground mb-1 block">Description</label>
-                <textarea
-                  value={t.description}
-                  onChange={(e) => updateType(i, { description: e.target.value })}
-                  placeholder="Session description — use multiple lines for paragraphs. Formatting (line breaks) will be preserved for the client."
-                  rows={5}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-y"
-                />
+              <div className="pl-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-body text-xs text-muted-foreground mb-1 block">Description (EN)</label>
+                  <textarea
+                    value={t.description}
+                    onChange={(e) => updateType(i, { description: e.target.value })}
+                    placeholder="Session description — use multiple lines for paragraphs."
+                    rows={4}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-y"
+                  />
+                </div>
+                <div>
+                  <label className="font-body text-xs text-muted-foreground mb-1 block">Description (RU)</label>
+                  <textarea
+                    value={t.description_ru}
+                    onChange={(e) => updateType(i, { description_ru: e.target.value })}
+                    placeholder="Описание сессии — переносы строк сохраняются."
+                    rows={4}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-y"
+                  />
+                </div>
               </div>
               <div className="pl-7 space-y-2">
                 <label className="font-body text-xs text-muted-foreground block">Notification Emails</label>

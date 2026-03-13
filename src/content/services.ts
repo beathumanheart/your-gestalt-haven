@@ -93,8 +93,8 @@ export const servicesEN: ServicesContent = {
   },
 
   sessionDetailsTitle: "How It Works",
-  online: { label: "Online", description: "Per session" },
-  duration: { label: "50 minutes", description: "Per session" },
+  online: { label: "Online", description: "" },
+  duration: { label: "50 minutes", description: "" },
   paymentNote: "Payment within 24h of session. Bank transfer, Wise, Revolut, or crypto.",
 
   slidingTitle: "Solidarity Pricing",
@@ -159,8 +159,8 @@ export const servicesRU: ServicesContent = {
   },
 
   sessionDetailsTitle: "Как проходит терапия",
-  online: { label: "Онлайн", description: "За сессию" },
-  duration: { label: "50 минут", description: "Одна сессия" },
+  online: { label: "Онлайн", description: "" },
+  duration: { label: "50 минут", description: "" },
   paymentNote: "Оплата в течение 24ч. Перевод, Wise, Revolut или крипта.",
 
   slidingTitle: "Гибкая стоимость — по вашим возможностям",

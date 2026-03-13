@@ -12,10 +12,12 @@ interface Props {
   onSelect: (st: any) => void;
 }
 
-const DescriptionBlock = ({ text }: { text: string }) => {
+const DescriptionBlock = ({ text, language }: { text: string; language: Language }) => {
   const [expanded, setExpanded] = useState(false);
   const lines = text.split("\n").filter(Boolean);
   const isLong = lines.length > 1 || text.length > 100;
+  const moreLabel = language === "ru" ? "Подробнее" : "More";
+  const lessLabel = language === "ru" ? "Свернуть" : "Less";
 
   if (!isLong) {
     return (
@@ -41,7 +43,7 @@ const DescriptionBlock = ({ text }: { text: string }) => {
         className="flex items-center gap-1 mt-1 font-body text-xs text-primary hover:text-primary/80 transition-colors"
       >
         <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
-        {expanded ? "Less" : "More"}
+        {expanded ? lessLabel : moreLabel}
       </button>
     </div>
   );
@@ -107,7 +109,7 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onS
                 )}
               </div>
             </div>
-            {getDescription(st) && <DescriptionBlock text={getDescription(st)} />}
+            {getDescription(st) && <DescriptionBlock text={getDescription(st)} language={language} />}
           </button>
         ))}
       </div>

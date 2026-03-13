@@ -159,7 +159,7 @@ export const servicesRU: ServicesContent = {
   },
 
   sessionDetailsTitle: "Как проходит терапия",
-  online: { label: "Онлайн через Google Meet", description: "В одно время каждую неделю" },
+  online: { label: "Онлайн", description: "За сессию" },
   duration: { label: "50 минут", description: "Одна сессия" },
   paymentNote: "Оплата в течение 24ч. Перевод, Wise, Revolut или крипта.",
 

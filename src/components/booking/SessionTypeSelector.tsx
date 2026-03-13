@@ -107,7 +107,7 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onS
                 )}
               </div>
             </div>
-            {st.description && <DescriptionBlock text={st.description} />}
+            {getDescription(st) && <DescriptionBlock text={getDescription(st)} />}
           </button>
         ))}
       </div>

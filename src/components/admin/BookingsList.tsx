@@ -128,6 +128,15 @@ const BookingsList = () => {
                     </button>
                   </div>
                 )}
+                {b.status === "cancelled" && (
+                  <button
+                    onClick={() => deleteBooking(b.id)}
+                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
+                    title="Delete permanently"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
             {b.notes && (

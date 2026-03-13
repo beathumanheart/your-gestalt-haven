@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Clock, ChevronDown } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
+import type { Language } from "@/contexts/LanguageContext";
 
 interface Props {
   sessionTypes: any[];
   loading: boolean;
   selected?: string;
   t: BookingContent;
+  language: Language;
   onSelect: (st: any) => void;
 }
 

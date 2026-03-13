@@ -92,7 +92,7 @@ const Services = () => {
                   <detail.icon className="w-5 h-5 text-primary" />
                 </div>
                 <p className="font-display text-lg text-foreground">{detail.label}</p>
-                <p className="font-body text-sm text-muted-foreground">{detail.description}</p>
+                {detail.description && <p className="font-body text-sm text-muted-foreground">{detail.description}</p>}
               </div>
             ))}
           </div>

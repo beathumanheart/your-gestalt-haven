@@ -32,7 +32,6 @@ const BookingsList = () => {
 
   const updateStatus = async (id: string, status: string) => {
     if (status === "cancelled") {
-      // Route through edge function to send cancellation emails
       try {
         const { data: result, error } = await supabase.functions.invoke("process-booking", {
           body: { action: "cancel", bookingId: id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
@@ -48,6 +47,17 @@ const BookingsList = () => {
       await supabase.from("bookings").update({ status }).eq("id", id);
     }
     fetchBookings();
+  };
+
+  const deleteBooking = async (id: string) => {
+    if (!window.confirm("Permanently delete this cancelled booking?")) return;
+    const { error } = await supabase.from("bookings").delete().eq("id", id);
+    if (error) {
+      toast.error("Failed to delete booking");
+    } else {
+      toast.success("Booking deleted");
+      fetchBookings();
+    }
   };
 
   if (loading) return <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 bg-muted rounded-xl animate-pulse" />)}</div>;

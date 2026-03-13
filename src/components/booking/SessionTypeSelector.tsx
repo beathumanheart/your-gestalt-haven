@@ -1,4 +1,5 @@
-import { Clock } from "lucide-react";
+import { useState } from "react";
+import { Clock, ChevronDown } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 
 interface Props {
@@ -8,6 +9,41 @@ interface Props {
   t: BookingContent;
   onSelect: (st: any) => void;
 }
+
+const DescriptionBlock = ({ text }: { text: string }) => {
+  const [expanded, setExpanded] = useState(false);
+  const lines = text.split("\n").filter(Boolean);
+  const isLong = lines.length > 1 || text.length > 100;
+
+  if (!isLong) {
+    return (
+      <p className="font-body text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{text}</p>
+    );
+  }
+
+  return (
+    <div className="mt-2">
+      <div
+        className={`font-body text-sm text-muted-foreground whitespace-pre-wrap transition-all duration-300 overflow-hidden ${
+          expanded ? "" : "line-clamp-2"
+        }`}
+      >
+        {text}
+      </div>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setExpanded(!expanded);
+        }}
+        className="flex items-center gap-1 mt-1 font-body text-xs text-primary hover:text-primary/80 transition-colors"
+      >
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+        {expanded ? "Less" : "More"}
+      </button>
+    </div>
+  );
+};
 
 const SessionTypeSelector = ({ sessionTypes, loading, selected, t, onSelect }: Props) => {
   if (loading) {
@@ -46,9 +82,6 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, onSelect }: P
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h3 className="font-display text-lg font-medium text-foreground">{st.name}</h3>
-                {st.description && (
-                  <p className="font-body text-sm text-muted-foreground mt-1">{st.description}</p>
-                )}
               </div>
               <div className="flex flex-col items-end gap-1 ml-4">
                 <span className="flex items-center gap-1 font-body text-sm text-muted-foreground">
@@ -70,6 +103,7 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, onSelect }: P
                 )}
               </div>
             </div>
+            {st.description && <DescriptionBlock text={st.description} />}
           </button>
         ))}
       </div>

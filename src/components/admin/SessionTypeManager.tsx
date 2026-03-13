@@ -241,9 +241,9 @@ const SessionTypeManager = () => {
                 <textarea
                   value={t.description}
                   onChange={(e) => updateType(i, { description: e.target.value })}
-                  placeholder="Brief description of this session type..."
-                  rows={2}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-none"
+                  placeholder="Session description — use multiple lines for paragraphs. Formatting (line breaks) will be preserved for the client."
+                  rows={5}
+                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-y"
                 />
               </div>
               <div className="pl-7 space-y-2">

@@ -93,7 +93,7 @@ export const servicesEN: ServicesContent = {
   },
 
   sessionDetailsTitle: "How It Works",
-  online: { label: "Online via Google Meet", description: "Same day and time each week" },
+  online: { label: "Online", description: "Per session" },
   duration: { label: "50 minutes", description: "Per session" },
   paymentNote: "Payment within 24h of session. Bank transfer, Wise, Revolut, or crypto.",
 

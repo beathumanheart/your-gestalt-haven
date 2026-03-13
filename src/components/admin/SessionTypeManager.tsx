@@ -35,7 +35,7 @@ const SessionTypeManager = () => {
       .from("session_types")
       .select("*")
       .order("sort_order");
-    setTypes((data || []).map(t => ({ ...t, description: t.description || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true, pricing_type: (t as any).pricing_type || 'fixed', min_price: (t as any).min_price ?? null, max_price: (t as any).max_price ?? null, notification_email_1: (t as any).notification_email_1 || "", notification_email_2: (t as any).notification_email_2 || "", show_second_email: (t as any).show_second_email ?? false })));
+    setTypes((data || []).map(t => ({ ...t, description: t.description || "", description_ru: (t as any).description_ru || "", name_ru: (t as any).name_ru || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true, pricing_type: (t as any).pricing_type || 'fixed', min_price: (t as any).min_price ?? null, max_price: (t as any).max_price ?? null, notification_email_1: (t as any).notification_email_1 || "", notification_email_2: (t as any).notification_email_2 || "", show_second_email: (t as any).show_second_email ?? false })));
     setLoading(false);
   };
 

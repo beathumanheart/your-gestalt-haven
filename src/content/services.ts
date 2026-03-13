@@ -93,8 +93,8 @@ export const servicesEN: ServicesContent = {
   },
 
   sessionDetailsTitle: "How It Works",
-  online: { label: "Online", description: "Per session" },
-  duration: { label: "50 minutes", description: "Per session" },
+  online: { label: "Online", description: "" },
+  duration: { label: "50 minutes", description: "" },
   paymentNote: "Payment within 24h of session. Bank transfer, Wise, Revolut, or crypto.",
 
   slidingTitle: "Solidarity Pricing",

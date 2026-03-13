@@ -6,7 +6,9 @@ import { Plus, Trash2, Save, GripVertical } from "lucide-react";
 interface SessionType {
   id?: string;
   name: string;
+  name_ru: string;
   description: string;
+  description_ru: string;
   duration_minutes: number;
   price: number | null;
   show_price: boolean;

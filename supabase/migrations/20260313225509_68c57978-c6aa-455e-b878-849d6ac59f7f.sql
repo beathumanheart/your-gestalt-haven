@@ -1,0 +1,1 @@
+ALTER TABLE public.session_types ADD COLUMN name_ru text, ADD COLUMN description_ru text;

@@ -9,7 +9,7 @@ interface Props {
   selected?: string;
   t: BookingContent;
   language: Language;
-  onSelect: (st: any) => void;
+  onSelect: (st: any, index: number) => void;
 }
 
 const DescriptionBlock = ({ text, language }: { text: string; language: Language }) => {
@@ -75,10 +75,10 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onS
     <div className="space-y-4">
       <p className="font-body text-muted-foreground mb-6">{t.selectSession}</p>
       <div className="grid gap-3">
-        {sessionTypes.map((st) => (
+        {sessionTypes.map((st, index) => (
           <button
             key={st.id}
-            onClick={() => onSelect(st)}
+            onClick={() => onSelect(st, index)}
             className={`w-full text-left p-5 rounded-xl border-2 transition-all duration-300 ${
               selected === st.id
                 ? "border-primary bg-primary/5 shadow-soft"

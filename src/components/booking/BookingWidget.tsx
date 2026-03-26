@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { bookingEN, bookingRU } from "@/content/booking";
 import { useSessionTypes } from "@/hooks/useAvailability";
@@ -9,6 +9,13 @@ import BookingForm from "./BookingForm";
 import BookingConfirmation from "./BookingConfirmation";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { toast } from "sonner";
+import {
+  trackServicesView,
+  trackServiceSelected,
+  trackDateTimeView,
+  trackDateTimeSelected,
+  trackConfirmationView,
+} from "@/hooks/useBookingAnalytics";
 
 export interface BookingData {
   sessionTypeId: string;
@@ -38,6 +45,22 @@ const BookingWidget = () => {
 
   const stepIndex = STEPS.indexOf(step);
   const stepLabels = [t.stepSession, t.stepDateTime, t.stepDetails];
+
+  // Track step views
+  useEffect(() => {
+    if (step === "session") {
+      trackServicesView("direct");
+    } else if (step === "datetime" && booking.sessionTypeName) {
+      trackDateTimeView(booking.sessionTypeName);
+    }
+  }, [step]);
+
+  // Track confirmation view
+  useEffect(() => {
+    if (confirmed?.sessionTypeName) {
+      trackConfirmationView(confirmed.sessionTypeName);
+    }
+  }, [confirmed]);
 
   const canNext = () => {
     switch (step) {
@@ -135,13 +158,17 @@ const BookingWidget = () => {
             selected={booking.sessionTypeId}
             t={t}
             language={language}
-            onSelect={(st) => setBooking({
-              ...booking,
-              sessionTypeId: st.id,
-              sessionTypeName: (language === "ru" && st.name_ru) ? st.name_ru : st.name,
-              durationMinutes: st.duration_minutes,
-              showSecondEmail: st.show_second_email ?? false,
-            })}
+            onSelect={(st, index) => {
+              const name = (language === "ru" && st.name_ru) ? st.name_ru : st.name;
+              trackServiceSelected(name, index);
+              setBooking({
+                ...booking,
+                sessionTypeId: st.id,
+                sessionTypeName: name,
+                durationMinutes: st.duration_minutes,
+                showSecondEmail: st.show_second_email ?? false,
+              });
+            }}
           />
         )}
 
@@ -152,7 +179,16 @@ const BookingWidget = () => {
             durationMinutes={booking.durationMinutes || 30}
             t={t}
             onSelectDate={(d) => setBooking({ ...booking, date: d, timeSlot: undefined })}
-            onSelectTime={(slot) => setBooking({ ...booking, timeSlot: slot })}
+            onSelectTime={(slot) => {
+              if (booking.date && booking.sessionTypeName) {
+                trackDateTimeSelected(
+                  booking.sessionTypeName,
+                  booking.date.toISOString(),
+                  slot
+                );
+              }
+              setBooking({ ...booking, timeSlot: slot });
+            }}
           />
         )}
 

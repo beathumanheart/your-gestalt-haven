@@ -6,6 +6,7 @@ import { CalendarDays, Clock, User, Mail, ChevronLeft } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { BookingData } from "./BookingWidget";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
+import { trackBookingCompleted } from "@/hooks/useBookingAnalytics";
 
 interface Props {
   booking: BookingData;
@@ -66,6 +67,12 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
         return;
       }
 
+      trackBookingCompleted({
+        service_name: booking.sessionTypeName,
+        booking_date: format(booking.date, "yyyy-MM-dd"),
+        booking_time: booking.timeSlot,
+        is_new_client: true,
+      });
       onBooked({
         ...result?.booking,
         google_meet_link: result?.meetLink || null,
@@ -112,6 +119,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
               placeholder={t.namePlaceholder}
               className="pl-9 text-sm sm:text-base h-11 sm:h-12 font-body"
               maxLength={100}
+              data-ph-no-capture
             />
           </div>
           {errors.clientName && <p className="text-destructive text-xs mt-1">{errors.clientName}</p>}
@@ -128,6 +136,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
               placeholder={t.emailPlaceholder}
               className="pl-9 text-sm sm:text-base h-11 sm:h-12 font-body"
               maxLength={255}
+              data-ph-no-capture
             />
           </div>
           {errors.clientEmail && <p className="text-destructive text-xs mt-1">{errors.clientEmail}</p>}
@@ -148,6 +157,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
                 placeholder={t.emailPlaceholder}
                 className="pl-9 text-sm sm:text-base h-11 sm:h-12 font-body"
                 maxLength={255}
+                data-ph-no-capture
               />
             </div>
           </div>

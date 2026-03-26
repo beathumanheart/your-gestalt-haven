@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { navigationEN, navigationRU } from "@/content/navigation";
+import { trackBookNowClick } from "@/hooks/useBookingAnalytics";
 
 const Header = () => {
   const { language } = useLanguage();
@@ -82,7 +83,7 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <button
-              onClick={() => scrollToSection("contact")}
+              onClick={() => { trackBookNowClick("header_desktop"); scrollToSection("contact"); }}
               className="hidden md:block btn-primary text-sm py-2.5 px-6"
             >
               {c.bookSession}
@@ -119,7 +120,7 @@ const Header = () => {
               </button>
             ))}
             <button
-              onClick={() => scrollToSection("contact")}
+              onClick={() => { trackBookNowClick("header_mobile"); scrollToSection("contact"); }}
               className="btn-primary text-base py-3 px-8 mt-4"
             >
               {c.bookSession}

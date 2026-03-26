@@ -12,7 +12,13 @@ npm run lint       # ESLint
 npm run preview    # Preview production build
 ```
 
-**Testing**: Vitest is installed and `vitest.config.ts` exists, but there is no `test` script in `package.json`. Test files: `src/pages/AdminLogin.test.tsx`, `src/pages/AdminDashboard.test.tsx`.
+**Testing**:
+```bash
+npm run test          # vitest unit tests (run once)
+npm run test:watch    # vitest in watch mode
+npm run test:e2e      # Playwright E2E (requires built app at :4173)
+npm run test:all      # unit + E2E
+```
 
 ## Architecture
 
@@ -52,6 +58,12 @@ Language context is provided via `src/contexts/LanguageContext.tsx` (`useLanguag
 - **RLS**: All tables have Row Level Security. Only admins can write availability/session types; bookings are publicly creatable.
 - **Booking flow**: Multi-step widget (`src/components/booking/BookingWidget.tsx`) — session type → date/time → client details — calls `process-booking` Edge Function.
 - **Admin dashboard** (`src/pages/AdminDashboard.tsx`): Tabbed UI using components in `src/components/admin/`.
+
+### PostHog Analytics
+- Initialized in `src/main.tsx` with EU host (`eu.i.posthog.com`), `maskAllInputs: true`, `respect_dnt: true`
+- All tracking functions exported from `src/hooks/useBookingAnalytics.ts` — use these, don't call `posthog.capture` directly
+- 8 funnel events defined in `FUNNEL_STEPS` constant; booking form inputs carry `data-ph-no-capture`
+- PostHog key set via `VITE_PUBLIC_POSTHOG_KEY` / `VITE_PUBLIC_POSTHOG_HOST` env vars
 
 ### Styling
 - Custom design tokens in `src/index.css` (HSL CSS variables: sage, cream, terracotta, warm-gray)

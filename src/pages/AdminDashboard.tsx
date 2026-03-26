@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ElementType } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Calendar, Clock, List, Settings } from "lucide-react";
@@ -114,7 +114,7 @@ const AdminDashboard = () => {
     );
   }
 
-  const tabs: { id: Tab; label: string; icon: any }[] = [
+  const tabs: { id: Tab; label: string; icon: ElementType }[] = [
     { id: "bookings", label: "Bookings", icon: List },
     { id: "availability", label: "Availability", icon: Clock },
     { id: "sessions", label: "Session Types", icon: Settings },

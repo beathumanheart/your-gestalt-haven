@@ -16,6 +16,7 @@ import {
   trackDateTimeSelected,
   trackConfirmationView,
 } from "@/hooks/useBookingAnalytics";
+import type { SessionType } from "./SessionTypeSelector";
 
 export interface BookingData {
   sessionTypeId: string;
@@ -30,6 +31,16 @@ export interface BookingData {
   notes: string;
 }
 
+export interface ConfirmedBooking {
+  id: string;
+  start_time: string;
+  end_time: string;
+  client_email: string;
+  google_meet_link?: string | null;
+  sessionTypeName: string;
+  durationMinutes: number;
+}
+
 const STEPS = ["session", "datetime", "details"] as const;
 type Step = typeof STEPS[number];
 
@@ -40,7 +51,7 @@ const BookingWidget = () => {
 
   const [step, setStep] = useState<Step>("session");
   const [booking, setBooking] = useState<Partial<BookingData>>({});
-  const [confirmed, setConfirmed] = useState<any>(null);
+  const [confirmed, setConfirmed] = useState<ConfirmedBooking | null>(null);
   const [cancelling, setCancelling] = useState(false);
 
   const stepIndex = STEPS.indexOf(step);
@@ -158,7 +169,7 @@ const BookingWidget = () => {
             selected={booking.sessionTypeId}
             t={t}
             language={language}
-            onSelect={(st, index) => {
+            onSelect={(st: SessionType, index: number) => {
               const name = (language === "ru" && st.name_ru) ? st.name_ru : st.name;
               trackServiceSelected(name, index);
               setBooking({

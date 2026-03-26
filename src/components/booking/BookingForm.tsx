@@ -4,14 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { CalendarDays, Clock, User, Mail, ChevronLeft } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
-import type { BookingData } from "./BookingWidget";
+import type { BookingData, ConfirmedBooking } from "./BookingWidget";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
 import { trackBookingCompleted } from "@/hooks/useBookingAnalytics";
 
 interface Props {
   booking: BookingData;
   t: BookingContent;
-  onBooked: (result: any) => void;
+  onBooked: (result: ConfirmedBooking) => void;
   onChange: (fields: Partial<BookingData>) => void;
   onBack: () => void;
 }

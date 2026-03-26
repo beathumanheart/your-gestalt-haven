@@ -4,8 +4,19 @@ import { format, parseISO } from "date-fns";
 import { CalendarDays, Mail, User, XCircle, CheckCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+interface Booking {
+  id: string;
+  start_time: string;
+  end_time: string;
+  client_name: string;
+  client_email: string;
+  status: string;
+  notes?: string | null;
+  session_types?: { name: string; duration_minutes: number } | null;
+}
+
 const BookingsList = () => {
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchBookings = async () => {

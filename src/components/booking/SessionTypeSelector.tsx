@@ -3,13 +3,29 @@ import { Clock, ChevronDown } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { Language } from "@/contexts/LanguageContext";
 
+export interface SessionType {
+  id: string;
+  name: string;
+  name_ru?: string | null;
+  description?: string | null;
+  description_ru?: string | null;
+  duration_minutes: number;
+  price?: number | null;
+  show_price?: boolean;
+  pricing_type?: string;
+  min_price?: number | null;
+  max_price?: number | null;
+  currency?: string;
+  show_second_email?: boolean;
+}
+
 interface Props {
-  sessionTypes: any[];
+  sessionTypes: SessionType[];
   loading: boolean;
   selected?: string;
   t: BookingContent;
   language: Language;
-  onSelect: (st: any, index: number) => void;
+  onSelect: (st: SessionType, index: number) => void;
 }
 
 const DescriptionBlock = ({ text, language }: { text: string; language: Language }) => {
@@ -50,8 +66,8 @@ const DescriptionBlock = ({ text, language }: { text: string; language: Language
 };
 
 const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onSelect }: Props) => {
-  const getName = (st: any) => (language === "ru" && st.name_ru) ? st.name_ru : st.name;
-  const getDescription = (st: any) => (language === "ru" && st.description_ru) ? st.description_ru : st.description;
+  const getName = (st: SessionType) => (language === "ru" && st.name_ru) ? st.name_ru : st.name;
+  const getDescription = (st: SessionType) => (language === "ru" && st.description_ru) ? st.description_ru : st.description;
   if (loading) {
     return (
       <div className="space-y-4">

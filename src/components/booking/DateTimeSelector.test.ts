@@ -20,7 +20,7 @@ describe("getUserTimezone", () => {
 
   it("returns UTC when Intl fails", () => {
     const original = Intl.DateTimeFormat;
-    // @ts-ignore
+    // @ts-expect-error - mocking Intl.DateTimeFormat to throw
     vi.spyOn(Intl, "DateTimeFormat").mockImplementation(() => {
       throw new Error("not supported");
     });

@@ -3,9 +3,10 @@ import { format, parseISO } from "date-fns";
 import { CalendarDays, Clock, Mail, Video, CheckCircle, XCircle } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
+import type { ConfirmedBooking } from "./BookingWidget";
 
 interface Props {
-  booking: any;
+  booking: ConfirmedBooking;
   t: BookingContent;
   onReset: () => void;
   onCancel: () => void;

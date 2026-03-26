@@ -35,7 +35,33 @@ const SessionTypeManager = () => {
       .from("session_types")
       .select("*")
       .order("sort_order");
-    setTypes((data || []).map(t => ({ ...t, description: t.description || "", description_ru: (t as any).description_ru || "", name_ru: (t as any).name_ru || "", price: t.price, currency: t.currency || "USD", show_price: t.show_price ?? true, pricing_type: (t as any).pricing_type || 'fixed', min_price: (t as any).min_price ?? null, max_price: (t as any).max_price ?? null, notification_email_1: (t as any).notification_email_1 || "", notification_email_2: (t as any).notification_email_2 || "", show_second_email: (t as any).show_second_email ?? false })));
+    setTypes((data || []).map(t => {
+      const row = t as typeof t & {
+        description_ru: string;
+        name_ru: string;
+        pricing_type: string;
+        min_price: number | null;
+        max_price: number | null;
+        notification_email_1: string;
+        notification_email_2: string;
+        show_second_email: boolean;
+      };
+      return {
+        ...row,
+        description: row.description || "",
+        description_ru: row.description_ru || "",
+        name_ru: row.name_ru || "",
+        price: row.price,
+        currency: row.currency || "USD",
+        show_price: row.show_price ?? true,
+        pricing_type: (row.pricing_type || "fixed") as "fixed" | "solidarity",
+        min_price: row.min_price ?? null,
+        max_price: row.max_price ?? null,
+        notification_email_1: row.notification_email_1 || "",
+        notification_email_2: row.notification_email_2 || "",
+        show_second_email: row.show_second_email ?? false,
+      };
+    }));
     setLoading(false);
   };
 

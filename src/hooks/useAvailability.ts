@@ -8,7 +8,7 @@ export interface TimeSlot {
 }
 
 export function useSessionTypes() {
-  const [sessionTypes, setSessionTypes] = useState<any[]>([]);
+  const [sessionTypes, setSessionTypes] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
     const { data: bookings } = await supabase
       .rpc("get_booked_slots", { target_date: dateStr });
 
-    const bookedSlots = (bookings || []).map((b: any) => ({
+    const bookedSlots = (bookings || []).map((b: { start_time: string; end_time: string }) => ({
       start: parseISO(b.start_time),
       end: parseISO(b.end_time),
     }));

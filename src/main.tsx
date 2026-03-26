@@ -9,7 +9,6 @@ posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
   autocapture: true,
   capture_performance: true,
   capture_pageleave: true,
-  respect_dnt: true,
   session_recording: {
     maskAllInputs: true,
   },

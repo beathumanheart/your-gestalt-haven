@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, ChevronDown } from "lucide-react";
+import { Clock, ChevronDown, Link, Check } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { Language } from "@/contexts/LanguageContext";
 
@@ -26,6 +26,7 @@ interface Props {
   t: BookingContent;
   language: Language;
   onSelect: (st: SessionType, index: number) => void;
+  getShareUrl?: (id: string) => string;
 }
 
 const DescriptionBlock = ({ text, language }: { text: string; language: Language }) => {
@@ -65,9 +66,22 @@ const DescriptionBlock = ({ text, language }: { text: string; language: Language
   );
 };
 
-const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onSelect }: Props) => {
+const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onSelect, getShareUrl }: Props) => {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const getName = (st: SessionType) => (language === "ru" && st.name_ru) ? st.name_ru : st.name;
   const getDescription = (st: SessionType) => (language === "ru" && st.description_ru) ? st.description_ru : st.description;
+
+  const handleCopyLink = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!getShareUrl) return;
+    try {
+      await navigator.clipboard.writeText(getShareUrl(id));
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // fallback: do nothing silently
+    }
+  };
   if (loading) {
     return (
       <div className="space-y-4">
@@ -102,8 +116,23 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onS
             }`}
           >
             <div className="flex items-start justify-between">
-              <div className="flex-1">
+              <div className="flex-1 flex items-center gap-2">
                 <h3 className="font-display text-lg font-medium text-foreground">{getName(st)}</h3>
+                {getShareUrl && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => handleCopyLink(e, st.id)}
+                    onKeyDown={(e) => e.key === "Enter" && handleCopyLink(e as unknown as React.MouseEvent, st.id)}
+                    title={language === "ru" ? "Скопировать ссылку" : "Copy link"}
+                    className="flex-shrink-0 p-1 rounded text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                  >
+                    {copiedId === st.id
+                      ? <Check className="w-3.5 h-3.5 text-primary" />
+                      : <Link className="w-3.5 h-3.5" />
+                    }
+                  </span>
+                )}
               </div>
               <div className="flex flex-col items-end gap-1 ml-4">
                 <span className="flex items-center gap-1 font-body text-sm text-muted-foreground">

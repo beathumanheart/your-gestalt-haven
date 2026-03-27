@@ -70,6 +70,30 @@ test.describe("Booking widget", () => {
   });
 });
 
+test.describe("Session direct links", () => {
+  test("page loads without crashing when ?session= param is present", async ({ page }) => {
+    await page.goto("/?session=00000000-0000-0000-0000-000000000000");
+    const widget = page.locator(".card-organic").first();
+    await expect(widget).toBeVisible({ timeout: 10_000 });
+  });
+
+  test("booking widget is still present and functional with unknown ?session= ID", async ({ page }) => {
+    await page.goto("/?session=00000000-0000-0000-0000-000000000000");
+    await page.evaluate(() => {
+      document.getElementById("contact")?.scrollIntoView();
+    });
+    // Step indicator is rendered regardless of session data
+    const stepIndicator = page.locator(".card-organic .rounded-full").first();
+    await expect(stepIndicator).toBeVisible({ timeout: 10_000 });
+  });
+
+  test("/ru route loads correctly with ?session= param", async ({ page }) => {
+    await page.goto("/ru?session=00000000-0000-0000-0000-000000000000");
+    const widget = page.locator(".card-organic").first();
+    await expect(widget).toBeVisible({ timeout: 10_000 });
+  });
+});
+
 test.describe("PostHog initialisation", () => {
   test("PostHog script is loaded when key is configured", async ({ page }) => {
     await page.goto("/");

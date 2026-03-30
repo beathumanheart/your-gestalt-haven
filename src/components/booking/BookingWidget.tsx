@@ -9,7 +9,7 @@ import BookingForm from "./BookingForm";
 import BookingConfirmation from "./BookingConfirmation";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { toast } from "sonner";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   trackServicesView,
   trackServiceSelected,
@@ -45,11 +45,10 @@ export interface ConfirmedBooking {
 const STEPS = ["session", "datetime", "details"] as const;
 type Step = typeof STEPS[number];
 
-const BookingWidget = () => {
-  const { language } = useLanguage();
+const BookingWidget = ({ initialSessionId }: { initialSessionId?: string } = {}) => {
+  const { language, langPath } = useLanguage();
   const t = language === "ru" ? bookingRU : bookingEN;
   const { sessionTypes, loading: loadingTypes } = useSessionTypes();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
 
   const [step, setStep] = useState<Step>("session");
@@ -77,29 +76,25 @@ const BookingWidget = () => {
     }
   }, [confirmed]);
 
-  // Auto-select session type from ?session= query param
+  // Auto-select session type from prop or ?session= query param
   useEffect(() => {
     if (autoSelectedRef.current || loadingTypes || sessionTypes.length === 0) return;
-    const sessionId = searchParams.get("session");
+    const sessionId = initialSessionId || searchParams.get("session");
     if (!sessionId) return;
     const st = sessionTypes.find((s) => s.id === sessionId);
     if (!st) return;
     autoSelectedRef.current = true;
     const name = (language === "ru" && st.name_ru) ? st.name_ru : st.name;
-    trackServiceSelected(name, sessionTypes.indexOf(st));
     setBooking({
       sessionTypeId: st.id,
       sessionTypeName: name,
       durationMinutes: st.duration_minutes,
       showSecondEmail: st.show_second_email ?? false,
     });
-    setStep("datetime");
-  }, [sessionTypes, loadingTypes, searchParams, language]);
+  }, [sessionTypes, loadingTypes, searchParams, initialSessionId, language]);
 
-  const getShareUrl = (sessionId: string) => {
-    const base = window.location.origin + location.pathname;
-    return `${base}?session=${sessionId}`;
-  };
+  const getShareUrl = (sessionId: string) =>
+    window.location.origin + langPath(`/book/${sessionId}`);
 
   const canNext = () => {
     switch (step) {
@@ -111,6 +106,10 @@ const BookingWidget = () => {
 
   const goNext = () => {
     const idx = STEPS.indexOf(step);
+    if (step === "session" && booking.sessionTypeName) {
+      const stIndex = sessionTypes.findIndex((s) => s.id === booking.sessionTypeId);
+      trackServiceSelected(booking.sessionTypeName, stIndex);
+    }
     if (idx < STEPS.length - 1) setStep(STEPS[idx + 1]);
   };
 
@@ -195,12 +194,12 @@ const BookingWidget = () => {
             sessionTypes={sessionTypes}
             loading={loadingTypes}
             selected={booking.sessionTypeId}
+            expandedId={initialSessionId || searchParams.get("session") || undefined}
             t={t}
             language={language}
             getShareUrl={getShareUrl}
-            onSelect={(st: SessionType, index: number) => {
+            onSelect={(st: SessionType, _index: number) => {
               const name = (language === "ru" && st.name_ru) ? st.name_ru : st.name;
-              trackServiceSelected(name, index);
               setBooking({
                 ...booking,
                 sessionTypeId: st.id,

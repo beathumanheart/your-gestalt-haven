@@ -23,14 +23,15 @@ interface Props {
   sessionTypes: SessionType[];
   loading: boolean;
   selected?: string;
+  expandedId?: string;
   t: BookingContent;
   language: Language;
   onSelect: (st: SessionType, index: number) => void;
   getShareUrl?: (id: string) => string;
 }
 
-const DescriptionBlock = ({ text, language }: { text: string; language: Language }) => {
-  const [expanded, setExpanded] = useState(false);
+const DescriptionBlock = ({ text, language, initialExpanded = false }: { text: string; language: Language; initialExpanded?: boolean }) => {
+  const [expanded, setExpanded] = useState(initialExpanded);
   const lines = text.split("\n").filter(Boolean);
   const isLong = lines.length > 1 || text.length > 100;
   const moreLabel = language === "ru" ? "Подробнее" : "More";
@@ -66,7 +67,7 @@ const DescriptionBlock = ({ text, language }: { text: string; language: Language
   );
 };
 
-const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onSelect, getShareUrl }: Props) => {
+const SessionTypeSelector = ({ sessionTypes, loading, selected, expandedId, t, language, onSelect, getShareUrl }: Props) => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const getName = (st: SessionType) => (language === "ru" && st.name_ru) ? st.name_ru : st.name;
   const getDescription = (st: SessionType) => (language === "ru" && st.description_ru) ? st.description_ru : st.description;
@@ -154,7 +155,7 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, t, language, onS
                 )}
               </div>
             </div>
-            {getDescription(st) && <DescriptionBlock text={getDescription(st)} language={language} />}
+            {getDescription(st) && <DescriptionBlock text={getDescription(st)} language={language} initialExpanded={expandedId === st.id} />}
           </button>
         ))}
       </div>

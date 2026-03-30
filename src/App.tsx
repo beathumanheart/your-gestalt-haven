@@ -9,9 +9,11 @@ import {
   Route,
   Navigate,
   useParams,
+  useSearchParams,
 } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Index from "./pages/Index";
+import BookSession from "./pages/BookSession";
 import OfferAgreement from "./pages/OfferAgreement";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
@@ -33,6 +35,18 @@ const LangLayout = ({ children }: { children: React.ReactNode }) => {
   return <LanguageProvider>{children}</LanguageProvider>;
 };
 
+// Redirect legacy ?session=<id> URLs to the dedicated book page
+const SessionParamRedirect = ({ children }: { children: React.ReactNode }) => {
+  const [searchParams] = useSearchParams();
+  const { lang } = useParams();
+  const sessionId = searchParams.get("session");
+  if (sessionId) {
+    const langPrefix = lang === "ru" ? "ru" : "en";
+    return <Navigate to={`/${langPrefix}/book/${sessionId}`} replace />;
+  }
+  return <>{children}</>;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -45,7 +59,9 @@ const App = () => (
             path="/"
             element={
               <LangLayout>
-                <Index />
+                <SessionParamRedirect>
+                  <Index />
+                </SessionParamRedirect>
               </LangLayout>
             }
           />
@@ -60,7 +76,17 @@ const App = () => (
             path="/:lang"
             element={
               <LangLayout>
-                <Index />
+                <SessionParamRedirect>
+                  <Index />
+                </SessionParamRedirect>
+              </LangLayout>
+            }
+          />
+          <Route
+            path="/:lang/book/:sessionId"
+            element={
+              <LangLayout>
+                <BookSession />
               </LangLayout>
             }
           />

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, addMinutes, isBefore, isAfter, parseISO, startOfDay } from "date-fns";
+import type { SessionType } from "@/components/booking/SessionTypeSelector";
 
 export interface TimeSlot {
   start: string; // HH:mm
@@ -8,7 +9,7 @@ export interface TimeSlot {
 }
 
 export function useSessionTypes() {
-  const [sessionTypes, setSessionTypes] = useState<Record<string, unknown>[]>([]);
+  const [sessionTypes, setSessionTypes] = useState<SessionType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export function useSessionTypes() {
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => {
-        setSessionTypes(data || []);
+        setSessionTypes((data as unknown as SessionType[]) || []);
         setLoading(false);
       });
   }, []);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -7,10 +8,15 @@ import { navigationEN, navigationRU } from "@/content/navigation";
 import { trackBookNowClick } from "@/hooks/useBookingAnalytics";
 
 const Header = () => {
-  const { language } = useLanguage();
+  const { language, langPath } = useLanguage();
   const c = language === "ru" ? navigationRU : navigationEN;
+  const navigate = useNavigate();
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Check if we're on the homepage
+  const isHomepage = location.pathname === "/" || /^\/(en|ru)\/?$/.test(location.pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,11 +31,16 @@ const Header = () => {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const scrollToSection = (id: string) => {
+  const navigateToSection = (id: string) => {
     setMobileOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    if (isHomepage) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // Navigate to homepage with hash to scroll after load
+      navigate(langPath("/") + `#${id}`);
     }
   };
 
@@ -44,7 +55,7 @@ const Header = () => {
       >
         <nav className="container-narrow flex items-center justify-between px-6">
           <button
-            onClick={() => scrollToSection("hero")}
+            onClick={() => navigateToSection("hero")}
             className="flex items-center gap-2 font-display text-xl md:text-2xl font-medium text-foreground hover:text-primary transition-colors"
           >
             <svg 
@@ -72,7 +83,7 @@ const Header = () => {
             {c.navItems.map((item) => (
               <button
                 key={item.sectionId}
-                onClick={() => scrollToSection(item.sectionId)}
+                onClick={() => navigateToSection(item.sectionId)}
                 className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {item.label}
@@ -83,7 +94,7 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <button
-              onClick={() => { trackBookNowClick("header_desktop"); scrollToSection("contact"); }}
+              onClick={() => { trackBookNowClick("header_desktop"); navigateToSection("contact"); }}
               className="hidden md:block btn-primary text-sm py-2.5 px-6"
             >
               {c.bookSession}
@@ -113,14 +124,14 @@ const Header = () => {
             {c.navItems.map((item) => (
               <button
                 key={item.sectionId}
-                onClick={() => scrollToSection(item.sectionId)}
+                onClick={() => navigateToSection(item.sectionId)}
                 className="font-display text-2xl text-foreground hover:text-primary transition-colors"
               >
                 {item.label}
               </button>
             ))}
             <button
-              onClick={() => { trackBookNowClick("header_mobile"); scrollToSection("contact"); }}
+              onClick={() => { trackBookNowClick("header_mobile"); navigateToSection("contact"); }}
               className="btn-primary text-base py-3 px-8 mt-4"
             >
               {c.bookSession}

@@ -76,7 +76,7 @@ const BookingWidget = ({ initialSessionId }: { initialSessionId?: string } = {})
     }
   }, [confirmed]);
 
-  // Auto-select session type from prop or ?session= query param
+  // Auto-select session type from prop or ?session= query param and skip to datetime
   useEffect(() => {
     if (autoSelectedRef.current || loadingTypes || sessionTypes.length === 0) return;
     const sessionId = initialSessionId || searchParams.get("session");
@@ -91,6 +91,10 @@ const BookingWidget = ({ initialSessionId }: { initialSessionId?: string } = {})
       durationMinutes: st.duration_minutes,
       showSecondEmail: st.show_second_email ?? false,
     });
+    // Skip step 1 when session is pre-selected via URL
+    if (initialSessionId) {
+      setStep("datetime");
+    }
   }, [sessionTypes, loadingTypes, searchParams, initialSessionId, language]);
 
   const getShareUrl = (sessionId: string) =>

@@ -8,7 +8,7 @@ export interface TimeSlot {
 }
 
 export function useSessionTypes() {
-  const [sessionTypes, setSessionTypes] = useState<Record<string, unknown>[]>([]);
+  const [sessionTypes, setSessionTypes] = useState<SessionType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export function useSessionTypes() {
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => {
-        setSessionTypes(data || []);
+        setSessionTypes((data as unknown as SessionType[]) || []);
         setLoading(false);
       });
   }, []);

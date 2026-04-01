@@ -7,6 +7,7 @@ interface SessionType {
   id?: string;
   name: string;
   name_ru: string;
+  slug: string;
   description: string;
   description_ru: string;
   duration_minutes: number;
@@ -23,6 +24,9 @@ interface SessionType {
   show_second_email: boolean;
   isNew?: boolean;
 }
+
+const generateSlug = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 
 const SessionTypeManager = () => {
   const [types, setTypes] = useState<SessionType[]>([]);

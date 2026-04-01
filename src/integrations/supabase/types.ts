@@ -176,6 +176,7 @@ export type Database = {
           pricing_type: string
           show_price: boolean
           show_second_email: boolean
+          slug: string
           sort_order: number
           updated_at: string
         }
@@ -197,6 +198,7 @@ export type Database = {
           pricing_type?: string
           show_price?: boolean
           show_second_email?: boolean
+          slug: string
           sort_order?: number
           updated_at?: string
         }
@@ -218,6 +220,7 @@ export type Database = {
           pricing_type?: string
           show_price?: boolean
           show_second_email?: boolean
+          slug?: string
           sort_order?: number
           updated_at?: string
         }

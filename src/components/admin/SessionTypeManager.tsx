@@ -75,6 +75,7 @@ const SessionTypeManager = () => {
     setTypes([...types, {
       name: "",
       name_ru: "",
+      slug: "",
       description: "",
       description_ru: "",
       duration_minutes: 50,

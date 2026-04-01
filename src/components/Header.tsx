@@ -31,11 +31,16 @@ const Header = () => {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const scrollToSection = (id: string) => {
+  const navigateToSection = (id: string) => {
     setMobileOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    if (isHomepage) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // Navigate to homepage with hash to scroll after load
+      navigate(langPath("/") + `#${id}`);
     }
   };
 

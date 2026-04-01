@@ -52,6 +52,7 @@ const SessionTypeManager = () => {
       };
       return {
         ...row,
+        slug: (row as typeof row & { slug: string }).slug || "",
         description: row.description || "",
         description_ru: row.description_ru || "",
         name_ru: row.name_ru || "",

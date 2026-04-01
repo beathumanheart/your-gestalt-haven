@@ -122,7 +122,7 @@ const BookSession = () => {
                 )}
               </div>
 
-              <BookingWidget initialSessionId={sessionId} />
+              <BookingWidget initialSessionId={session?.id} />
             </>
           )}
         </div>

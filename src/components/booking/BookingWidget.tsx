@@ -97,8 +97,11 @@ const BookingWidget = ({ initialSessionId }: { initialSessionId?: string } = {})
     }
   }, [sessionTypes, loadingTypes, searchParams, initialSessionId, language]);
 
-  const getShareUrl = (sessionId: string) =>
-    window.location.origin + langPath(`/book/${sessionId}`);
+  const getShareUrl = (sessionId: string) => {
+    const st = sessionTypes.find((s) => s.id === sessionId);
+    const slug = st?.slug || sessionId;
+    return window.location.origin + langPath(`/book/${slug}`);
+  };
 
   const canNext = () => {
     switch (step) {

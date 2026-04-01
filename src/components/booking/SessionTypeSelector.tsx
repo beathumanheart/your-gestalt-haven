@@ -7,6 +7,7 @@ export interface SessionType {
   id: string;
   name: string;
   name_ru?: string | null;
+  slug?: string;
   description?: string | null;
   description_ru?: string | null;
   duration_minutes: number;

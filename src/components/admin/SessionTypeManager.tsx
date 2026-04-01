@@ -113,6 +113,7 @@ const SessionTypeManager = () => {
       const data = {
         name: t.name,
         name_ru: t.name_ru || null,
+        slug: t.slug || generateSlug(t.name),
         description: t.description || null,
         description_ru: t.description_ru || null,
         duration_minutes: t.duration_minutes,

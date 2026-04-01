@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -7,10 +8,15 @@ import { navigationEN, navigationRU } from "@/content/navigation";
 import { trackBookNowClick } from "@/hooks/useBookingAnalytics";
 
 const Header = () => {
-  const { language } = useLanguage();
+  const { language, langPath } = useLanguage();
   const c = language === "ru" ? navigationRU : navigationEN;
+  const navigate = useNavigate();
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Check if we're on the homepage
+  const isHomepage = location.pathname === "/" || /^\/(en|ru)\/?$/.test(location.pathname);
 
   useEffect(() => {
     const handleScroll = () => {

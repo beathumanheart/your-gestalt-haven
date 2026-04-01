@@ -7,6 +7,7 @@ interface SessionType {
   id?: string;
   name: string;
   name_ru: string;
+  slug: string;
   description: string;
   description_ru: string;
   duration_minutes: number;
@@ -23,6 +24,9 @@ interface SessionType {
   show_second_email: boolean;
   isNew?: boolean;
 }
+
+const generateSlug = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 
 const SessionTypeManager = () => {
   const [types, setTypes] = useState<SessionType[]>([]);
@@ -48,6 +52,7 @@ const SessionTypeManager = () => {
       };
       return {
         ...row,
+        slug: (row as typeof row & { slug: string }).slug || "",
         description: row.description || "",
         description_ru: row.description_ru || "",
         name_ru: row.name_ru || "",
@@ -71,6 +76,7 @@ const SessionTypeManager = () => {
     setTypes([...types, {
       name: "",
       name_ru: "",
+      slug: "",
       description: "",
       description_ru: "",
       duration_minutes: 50,
@@ -108,6 +114,7 @@ const SessionTypeManager = () => {
       const data = {
         name: t.name,
         name_ru: t.name_ru || null,
+        slug: t.slug || generateSlug(t.name),
         description: t.description || null,
         description_ru: t.description_ru || null,
         duration_minutes: t.duration_minutes,

@@ -17,17 +17,24 @@ const BookSession = () => {
 
   useEffect(() => {
     if (!sessionId) { setNotFound(true); setLoading(false); return; }
-    supabase
+    // Try slug first, then fall back to UUID for backward compatibility
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId);
+    const query = supabase
       .from("session_types")
       .select("*")
-      .eq("id", sessionId)
-      .eq("is_active", true)
-      .single()
-      .then(({ data, error }) => {
-        if (error || !data) setNotFound(true);
-        else setSession(data as unknown as SessionType);
-        setLoading(false);
-      });
+      .eq("is_active", true);
+    
+    if (isUuid) {
+      query.eq("id", sessionId);
+    } else {
+      query.eq("slug", sessionId);
+    }
+    
+    query.single().then(({ data, error }) => {
+      if (error || !data) setNotFound(true);
+      else setSession(data as unknown as SessionType);
+      setLoading(false);
+    });
   }, [sessionId]);
 
   const name = session

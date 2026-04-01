@@ -55,7 +55,7 @@ const Header = () => {
       >
         <nav className="container-narrow flex items-center justify-between px-6">
           <button
-            onClick={() => scrollToSection("hero")}
+            onClick={() => navigateToSection("hero")}
             className="flex items-center gap-2 font-display text-xl md:text-2xl font-medium text-foreground hover:text-primary transition-colors"
           >
             <svg 
@@ -83,7 +83,7 @@ const Header = () => {
             {c.navItems.map((item) => (
               <button
                 key={item.sectionId}
-                onClick={() => scrollToSection(item.sectionId)}
+                onClick={() => navigateToSection(item.sectionId)}
                 className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {item.label}
@@ -94,7 +94,7 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <button
-              onClick={() => { trackBookNowClick("header_desktop"); scrollToSection("contact"); }}
+              onClick={() => { trackBookNowClick("header_desktop"); navigateToSection("contact"); }}
               className="hidden md:block btn-primary text-sm py-2.5 px-6"
             >
               {c.bookSession}
@@ -124,14 +124,14 @@ const Header = () => {
             {c.navItems.map((item) => (
               <button
                 key={item.sectionId}
-                onClick={() => scrollToSection(item.sectionId)}
+                onClick={() => navigateToSection(item.sectionId)}
                 className="font-display text-2xl text-foreground hover:text-primary transition-colors"
               >
                 {item.label}
               </button>
             ))}
             <button
-              onClick={() => { trackBookNowClick("header_mobile"); scrollToSection("contact"); }}
+              onClick={() => { trackBookNowClick("header_mobile"); navigateToSection("contact"); }}
               className="btn-primary text-base py-3 px-8 mt-4"
             >
               {c.bookSession}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, addMinutes, isBefore, isAfter, parseISO, startOfDay } from "date-fns";
+import type { SessionType } from "@/components/booking/SessionTypeSelector";
 
 export interface TimeSlot {
   start: string; // HH:mm

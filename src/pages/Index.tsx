@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
@@ -9,9 +10,23 @@ import Footer from "@/components/Footer";
 import { trackHomepageView } from "@/hooks/useBookingAnalytics";
 
 const Index = () => {
+  const location = useLocation();
+
   useEffect(() => {
     trackHomepageView();
   }, []);
+
+  // Handle hash-based scroll after navigation from sub-pages
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      // Small delay to ensure DOM is rendered
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [location.hash]);
 
   return (
     <main className="min-h-screen bg-background">

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarDays, Clock, Mail, Video, CheckCircle, XCircle } from "lucide-react";
+import { CalendarDays, Clock, Mail, Video, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
 import type { ConfirmedBooking } from "./BookingWidget";
@@ -25,7 +25,22 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
       <h3 className="font-display text-2xl md:text-3xl font-light text-foreground mb-2">
         {t.confirmTitle}
       </h3>
-      <p className="font-body text-muted-foreground mb-8">{t.confirmSubtitle}</p>
+      {booking.emailSent === false ? (
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-8 text-left max-w-sm mx-auto" data-testid="email-warning">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-body text-sm text-amber-800">{t.emailWarning}</p>
+            <p className="font-body text-xs text-amber-700">
+              {t.confidential}
+              <a href={t.telegramUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{t.telegramLabel}</a>
+              {t.orText}
+              <a href={t.signalUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{t.signalLabel}</a>
+            </p>
+          </div>
+        </div>
+      ) : (
+        <p className="font-body text-muted-foreground mb-8">{t.confirmSubtitle}</p>
+      )}
 
       <div className="bg-muted/50 rounded-xl p-5 space-y-3 max-w-sm mx-auto text-left mb-8">
         <div className="flex items-center gap-3 font-body text-sm">
@@ -50,23 +65,33 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
             {booking.durationMinutes} min
           </span>
         </div>
-        <div className="flex items-center gap-3 font-body text-sm">
-          <Mail className="w-4 h-4 text-primary shrink-0" />
-          <span className="text-muted-foreground">{t.confirmEmail}:</span>
-          <span className="text-foreground font-medium ml-auto truncate max-w-[160px]">
-            {booking.client_email}
-          </span>
-        </div>
+        {booking.emailSent !== false && (
+          <div className="flex items-center gap-3 font-body text-sm">
+            <Mail className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-muted-foreground">{t.confirmEmail}:</span>
+            <span className="text-foreground font-medium ml-auto truncate max-w-[160px]">
+              {booking.client_email}
+            </span>
+          </div>
+        )}
         {booking.google_meet_link && (
-          <a
-            href={booking.google_meet_link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 font-body text-sm text-primary hover:underline pt-2 border-t border-border mt-2"
-          >
-            <Video className="w-4 h-4 shrink-0" />
-            {t.confirmMeetLink} →
-          </a>
+          <div className="pt-2 border-t border-border mt-2 space-y-1.5">
+            <a
+              href={booking.google_meet_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 font-body text-sm text-primary hover:underline"
+            >
+              <Video className="w-4 h-4 shrink-0" />
+              {t.confirmMeetLink} →
+            </a>
+            <p
+              className="font-body text-xs text-muted-foreground break-all select-all pl-7"
+              data-testid="meet-link-text"
+            >
+              {booking.google_meet_link}
+            </p>
+          </div>
         )}
       </div>
 

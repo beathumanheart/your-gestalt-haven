@@ -103,6 +103,14 @@ export type BookingError = {
   request_id?: string;
 };
 
+export function trackEmailFailed(params: {
+  service_name: string;
+  booking_date: string;
+  booking_time: string;
+}) {
+  trackEvent("booking_funnel_email_failed", params);
+}
+
 export function trackBookingFailed(err: BookingError) {
   trackEvent("booking_failed", err as unknown as Record<string, unknown>);
 }
@@ -117,6 +125,7 @@ export function useBookingAnalytics() {
     trackDateTimeSelected,
     trackConfirmationView,
     trackBookingCompleted,
+    trackEmailFailed,
     trackBookingFailed,
     trackEvent,
     FUNNEL_STEPS,

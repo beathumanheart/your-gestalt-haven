@@ -6,7 +6,7 @@ import { CalendarDays, Clock, User, Mail, ChevronLeft } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { BookingData, ConfirmedBooking } from "./BookingWidget";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
-import { trackBookingCompleted, trackBookingFailed, type BookingError } from "@/hooks/useBookingAnalytics";
+import { trackBookingCompleted, trackEmailFailed, trackBookingFailed, type BookingError } from "@/hooks/useBookingAnalytics";
 
 interface Props {
   booking: BookingData;
@@ -65,17 +65,28 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
 
       if (error) throw error;
 
+      const bookingDate = format(booking.date, "yyyy-MM-dd");
       trackBookingCompleted({
         service_name: booking.sessionTypeName,
-        booking_date: format(booking.date, "yyyy-MM-dd"),
+        booking_date: bookingDate,
         booking_time: booking.timeSlot,
         is_new_client: true,
       });
+      if (result?.emailSent === false) {
+        trackEmailFailed({
+          service_name: booking.sessionTypeName,
+          booking_date: bookingDate,
+          booking_time: booking.timeSlot,
+        });
+      }
       onBooked({
         ...result?.booking,
+        // client_email comes from local state — the server no longer echoes it back.
+        client_email: booking.clientEmail.trim().toLowerCase(),
         google_meet_link: result?.meetLink || null,
         sessionTypeName: booking.sessionTypeName,
         durationMinutes: booking.durationMinutes,
+        emailSent: result?.emailSent ?? true,
       });
     } catch (err: unknown) {
       const newErrorId = crypto.randomUUID();

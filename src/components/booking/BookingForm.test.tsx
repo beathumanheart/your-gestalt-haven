@@ -19,12 +19,13 @@ vi.mock("@/hooks/useBookingAnalytics", async (importOriginal) => {
   return {
     ...actual,
     trackBookingCompleted: vi.fn(),
+    trackEmailFailed: vi.fn(),
     trackBookingFailed: vi.fn(),
   };
 });
 
 import { supabase } from "@/integrations/supabase/client";
-import { trackBookingFailed } from "@/hooks/useBookingAnalytics";
+import { trackBookingFailed, trackEmailFailed } from "@/hooks/useBookingAnalytics";
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -224,6 +225,94 @@ describe("BookingForm – 5xx from edge function", () => {
     await waitFor(() => {
       expect(screen.getByTestId("booking-error-ref")).toBeInTheDocument();
       expect(screen.getByTestId("booking-error-ref").textContent).toMatch(/^ref: [0-9a-f-]{36}$/);
+    });
+  });
+});
+
+describe("BookingForm – email failure (200 with emailSent: false)", () => {
+  const successWithNoEmail = {
+    data: {
+      success: true,
+      booking: { id: "b1", start_time: "2026-05-10T10:00:00", end_time: "2026-05-10T10:50:00", google_meet_link: "https://meet.example.com/abc" },
+      meetLink: "https://meet.example.com/abc",
+      emailSent: false,
+      requestId: "req-email-fail",
+    },
+    error: null,
+  };
+
+  it("calls onBooked (shows confirmation) even when emailSent is false", async () => {
+    const onBooked = vi.fn();
+    vi.mocked(supabase.functions.invoke).mockResolvedValueOnce(successWithNoEmail);
+
+    render(
+      <BookingForm
+        booking={validBooking as BookingData}
+        t={bookingEN}
+        onBooked={onBooked}
+        onChange={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+    submitForm();
+
+    await waitFor(() => {
+      expect(onBooked).toHaveBeenCalledWith(
+        expect.objectContaining({ emailSent: false })
+      );
+    });
+    expect(screen.queryByTestId("booking-error")).not.toBeInTheDocument();
+  });
+
+  it("fires trackEmailFailed when emailSent is false", async () => {
+    vi.mocked(supabase.functions.invoke).mockResolvedValueOnce(successWithNoEmail);
+
+    renderForm();
+    submitForm();
+
+    await waitFor(() => {
+      expect(vi.mocked(trackEmailFailed)).toHaveBeenCalledWith(
+        expect.objectContaining({ service_name: "Individual Therapy" })
+      );
+    });
+  });
+
+  it("does NOT fire trackEmailFailed when emailSent is true", async () => {
+    vi.mocked(supabase.functions.invoke).mockResolvedValueOnce({
+      data: { success: true, booking: { id: "b2", start_time: "2026-05-10T10:00:00", end_time: "2026-05-10T10:50:00", google_meet_link: null }, meetLink: null, emailSent: true, requestId: "req-ok" },
+      error: null,
+    });
+
+    renderForm();
+    submitForm();
+
+    await waitFor(() => {
+      expect(vi.mocked(supabase.functions.invoke)).toHaveBeenCalled();
+    });
+    // Give a tick for any async tracking calls
+    await new Promise((r) => setTimeout(r, 50));
+    expect(vi.mocked(trackEmailFailed)).not.toHaveBeenCalled();
+  });
+
+  it("passes client_email from local state, not from server response", async () => {
+    const onBooked = vi.fn();
+    vi.mocked(supabase.functions.invoke).mockResolvedValueOnce(successWithNoEmail);
+
+    render(
+      <BookingForm
+        booking={validBooking as BookingData}
+        t={bookingEN}
+        onBooked={onBooked}
+        onChange={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+    submitForm();
+
+    await waitFor(() => {
+      expect(onBooked).toHaveBeenCalledWith(
+        expect.objectContaining({ client_email: "test@example.com" })
+      );
     });
   });
 });

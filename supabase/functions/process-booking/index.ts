@@ -299,19 +299,26 @@ async function sendEmail(brevoApiKey: string, opts: {
     payload.attachment = opts.attachment;
   }
 
+  // Guard against Brevo hanging (e.g. IP verification delay) timing out the whole edge function.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10_000);
   try {
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: { "Content-Type": "application/json", "api-key": brevoApiKey },
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     if (!res.ok) {
       console.error(`[email] Brevo rejected: status=${res.status}`);
       return { ok: false, code: "BREVO_REJECTED" };
     }
     return { ok: true };
-  } catch {
-    console.error("[email] Network error reaching Brevo API");
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const isTimeout = err instanceof Error && err.name === "AbortError";
+    console.error(isTimeout ? "[email] Brevo request timed out after 10s" : "[email] Network error reaching Brevo API");
     return { ok: false, code: "BREVO_UNREACHABLE" };
   }
 }
@@ -632,8 +639,17 @@ Deno.serve(async (req) => {
     }
 
     logInfo(requestId, "complete", { durationMs: Date.now() - startMs });
+    // client_email is intentionally excluded — the client already knows their email.
+    const bookingResponse = {
+      id: booking.id,
+      start_time: booking.start_time,
+      end_time: booking.end_time,
+      session_type_id: booking.session_type_id,
+      client_timezone: booking.client_timezone,
+      google_meet_link: clientLink,
+    };
     return new Response(
-      JSON.stringify({ success: true, booking: { ...booking, google_meet_link: clientLink }, meetLink: clientLink, emailSent, requestId }),
+      JSON.stringify({ success: true, booking: bookingResponse, meetLink: clientLink, emailSent, requestId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {

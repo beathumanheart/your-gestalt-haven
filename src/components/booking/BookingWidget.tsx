@@ -40,6 +40,7 @@ export interface ConfirmedBooking {
   google_meet_link?: string | null;
   sessionTypeName: string;
   durationMinutes: number;
+  emailSent?: boolean;
 }
 
 const STEPS = ["session", "datetime", "details"] as const;

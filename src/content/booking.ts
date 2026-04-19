@@ -46,6 +46,8 @@ export interface BookingContent {
   bookAnother: string;
   cancelBooking: string;
   cancelledSuccess: string;
+  // Email warning (confirmation screen when email failed to send)
+  emailWarning: string;
   // Errors
   errorGeneral: string;
   errorNetwork: string;
@@ -105,6 +107,7 @@ export const bookingEN: BookingContent = {
   bookAnother: "Book another session",
   cancelBooking: "Cancel booking",
   cancelledSuccess: "Booking cancelled successfully.",
+  emailWarning: "We had trouble sending your confirmation email, but your booking is saved. Please copy the meeting link below — it's your way in.",
   errorGeneral: "Something went wrong. Please try again or reach out directly.",
   errorNetwork: "We couldn't reach our booking system. Please check your connection and try again.",
   errorServer: "Our booking system is having trouble. Please try again in a moment, or reach out via Telegram or Signal.",
@@ -161,6 +164,7 @@ export const bookingRU: BookingContent = {
   bookAnother: "Записаться ещё раз",
   cancelBooking: "Отменить запись",
   cancelledSuccess: "Запись успешно отменена.",
+  emailWarning: "Не удалось отправить письмо с подтверждением, но ваша запись сохранена. Скопируйте ссылку на встречу — она откроет вам доступ к сессии.",
   errorGeneral: "Что-то пошло не так. Попробуйте ещё раз или напишите нам напрямую.",
   errorNetwork: "Не удалось подключиться к системе записи. Проверьте интернет-соединение и попробуйте ещё раз.",
   errorServer: "В системе записи возникли проблемы. Попробуйте через минуту или свяжитесь через Telegram или Signal.",

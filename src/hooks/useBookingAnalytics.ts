@@ -77,6 +77,36 @@ export function trackBookingCompleted(params: {
   });
 }
 
+// ── Error tracking ─────────────────────────────────────────────
+
+/**
+ * Whitelisted fields for booking_failed events.
+ * Intentionally narrow — never add email, name, phone, notes,
+ * or any user-supplied text. This is a therapy practice.
+ */
+export type BookingError = {
+  /** Client-generated UUID to correlate with Supabase edge function logs */
+  error_id: string;
+  error_code:
+    | "VALIDATION_FAILED"
+    | "SLOT_TAKEN"
+    | "BREVO_UNREACHABLE"
+    | "BREVO_REJECTED"
+    | "INTERNAL"
+    | "NETWORK"
+    | "UNKNOWN";
+  /** HTTP status from the edge function response, if available */
+  http_status?: number;
+  /** Which step in the funnel the failure occurred */
+  funnel_step: string;
+  /** requestId returned by the edge function for log correlation */
+  request_id?: string;
+};
+
+export function trackBookingFailed(err: BookingError) {
+  trackEvent("booking_failed", err as unknown as Record<string, unknown>);
+}
+
 export function useBookingAnalytics() {
   return {
     trackHomepageView,
@@ -87,6 +117,7 @@ export function useBookingAnalytics() {
     trackDateTimeSelected,
     trackConfirmationView,
     trackBookingCompleted,
+    trackBookingFailed,
     trackEvent,
     FUNNEL_STEPS,
   };

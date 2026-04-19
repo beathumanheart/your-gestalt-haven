@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { CalendarDays, Clock, Mail, Video, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
@@ -15,6 +15,14 @@ interface Props {
 const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
   const startDate = parseISO(booking.start_time);
   const timezone = useMemo(() => getUserTimezone(), []);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    if (!booking.google_meet_link) return;
+    navigator.clipboard.writeText(booking.google_meet_link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="card-organic p-6 md:p-10 text-center">
@@ -85,12 +93,13 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
               <Video className="w-4 h-4 shrink-0" />
               {t.confirmMeetLink} →
             </a>
-            <p
-              className="font-body text-xs text-muted-foreground break-all select-all pl-7"
-              data-testid="meet-link-text"
+            <button
+              onClick={handleCopyLink}
+              className="font-body text-sm text-primary hover:underline underline-offset-2 pl-7"
+              data-testid="copy-meet-link"
             >
-              {booking.google_meet_link}
-            </p>
+              {copied ? t.copiedMeetLink : t.copyMeetLink}
+            </button>
           </div>
         )}
       </div>

@@ -43,6 +43,8 @@ export interface BookingContent {
   confirmTimezone: string;
   confirmEmail: string;
   confirmMeetLink: string;
+  copyMeetLink: string;
+  copiedMeetLink: string;
   bookAnother: string;
   cancelBooking: string;
   cancelledSuccess: string;
@@ -104,10 +106,12 @@ export const bookingEN: BookingContent = {
   confirmTimezone: "Timezone",
   confirmEmail: "Confirmation sent to",
   confirmMeetLink: "Join Video Session",
+  copyMeetLink: "Copy meeting link",
+  copiedMeetLink: "✓ Copied!",
   bookAnother: "Book another session",
   cancelBooking: "Cancel booking",
   cancelledSuccess: "Booking cancelled successfully.",
-  emailWarning: "We had trouble sending your confirmation email, but your booking is saved. Please copy the meeting link below — it's your way in.",
+  emailWarning: "We had trouble sending your confirmation email, but your booking is saved. Please save the meeting link below — it's your way in.",
   errorGeneral: "Something went wrong. Please try again or reach out directly.",
   errorNetwork: "We couldn't reach our booking system. Please check your connection and try again.",
   errorServer: "Our booking system is having trouble. Please try again in a moment, or reach out via Telegram or Signal.",
@@ -161,10 +165,12 @@ export const bookingRU: BookingContent = {
   confirmTimezone: "Часовой пояс",
   confirmEmail: "Подтверждение отправлено на",
   confirmMeetLink: "Присоединиться к видеосессии",
+  copyMeetLink: "Скопировать ссылку на встречу",
+  copiedMeetLink: "✓ Скопировано!",
   bookAnother: "Записаться ещё раз",
   cancelBooking: "Отменить запись",
   cancelledSuccess: "Запись успешно отменена.",
-  emailWarning: "Не удалось отправить письмо с подтверждением, но ваша запись сохранена. Скопируйте ссылку на встречу — она откроет вам доступ к сессии.",
+  emailWarning: "Не удалось отправить письмо с подтверждением, но ваша запись сохранена. Сохраните ссылку на встречу — она откроет вам доступ к сессии.",
   errorGeneral: "Что-то пошло не так. Попробуйте ещё раз или напишите нам напрямую.",
   errorNetwork: "Не удалось подключиться к системе записи. Проверьте интернет-соединение и попробуйте ещё раз.",
   errorServer: "В системе записи возникли проблемы. Попробуйте через минуту или свяжитесь через Telegram или Signal.",

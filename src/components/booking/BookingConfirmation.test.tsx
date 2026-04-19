@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import BookingConfirmation from "./BookingConfirmation";
 import { bookingEN } from "@/content/booking";
 import type { ConfirmedBooking } from "./BookingWidget";
@@ -66,26 +66,55 @@ describe("BookingConfirmation – email failed (phantom booking scenario)", () =
 });
 
 describe("BookingConfirmation – meet link (regression)", () => {
-  it("shows the meet link as a clickable button", () => {
+  beforeEach(() => {
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("shows the meet link as a clickable anchor", () => {
     renderConfirmation({ emailSent: true });
     const link = screen.getByRole("link", { name: /join video session/i });
     expect(link).toHaveAttribute("href", "https://8x8.vc/session-abc123");
   });
 
-  it("shows the meet link URL as visible selectable text", () => {
+  it("does not display the raw URL as text", () => {
     renderConfirmation({ emailSent: true });
-    expect(screen.getByTestId("meet-link-text").textContent).toBe("https://8x8.vc/session-abc123");
+    expect(screen.queryByTestId("meet-link-text")).not.toBeInTheDocument();
+    expect(screen.queryByText("https://8x8.vc/session-abc123")).not.toBeInTheDocument();
   });
 
-  it("meet link text is present even when emailSent is false — this is the client's lifeline", () => {
+  it("shows copy button that writes URL to clipboard", () => {
+    renderConfirmation({ emailSent: true });
+    const btn = screen.getByTestId("copy-meet-link");
+    expect(btn.textContent).toBe(bookingEN.copyMeetLink);
+    fireEvent.click(btn);
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith("https://8x8.vc/session-abc123");
+  });
+
+  it("copy button shows copied feedback then reverts after 2s", () => {
+    renderConfirmation({ emailSent: true });
+    const btn = screen.getByTestId("copy-meet-link");
+    fireEvent.click(btn);
+    expect(btn.textContent).toBe(bookingEN.copiedMeetLink);
+    act(() => { vi.advanceTimersByTime(2000); });
+    expect(btn.textContent).toBe(bookingEN.copyMeetLink);
+  });
+
+  it("copy button is present even when emailSent is false — this is the client's lifeline", () => {
     renderConfirmation({ emailSent: false });
-    expect(screen.getByTestId("meet-link-text").textContent).toBe("https://8x8.vc/session-abc123");
+    expect(screen.getByTestId("copy-meet-link")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /join video session/i })).toBeInTheDocument();
   });
 
   it("renders nothing for meet link section when google_meet_link is absent", () => {
     renderConfirmation({ google_meet_link: null });
-    expect(screen.queryByTestId("meet-link-text")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("copy-meet-link")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /join video session/i })).not.toBeInTheDocument();
   });
 });

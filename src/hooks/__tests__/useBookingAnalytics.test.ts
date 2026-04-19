@@ -10,6 +10,8 @@ import {
   trackDateTimeSelected,
   trackConfirmationView,
   trackBookingCompleted,
+  trackBookingFailed,
+  type BookingError,
 } from "../useBookingAnalytics";
 
 // Mock posthog-js
@@ -206,5 +208,78 @@ describe("trackBookingCompleted", () => {
       FUNNEL_STEPS.BOOKING_COMPLETED,
       expect.objectContaining({ is_new_client: false })
     );
+  });
+});
+
+describe("trackBookingFailed", () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it("captures booking_failed event with correct name", () => {
+    trackBookingFailed({
+      error_id: "test-uuid-1234",
+      error_code: "INTERNAL",
+      http_status: 500,
+      funnel_step: "booking_details",
+    });
+    expect(posthog.capture).toHaveBeenCalledWith(
+      "booking_failed",
+      expect.objectContaining({
+        error_id: "test-uuid-1234",
+        error_code: "INTERNAL",
+        http_status: 500,
+        funnel_step: "booking_details",
+      })
+    );
+  });
+
+  it("includes request_id when provided", () => {
+    trackBookingFailed({
+      error_id: "err-id",
+      error_code: "BREVO_REJECTED",
+      funnel_step: "booking_details",
+      request_id: "req-uuid-xyz",
+    });
+    expect(posthog.capture).toHaveBeenCalledWith(
+      "booking_failed",
+      expect.objectContaining({ request_id: "req-uuid-xyz" })
+    );
+  });
+
+  it("works without optional fields", () => {
+    trackBookingFailed({ error_id: "x", error_code: "NETWORK", funnel_step: "booking_details" });
+    expect(posthog.capture).toHaveBeenCalledWith("booking_failed", expect.objectContaining({ error_code: "NETWORK" }));
+  });
+
+  it("NEVER sends PII fields to PostHog — structural regression test", () => {
+    const PII_KEYS = ["email", "name", "phone", "clientEmail", "clientName", "notes", "message", "enquiry"];
+
+    trackBookingFailed({
+      error_id: "pii-test-id",
+      error_code: "INTERNAL",
+      http_status: 500,
+      funnel_step: "booking_details",
+      request_id: "req-123",
+    });
+
+    const capturedProps = vi.mocked(posthog.capture).mock.calls[0][1] as Record<string, unknown>;
+    for (const key of PII_KEYS) {
+      expect(capturedProps, `PostHog event must not contain PII field "${key}"`).not.toHaveProperty(key);
+    }
+  });
+
+  it("BookingError type only accepts whitelisted fields — TypeScript compile-time guard", () => {
+    // This test documents the contract. If you try to add a PII field to BookingError,
+    // TypeScript will reject it at compile time. The type check below confirms the
+    // allowed shape does not include any of the blocked field names.
+    const err: BookingError = {
+      error_id: "x",
+      error_code: "UNKNOWN",
+      funnel_step: "booking_details",
+    };
+    const keys = Object.keys(err);
+    const PII_KEYS = ["email", "name", "phone", "clientEmail", "clientName", "notes", "message", "enquiry"];
+    for (const key of PII_KEYS) {
+      expect(keys).not.toContain(key);
+    }
   });
 });

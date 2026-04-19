@@ -6,7 +6,7 @@ import { CalendarDays, Clock, User, Mail, ChevronLeft } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { BookingData, ConfirmedBooking } from "./BookingWidget";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
-import { trackBookingCompleted } from "@/hooks/useBookingAnalytics";
+import { trackBookingCompleted, trackBookingFailed, type BookingError } from "@/hooks/useBookingAnalytics";
 
 interface Props {
   booking: BookingData;
@@ -20,6 +20,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState("");
+  const [errorId, setErrorId] = useState<string | null>(null);
   const timezone = useMemo(() => getUserTimezone(), []);
 
   const validate = () => {
@@ -38,6 +39,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
 
     setSubmitting(true);
     setGeneralError("");
+    setErrorId(null);
 
     try {
       const dateStr = format(booking.date, "yyyy-MM-dd");
@@ -62,10 +64,6 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
       });
 
       if (error) throw error;
-      if (result?.error) {
-        setGeneralError(result.error.includes("no longer available") ? "This time slot is no longer available. Please go back and choose another." : result.error);
-        return;
-      }
 
       trackBookingCompleted({
         service_name: booking.sessionTypeName,
@@ -79,9 +77,50 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
         sessionTypeName: booking.sessionTypeName,
         durationMinutes: booking.durationMinutes,
       });
-    } catch (err) {
-      console.error("Booking error:", err);
-      setGeneralError(t.errorGeneral);
+    } catch (err: unknown) {
+      const newErrorId = crypto.randomUUID();
+      let httpStatus: number | undefined;
+      let edgeRequestId: string | undefined;
+      let analyticsCode: BookingError["error_code"] = "UNKNOWN";
+      let userMessage = t.errorGeneral;
+
+      if (err && typeof err === "object" && "name" in err) {
+        const named = err as { name: string; message?: string; context?: { status?: number } };
+
+        if (named.name === "FunctionsFetchError") {
+          analyticsCode = "NETWORK";
+          userMessage = t.errorNetwork;
+        } else if (named.name === "FunctionsHttpError") {
+          httpStatus = named.context?.status;
+          try {
+            const body = JSON.parse(named.message ?? "");
+            if (body?.error?.code) {
+              analyticsCode = body.error.code as BookingError["error_code"];
+              edgeRequestId = body.error.requestId;
+              userMessage = httpStatus && httpStatus < 500
+                ? (body.error.message ?? t.errorGeneral)
+                : t.errorServer;
+            } else {
+              analyticsCode = httpStatus && httpStatus < 500 ? "VALIDATION_FAILED" : "INTERNAL";
+              userMessage = httpStatus && httpStatus < 500 ? t.errorGeneral : t.errorServer;
+            }
+          } catch {
+            analyticsCode = httpStatus && httpStatus < 500 ? "VALIDATION_FAILED" : "INTERNAL";
+            userMessage = httpStatus && httpStatus < 500 ? t.errorGeneral : t.errorServer;
+          }
+        }
+      }
+
+      trackBookingFailed({
+        error_id: newErrorId,
+        error_code: analyticsCode,
+        http_status: httpStatus,
+        funnel_step: "booking_details",
+        request_id: edgeRequestId,
+      });
+
+      setErrorId(newErrorId);
+      setGeneralError(userMessage);
     } finally {
       setSubmitting(false);
     }
@@ -176,7 +215,12 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
         </div>
 
         {generalError && (
-          <p className="text-destructive text-sm font-body">{generalError}</p>
+          <div className="space-y-1" data-testid="booking-error">
+            <p className="text-destructive text-sm font-body">{generalError}</p>
+            {errorId && (
+              <p className="text-muted-foreground text-xs font-body" data-testid="booking-error-ref">ref: {errorId}</p>
+            )}
+          </div>
         )}
 
         <div className="flex items-center gap-3 pt-1">

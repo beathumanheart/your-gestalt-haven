@@ -9,6 +9,39 @@ const corsHeaders = {
 const THERAPIST_EMAIL = "be@humanheart.life";
 const THERAPIST_NAME = "Human Heart Beat";
 
+// ── Observability ──────────────────────────────────────────────
+
+type EmailResult = { ok: true } | { ok: false; code: "BREVO_UNREACHABLE" | "BREVO_REJECTED" };
+
+function generateRequestId(): string { return crypto.randomUUID(); }
+
+function logInfo(requestId: string, step: string, data?: Record<string, unknown>): void {
+  console.log(JSON.stringify({ requestId, timestamp: new Date().toISOString(), step, status: "ok", ...data }));
+}
+
+function logError(requestId: string, step: string, errorCode: string, errorMessage?: string): void {
+  console.error(JSON.stringify({
+    requestId,
+    timestamp: new Date().toISOString(),
+    step,
+    status: "error",
+    errorCode,
+    ...(errorMessage ? { errorMessage } : {}),
+  }));
+}
+
+function errorResponse(
+  status: number,
+  code: "VALIDATION_FAILED" | "SLOT_TAKEN" | "BREVO_UNREACHABLE" | "BREVO_REJECTED" | "INTERNAL",
+  message: string,
+  requestId: string
+): Response {
+  return new Response(JSON.stringify({ error: { code, message, requestId } }), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 // ── JaaS JWT Token Generation ──────────────────────────────────
 
 function base64UrlEncode(data: Uint8Array): string {
@@ -252,7 +285,7 @@ async function sendEmail(brevoApiKey: string, opts: {
   subject: string;
   htmlContent: string;
   attachment?: { content: string; name: string }[];
-}) {
+}): Promise<EmailResult> {
   const senderEmail = Deno.env.get("SENDER_EMAIL") || THERAPIST_EMAIL;
   const senderName = Deno.env.get("SENDER_NAME") || THERAPIST_NAME;
 
@@ -266,16 +299,21 @@ async function sendEmail(brevoApiKey: string, opts: {
     payload.attachment = opts.attachment;
   }
 
-  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "api-key": brevoApiKey },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) {
-    console.error("Brevo error:", await res.text());
-    return false;
+  try {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "api-key": brevoApiKey },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      console.error(`[email] Brevo rejected: status=${res.status}`);
+      return { ok: false, code: "BREVO_REJECTED" };
+    }
+    return { ok: true };
+  } catch {
+    console.error("[email] Network error reaching Brevo API");
+    return { ok: false, code: "BREVO_UNREACHABLE" };
   }
-  return true;
 }
 
 function detailsTable(rows: string): string {
@@ -345,7 +383,7 @@ async function sendCancellationEmails(booking: any, timezone: string) {
 
   const subject = `Booking Cancelled: ${sessionName} on ${dateStr}`;
 
-  const [clientOk, therapistOk] = await Promise.all([
+  const [clientResult, therapistResult] = await Promise.all([
     sendEmail(brevoApiKey, {
       to: [{ email: booking.client_email, name: booking.client_name }],
       subject,
@@ -359,8 +397,8 @@ async function sendCancellationEmails(booking: any, timezone: string) {
     }),
   ]);
 
-  console.log(`Cancel emails: client=${clientOk}, therapist=${therapistOk}`);
-  return clientOk;
+  console.log(`Cancel emails: client=${clientResult.ok}, therapist=${therapistResult.ok}`);
+  return clientResult.ok;
 }
 
 async function handleCancel(bookingId: string, _timezone: string) {
@@ -394,6 +432,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const requestId = generateRequestId();
+  const startMs = Date.now();
+
   // GET cancellation (email link)
   if (req.method === "GET") {
     const url = new URL(req.url);
@@ -420,7 +461,8 @@ Deno.serve(async (req) => {
     // POST cancellation (website)
     if (body.action === "cancel" && body.bookingId) {
       const result = await handleCancel(body.bookingId, body.timezone || "UTC");
-      return new Response(JSON.stringify(result), {
+      logInfo(requestId, "cancel", { success: result.success });
+      return new Response(JSON.stringify({ ...result, requestId }), {
         status: result.success ? 200 : 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -430,9 +472,8 @@ Deno.serve(async (req) => {
     const { sessionTypeId, clientName, clientEmail, clientEmail2, startTime, endTime, notes, timezone } = body;
 
     if (!sessionTypeId || !clientName || !clientEmail || !startTime || !endTime) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      logError(requestId, "validation", "VALIDATION_FAILED");
+      return errorResponse(400, "VALIDATION_FAILED", "Missing required fields", requestId);
     }
 
     const supabase = getSupabase();
@@ -443,9 +484,8 @@ Deno.serve(async (req) => {
       .lt("start_time", endTime).gt("end_time", startTime).limit(1);
 
     if (existing && existing.length > 0) {
-      return new Response(JSON.stringify({ error: "This time slot is no longer available" }), {
-        status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      logError(requestId, "slot_check", "SLOT_TAKEN");
+      return errorResponse(409, "SLOT_TAKEN", "This time slot is no longer available. Please go back and choose another.", requestId);
     }
 
     const { data: booking, error: insertError } = await supabase
@@ -462,10 +502,8 @@ Deno.serve(async (req) => {
       .single();
 
     if (insertError || !booking) {
-      console.error("Insert error:", insertError);
-      return new Response(JSON.stringify({ error: "Failed to create booking" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      logError(requestId, "db_insert", "INTERNAL", insertError?.message);
+      return errorResponse(500, "INTERNAL", "Failed to create booking. Please try again.", requestId);
     }
 
     // Generate separate JaaS links for client (non-moderator) and therapist (moderator)
@@ -568,7 +606,7 @@ Deno.serve(async (req) => {
       }
 
       try {
-        const [clientOk, therapistOk] = await Promise.all([
+        const [clientResult, therapistResult] = await Promise.all([
           sendEmail(brevoApiKey, {
             to: clientRecipients,
             subject: `Booking Confirmed: ${sessionName} on ${dateStr}`,
@@ -582,21 +620,24 @@ Deno.serve(async (req) => {
             attachment: [{ content: therapistIcsBase64, name: "booking.ics" }],
           }),
         ]);
-        emailSent = clientOk;
-        console.log(`Emails: client=${clientOk}, therapist=${therapistOk}`);
+        emailSent = clientResult.ok;
+        logInfo(requestId, "email", { clientOk: clientResult.ok, therapistOk: therapistResult.ok });
+        if (!clientResult.ok) logError(requestId, "email_client", clientResult.code);
+        if (!therapistResult.ok) logError(requestId, "email_therapist", therapistResult.code);
       } catch (emailErr) {
-        console.error("Email sending failed:", emailErr);
+        logError(requestId, "email", "INTERNAL", "Unexpected error during email sending");
       }
+    } else {
+      logError(requestId, "email_config", "INTERNAL", "BREVO_API_KEY not configured");
     }
 
+    logInfo(requestId, "complete", { durationMs: Date.now() - startMs });
     return new Response(
-      JSON.stringify({ success: true, booking: { ...booking, google_meet_link: clientLink }, meetLink: clientLink, emailSent }),
+      JSON.stringify({ success: true, booking: { ...booking, google_meet_link: clientLink }, meetLink: clientLink, emailSent, requestId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
-    console.error("process-booking error:", err);
-    return new Response(JSON.stringify({ error: "Internal error" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    logError(requestId, "handler", "INTERNAL");
+    return errorResponse(500, "INTERNAL", "An unexpected error occurred. Please try again.", requestId);
   }
 });

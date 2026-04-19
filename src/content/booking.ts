@@ -48,6 +48,8 @@ export interface BookingContent {
   cancelledSuccess: string;
   // Errors
   errorGeneral: string;
+  errorNetwork: string;
+  errorServer: string;
   errorNameRequired: string;
   errorEmailRequired: string;
   errorEmailInvalid: string;
@@ -103,7 +105,9 @@ export const bookingEN: BookingContent = {
   bookAnother: "Book another session",
   cancelBooking: "Cancel booking",
   cancelledSuccess: "Booking cancelled successfully.",
-  errorGeneral: "Something went wrong. Please try again.",
+  errorGeneral: "Something went wrong. Please try again or reach out directly.",
+  errorNetwork: "We couldn't reach our booking system. Please check your connection and try again.",
+  errorServer: "Our booking system is having trouble. Please try again in a moment, or reach out via Telegram or Signal.",
   errorNameRequired: "Name is required",
   errorEmailRequired: "Email is required",
   errorEmailInvalid: "Please enter a valid email",
@@ -157,7 +161,9 @@ export const bookingRU: BookingContent = {
   bookAnother: "Записаться ещё раз",
   cancelBooking: "Отменить запись",
   cancelledSuccess: "Запись успешно отменена.",
-  errorGeneral: "Что-то пошло не так. Попробуйте ещё раз.",
+  errorGeneral: "Что-то пошло не так. Попробуйте ещё раз или напишите нам напрямую.",
+  errorNetwork: "Не удалось подключиться к системе записи. Проверьте интернет-соединение и попробуйте ещё раз.",
+  errorServer: "В системе записи возникли проблемы. Попробуйте через минуту или свяжитесь через Telegram или Signal.",
   errorNameRequired: "Имя обязательно",
   errorEmailRequired: "Email обязателен",
   errorEmailInvalid: "Введите корректный email",

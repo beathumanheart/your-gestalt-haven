@@ -1,11 +1,14 @@
 import heroImage from "@/assets/hero-therapy.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { heroEN, heroRU } from "@/content/hero";
+import { navigationEN, navigationRU } from "@/content/navigation";
+import { trackBookNowClick } from "@/hooks/useBookingAnalytics";
 
 
 const Hero = () => {
   const { language } = useLanguage();
   const c = language === "ru" ? heroRU : heroEN;
+  const nav = language === "ru" ? navigationRU : navigationEN;
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -47,12 +50,20 @@ const Hero = () => {
         </p>
         
         <div className="opacity-0 animate-fade-up delay-300">
-          <button
-            onClick={() => scrollToSection("about")}
-            className="px-8 py-4 rounded-full font-medium border border-border text-foreground hover:bg-secondary transition-all duration-300"
-          >
-            {c.learnMore}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-center items-stretch sm:items-center mx-auto max-w-xs sm:max-w-none">
+            <button
+              onClick={() => scrollToSection("about")}
+              className="order-2 sm:order-1 px-8 py-4 rounded-full font-medium border border-border text-foreground hover:bg-secondary transition-all duration-300"
+            >
+              {c.learnMore}
+            </button>
+            <button
+              onClick={() => { trackBookNowClick("hero"); scrollToSection("contact"); }}
+              className="order-1 sm:order-2 btn-primary"
+            >
+              {nav.bookSession}
+            </button>
+          </div>
         </div>
       </div>
 

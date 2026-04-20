@@ -43,12 +43,10 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
 
     try {
       const dateStr = format(booking.date, "yyyy-MM-dd");
-      const startTime = `${dateStr}T${booking.timeSlot}:00`;
-      const endDate = addMinutes(
-        parse(`${dateStr} ${booking.timeSlot}`, "yyyy-MM-dd HH:mm", new Date()),
-        booking.durationMinutes
-      );
-      const endTime = format(endDate, "yyyy-MM-dd'T'HH:mm:ss");
+      const localStart = parse(`${dateStr} ${booking.timeSlot}`, "yyyy-MM-dd HH:mm", new Date());
+      const localEnd = addMinutes(localStart, booking.durationMinutes);
+      const startTime = localStart.toISOString();
+      const endTime = localEnd.toISOString();
 
       const { data: result, error } = await supabase.functions.invoke("process-booking", {
         body: {

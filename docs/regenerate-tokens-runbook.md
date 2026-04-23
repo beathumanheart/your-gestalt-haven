@@ -15,11 +15,23 @@ actual session window (`session_start − 30 min` → `session_end + 30 min`).
 The `regenerate-booking-tokens` function is auth-gated by a custom secret header.
 You must set this secret before invoking the function.
 
-**In Lovable Cloud → Supabase → Edge Functions → Secrets** (or via Supabase Dashboard
-→ Settings → Edge Function Secrets):
+**Generate a cryptographically random secret:**
+
+```bash
+openssl rand -hex 32
+```
+
+This produces a 64-character hex string. Copy the output — you'll use it in
+both the Supabase secrets panel and in the curl command below. Do not invent
+a password; use this command.
+
+**Add it to Supabase Edge Function Secrets:**
+
+Supabase Dashboard → Edge Functions → Secrets → Add new secret:
 
 ```
-REGEN_SECRET = <generate a strong random value, e.g. openssl rand -hex 32>
+Name:  REGEN_SECRET
+Value: <output of openssl rand -hex 32>
 ```
 
 The function already has access to `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
@@ -146,5 +158,47 @@ Include the fresh `google_meet_link` from the database for each client.
   only the JWT token changes.
 - The function is idempotent: running it twice will regenerate links again
   (harmless, but unnecessary).
-- After running, remove or rotate `REGEN_SECRET` from Supabase secrets.
-  The function is no longer needed once all tokens are refreshed.
+
+---
+
+## 6. Delete the Function After Use
+
+**Do this immediately after Step 3 confirms success.**
+
+A permanently-deployed token-rewrite endpoint is unnecessary attack surface.
+Even with the secret header check, there is no reason for this function to
+remain deployed once the fleet of existing bookings is fixed. If a future bug
+requires another regeneration pass, redeploy it temporarily at that time.
+
+### Step 6a — Remove `REGEN_SECRET` from Supabase secrets
+
+Supabase Dashboard → Edge Functions → Secrets → find `REGEN_SECRET` → Delete.
+
+This ensures the secret cannot be used even if the function somehow remains
+reachable.
+
+### Step 6b — Delete the function from the repository and push
+
+The canonical way to remove a Supabase edge function in a Lovable/GitHub-deployed
+project is to delete its directory from the repo and push — Lovable re-syncs and
+deprovisions the function automatically.
+
+```bash
+git rm -r supabase/functions/regenerate-booking-tokens
+git commit -m "chore: remove regenerate-booking-tokens after one-time token refresh"
+git push origin main        # or your production remote
+```
+
+Also remove the `[functions.regenerate-booking-tokens]` stanza from
+`supabase/config.toml` in the same commit.
+
+### Step 6c — Confirm deletion in Supabase Dashboard
+
+Supabase Dashboard → Edge Functions.
+
+The function `regenerate-booking-tokens` should no longer appear in the list
+within ~2 minutes of Lovable syncing the push. If it still appears after
+5 minutes, you can also delete it directly from the dashboard:
+
+Edge Functions → `regenerate-booking-tokens` → the three-dot menu (⋯) in the
+top-right of the function detail page → **Delete function**.

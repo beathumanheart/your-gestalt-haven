@@ -115,15 +115,52 @@ async function generateJaasJwtToken(
   return await signJwt(payload, privateKey, normalizedKid);
 }
 
+// ── Auth helpers ───────────────────────────────────────────────
+
+/**
+ * Constant-time string comparison.
+ *
+ * Standard string equality (===) can short-circuit on the first mismatched
+ * byte, leaking information about how many leading bytes matched. An attacker
+ * who can observe response-time variations could progressively narrow down the
+ * secret one character at a time. This function always inspects every byte
+ * regardless of where the first mismatch occurs, eliminating that signal.
+ *
+ * Approach: XOR each byte pair and OR the results. Any differing byte
+ * produces a non-zero bit; length mismatches are flagged via the initial
+ * length XOR. Both arrays are padded to the same length so the loop never
+ * exits early.
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+  const enc = new TextEncoder();
+  const aBytes = enc.encode(a);
+  const bBytes = enc.encode(b);
+
+  const len = Math.max(aBytes.length, bBytes.length);
+  const aPadded = new Uint8Array(len);
+  const bPadded = new Uint8Array(len);
+  aPadded.set(aBytes);
+  bPadded.set(bBytes);
+
+  // Seed diff with length XOR so different-length strings are always unequal
+  let diff = aBytes.length ^ bBytes.length;
+  for (let i = 0; i < len; i++) {
+    diff |= aPadded[i] ^ bPadded[i];
+  }
+  return diff === 0;
+}
+
 // ── Main handler ──────────────────────────────────────────────
 
 Deno.serve(async (req) => {
   const corsHeaders = { "Content-Type": "application/json" };
 
   // Security: reject anything without the correct secret header.
+  // Constant-time comparison guards against timing-based secret enumeration.
   const regenSecret = Deno.env.get("REGEN_SECRET");
-  const authHeader = req.headers.get("Authorization");
-  if (!regenSecret || authHeader !== `Bearer ${regenSecret}`) {
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const expected = regenSecret ? `Bearer ${regenSecret}` : "";
+  if (!regenSecret || !timingSafeEqual(authHeader, expected)) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: corsHeaders,

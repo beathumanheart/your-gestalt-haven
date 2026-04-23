@@ -93,19 +93,34 @@ async function generateJaasJwtToken(
   roomName: string,
   userName: string,
   userEmail: string,
-  isModerator: boolean
+  isModerator: boolean,
+  sessionStart: Date,
+  sessionEnd: Date,
 ): Promise<string | null> {
+  // JWT must cover the actual session window, not the booking-creation window.
+  // nbf = 30 min before session start; exp = 30 min after session end.
+  // This keeps the link valid for early arrivals and overruns without
+  // leaving it open indefinitely.
+  const BUFFER_SECS = 30 * 60;
+  const nbf = Math.floor(sessionStart.getTime() / 1000) - BUFFER_SECS;
+  const exp = Math.floor(sessionEnd.getTime() / 1000) + BUFFER_SECS;
+
+  // Throw before signing — never produce a token with a broken window.
+  if (exp <= nbf) {
+    throw new Error(
+      `Invalid session window: exp ${new Date(exp * 1000).toISOString()} ` +
+      `is not after nbf ${new Date(nbf * 1000).toISOString()}`
+    );
+  }
+
   const appId = Deno.env.get("JAAS_APP_ID");
   const privateKey = Deno.env.get("JAAS_PRIVATE_KEY");
   const apiKeyId = Deno.env.get("JAAS_API_KEY_ID");
-  
+
   if (!appId || !privateKey || !apiKeyId) {
     console.warn("JaaS credentials not configured (missing appId, privateKey, or apiKeyId), falling back to public Jitsi");
     return null;
   }
-
-  const now = Math.floor(Date.now() / 1000);
-  const exp = now + 3 * 60 * 60; // 3 hours
 
   const payload = {
     iss: "chat",
@@ -113,7 +128,7 @@ async function generateJaasJwtToken(
     sub: appId,
     room: roomName,
     exp,
-    nbf: now - 60,
+    nbf,
     context: {
       user: {
         moderator: isModerator ? "true" : "false",
@@ -148,16 +163,37 @@ function generateRoomName(bookingId: string): string {
 async function generateJitsiLinks(
   bookingId: string,
   clientName: string,
-  clientEmail: string
+  clientEmail: string,
+  startTimeIso: string,
+  endTimeIso: string,
 ): Promise<{ clientLink: string; therapistLink: string; roomName: string }> {
   const roomName = generateRoomName(bookingId);
+  // Convert ISO timestamptz strings (e.g. "2026-05-10T07:00:00+00:00") to Date.
+  // new Date() handles both +00:00 and Z suffixes correctly; getTime() is always UTC ms.
+  const sessionStart = new Date(startTimeIso);
+  const sessionEnd = new Date(endTimeIso);
   const appId = Deno.env.get("JAAS_APP_ID");
-  
+
   // Try to generate JaaS tokens
   const [clientToken, therapistToken] = await Promise.all([
-    generateJaasJwtToken(roomName, clientName, clientEmail, false),
-    generateJaasJwtToken(roomName, THERAPIST_NAME, THERAPIST_EMAIL, true),
+    generateJaasJwtToken(roomName, clientName, clientEmail, false, sessionStart, sessionEnd),
+    generateJaasJwtToken(roomName, THERAPIST_NAME, THERAPIST_EMAIL, true, sessionStart, sessionEnd),
   ]);
+
+  // Structured log for debuggability — no PII (no name, email, or token content)
+  const BUFFER_SECS = 30 * 60;
+  const nbfSec = Math.floor(sessionStart.getTime() / 1000) - BUFFER_SECS;
+  const expSec = Math.floor(sessionEnd.getTime() / 1000) + BUFFER_SECS;
+  console.log(JSON.stringify({
+    event: "jitsi_jwt_generated",
+    bookingId,
+    sessionStartIso: sessionStart.toISOString(),
+    sessionEndIso: sessionEnd.toISOString(),
+    nbfIso: new Date(nbfSec * 1000).toISOString(),
+    expIso: new Date(expSec * 1000).toISOString(),
+    lifetimeSeconds: expSec - nbfSec,
+    usingJaas: clientToken !== null,
+  }));
 
   if (clientToken && therapistToken && appId) {
     // JaaS links with JWT tokens
@@ -517,7 +553,9 @@ Deno.serve(async (req) => {
     const { clientLink, therapistLink } = await generateJitsiLinks(
       booking.id,
       booking.client_name,
-      booking.client_email
+      booking.client_email,
+      booking.start_time,
+      booking.end_time,
     );
     
     // Store client link in DB (what client sees)

@@ -6,8 +6,17 @@ import { heroEN, heroRU } from "@/content/hero";
 
 // ── Mocks ──────────────────────────────────────────────────────
 
+const mockNavigate = vi.fn();
+
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
+}));
+
 vi.mock("@/contexts/LanguageContext", () => ({
-  useLanguage: vi.fn(() => ({ language: "en" })),
+  useLanguage: vi.fn(() => ({
+    language: "en",
+    langPath: (path: string) => `/en${path}`,
+  })),
 }));
 
 vi.mock("@/hooks/useBookingAnalytics", () => ({
@@ -21,10 +30,10 @@ import { trackBookNowClick } from "@/hooks/useBookingAnalytics";
 
 beforeEach(() => {
   vi.clearAllMocks();
-  // scrollIntoView is not implemented in jsdom
-  window.HTMLElement.prototype.scrollIntoView = vi.fn();
-  // Default to EN
-  (useLanguage as ReturnType<typeof vi.fn>).mockReturnValue({ language: "en" });
+  (useLanguage as ReturnType<typeof vi.fn>).mockReturnValue({
+    language: "en",
+    langPath: (path: string) => `/en${path}`,
+  });
 });
 
 // ── Hero CTA buttons ────────────────────────────────────────────
@@ -41,7 +50,10 @@ describe("Hero – CTA buttons", () => {
   });
 
   it("renders the Book a Session button (RU) with the same label as the nav (RU)", () => {
-    (useLanguage as ReturnType<typeof vi.fn>).mockReturnValue({ language: "ru" });
+    (useLanguage as ReturnType<typeof vi.fn>).mockReturnValue({
+      language: "ru",
+      langPath: (path: string) => `/ru${path}`,
+    });
     render(<Hero />);
     expect(screen.getByRole("button", { name: navigationRU.bookSession })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: heroRU.learnMore })).toBeInTheDocument();
@@ -53,28 +65,16 @@ describe("Hero – CTA buttons", () => {
     expect(trackBookNowClick).toHaveBeenCalledWith("hero");
   });
 
-  it("clicking Book a Session scrolls to the contact section", () => {
-    const contactEl = document.createElement("div");
-    contactEl.id = "contact";
-    document.body.appendChild(contactEl);
-
+  it("clicking Book a Session navigates to /#contact", () => {
     render(<Hero />);
     fireEvent.click(screen.getByRole("button", { name: navigationEN.bookSession }));
-    expect(contactEl.scrollIntoView).toHaveBeenCalled();
-
-    document.body.removeChild(contactEl);
+    expect(mockNavigate).toHaveBeenCalledWith("/en/#contact");
   });
 
-  it("clicking Learn More scrolls to the about section", () => {
-    const aboutEl = document.createElement("div");
-    aboutEl.id = "about";
-    document.body.appendChild(aboutEl);
-
+  it("clicking Learn More navigates to /#about", () => {
     render(<Hero />);
     fireEvent.click(screen.getByRole("button", { name: heroEN.learnMore }));
-    expect(aboutEl.scrollIntoView).toHaveBeenCalled();
-
-    document.body.removeChild(aboutEl);
+    expect(mockNavigate).toHaveBeenCalledWith("/en/#about");
   });
 });
 
@@ -82,7 +82,6 @@ describe("Hero – CTA buttons", () => {
 
 describe("Hero – translation key reuse (regression)", () => {
   it("uses navigationEN.bookSession — not a separate hero-level key", () => {
-    // heroEN must NOT have its own bookSession field
     expect((heroEN as Record<string, unknown>)["bookSession"]).toBeUndefined();
   });
 

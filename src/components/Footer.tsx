@@ -22,22 +22,20 @@ const Footer = () => {
           
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
             <Link
-              to={langPath("/")}
+              to={langPath("/#about")}
               className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {c.footerAbout}
             </Link>
             <Link
-              to={langPath("/")}
+              to={langPath("/#services")}
               className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setTimeout(() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }), 100)}
             >
               {c.footerServices}
             </Link>
             <Link
-              to={langPath("/")}
+              to={langPath("/#contact")}
               className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setTimeout(() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }), 100)}
             >
               {c.footerContact}
             </Link>

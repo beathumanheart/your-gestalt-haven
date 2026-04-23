@@ -2,6 +2,3 @@ project_id = "syoddekztothkodfwvxn"
 
 [functions.process-booking]
 verify_jwt = false
-
-[functions.regenerate-booking-tokens]
-verify_jwt = false

@@ -92,8 +92,8 @@ const BookingWidget = ({ initialSessionId }: { initialSessionId?: string } = {})
       durationMinutes: st.duration_minutes,
       showSecondEmail: st.show_second_email ?? false,
     });
-    // Skip step 1 when session is pre-selected via URL
-    if (initialSessionId) {
+    // Skip step 1 when session is pre-selected via URL param or prop
+    if (sessionId) {
       setStep("datetime");
     }
   }, [sessionTypes, loadingTypes, searchParams, initialSessionId, language]);

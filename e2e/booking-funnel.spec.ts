@@ -71,26 +71,29 @@ test.describe("Booking widget", () => {
 });
 
 test.describe("Session direct links", () => {
+  // ?session=<id> URLs are redirected to /:lang/book/:id by SessionParamRedirect.
+  // For unknown IDs the BookSession page renders a "not found" state — no crash.
+
   test("page loads without crashing when ?session= param is present", async ({ page }) => {
+    // Redirects to /en/book/00000000-... → BookSession page renders
     await page.goto("/?session=00000000-0000-0000-0000-000000000000");
-    const widget = page.locator(".card-organic").first();
-    await expect(widget).toBeVisible({ timeout: 10_000 });
+    // "Back to home" link is always present on BookSession regardless of found/not-found
+    const backLink = page.locator('a:has-text("Back to home")');
+    await expect(backLink).toBeAttached({ timeout: 10_000 });
   });
 
-  test("booking widget is still present and functional with unknown ?session= ID", async ({ page }) => {
+  test("unknown ?session= ID shows not-found state without crashing", async ({ page }) => {
     await page.goto("/?session=00000000-0000-0000-0000-000000000000");
-    await page.evaluate(() => {
-      document.getElementById("contact")?.scrollIntoView();
-    });
-    // Step indicator is rendered regardless of session data
-    const stepIndicator = page.locator(".card-organic .rounded-full").first();
-    await expect(stepIndicator).toBeVisible({ timeout: 10_000 });
+    // BookSession renders "Session not found." for unknown IDs
+    const notFound = page.locator('text=Session not found.');
+    await expect(notFound).toBeAttached({ timeout: 10_000 });
   });
 
   test("/ru route loads correctly with ?session= param", async ({ page }) => {
+    // Redirects to /ru/book/00000000-... → BookSession renders in Russian
     await page.goto("/ru?session=00000000-0000-0000-0000-000000000000");
-    const widget = page.locator(".card-organic").first();
-    await expect(widget).toBeVisible({ timeout: 10_000 });
+    const backLink = page.locator('a:has-text("На главную")');
+    await expect(backLink).toBeAttached({ timeout: 10_000 });
   });
 });
 
@@ -142,14 +145,27 @@ test.describe("Booking error states", () => {
 });
 
 test.describe("PostHog initialisation", () => {
-  test("PostHog script is loaded when key is configured", async ({ page }) => {
-    await page.goto("/");
-    // Check posthog object exists on window (initialised by main.tsx)
-    // This passes even in CI as long as the build includes the posthog-js bundle
-    const posthogLoaded = await page.evaluate(() => {
-      return typeof (window as unknown as Record<string, unknown>).posthog !== "undefined";
+  test("PostHog initialises and sends a request when key is configured", async ({ page }) => {
+    // The app uses posthog-js as an npm package — window.posthog is not set
+    // (that's a CDN-snippet behaviour only). Instead, verify that posthog-js
+    // fires at least one request to eu.i.posthog.com, proving it initialised.
+    const posthogRequests: string[] = [];
+    page.on("request", (req) => {
+      if (req.url().includes("posthog.com")) posthogRequests.push(req.url());
     });
-    expect(posthogLoaded).toBe(true);
+
+    await page.goto("/");
+    await page.waitForTimeout(3000);
+
+    // If the build doesn't include a key (e.g. CI without the secret), skip.
+    const hasKey = await page.evaluate(() => {
+      return document.documentElement.innerHTML.includes("phc_");
+    });
+    if (!hasKey) {
+      test.skip();
+      return;
+    }
+    expect(posthogRequests.length).toBeGreaterThan(0);
   });
 
   test("PostHog sends requests when key is present", async ({ page }) => {

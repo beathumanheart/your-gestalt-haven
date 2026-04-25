@@ -51,6 +51,9 @@ jobs:
           VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.POSTHOG_KEY_PRODUCTION }}
           VITE_PUBLIC_POSTHOG_HOST: https://eu.i.posthog.com
 
+      - name: Copy index.html to 404.html for SPA routing
+        run: cp dist/index.html dist/404.html
+
       - name: Deploy to GitHub Pages (production)
         uses: peaceiris/actions-gh-pages@v3
         with:

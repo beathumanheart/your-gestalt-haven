@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { format, addMinutes, isBefore, isAfter, parseISO, startOfDay } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { findOverrideForDate, computeSlots } from "@/lib/availability";
+import type { DateOverride, ComputedSlot } from "@/lib/availability";
 import type { SessionType } from "@/components/booking/SessionTypeSelector";
 
-export interface TimeSlot {
-  start: string; // HH:mm
-  end: string;   // HH:mm
-}
+export type { ComputedSlot };
+
+const DEFAULT_HORIZON_DAYS = 180;
+const DEFAULT_NOTICE_HOURS = 24;
 
 export function useSessionTypes() {
   const [sessionTypes, setSessionTypes] = useState<SessionType[]>([]);
@@ -28,26 +30,92 @@ export function useSessionTypes() {
 }
 
 export function useAvailableSlots(date: Date | undefined, durationMinutes: number) {
-  const [slots, setSlots] = useState<TimeSlot[]>([]);
+  const [slots, setSlots] = useState<ComputedSlot[]>([]);
   const [loading, setLoading] = useState(false);
+  const [minimumNoticeHours, setMinimumNoticeHours] = useState(DEFAULT_NOTICE_HOURS);
 
   const fetchSlots = useCallback(async () => {
     if (!date) return;
     setLoading(true);
 
-    const dayOfWeek = date.getDay(); // 0=Sun
     const dateStr = format(date, "yyyy-MM-dd");
+    const dayOfWeek = date.getDay();
+    const now = new Date();
 
-    // Check for override on this date
-    const { data: overrides } = await supabase
-      .from("availability_overrides")
-      .select("*")
-      .eq("override_date", dateStr);
+    // Fetch settings, date overrides covering this date, and booked slots in parallel
+    const [settingsResult, overridesResult, bookingsResult] = await Promise.all([
+      supabase
+        .from("settings")
+        .select("key, value")
+        .in("key", ["booking_horizon_days", "minimum_notice_hours"]),
+      supabase
+        .from("availability_overrides")
+        .select("*")
+        .lte("override_date", dateStr)
+        .gte("end_date", dateStr)
+        .is("deleted_at", null),
+      supabase.rpc("get_booked_slots", { target_date: dateStr }),
+    ]);
 
-    const override = overrides?.[0];
+    // Parse settings
+    const settingsMap = new Map(
+      (settingsResult.data || []).map((s) => [s.key, s.value])
+    );
+    const horizonDays =
+      typeof settingsMap.get("booking_horizon_days") === "number"
+        ? (settingsMap.get("booking_horizon_days") as number)
+        : DEFAULT_HORIZON_DAYS;
+    const noticeHours =
+      typeof settingsMap.get("minimum_notice_hours") === "number"
+        ? (settingsMap.get("minimum_notice_hours") as number)
+        : DEFAULT_NOTICE_HOURS;
 
-    // If explicitly marked unavailable
+    setMinimumNoticeHours(noticeHours);
+
+    // Horizon check
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const horizonEnd = new Date(today);
+    horizonEnd.setDate(today.getDate() + horizonDays);
+    horizonEnd.setHours(23, 59, 59, 999);
+
+    if (date < today || date > horizonEnd) {
+      console.log(
+        JSON.stringify({
+          event: "slots_filtered",
+          date: dateStr,
+          appliedRules: { horizon: horizonDays, minimumNotice: noticeHours, override: null },
+          slotsBeforeFiltering: 0,
+          slotsAfterFiltering: 0,
+          reason: date < today ? "past_date" : "beyond_horizon",
+        })
+      );
+      setSlots([]);
+      setLoading(false);
+      return;
+    }
+
+    // Resolve override for this date
+    const overrides = (overridesResult.data || []).map((o) => ({
+      ...o,
+      deleted_at: o.deleted_at ?? null,
+      buffer_minutes: o.buffer_minutes ?? 0,
+      end_date: o.end_date ?? o.override_date,
+    })) as DateOverride[];
+
+    const override = findOverrideForDate(dateStr, overrides);
+
+    // Closed override → no slots
     if (override && !override.is_available) {
+      console.log(
+        JSON.stringify({
+          event: "slots_filtered",
+          date: dateStr,
+          appliedRules: { horizon: horizonDays, minimumNotice: noticeHours, override: "closed" },
+          slotsBeforeFiltering: null,
+          slotsAfterFiltering: 0,
+        })
+      );
       setSlots([]);
       setLoading(false);
       return;
@@ -56,69 +124,61 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
     let windows: { start: string; end: string; buffer_minutes: number }[] = [];
 
     if (override && override.is_available && override.start_time && override.end_time) {
-      // Use override times
-      windows = [{ start: override.start_time, end: override.end_time, buffer_minutes: override.buffer_minutes || 0 }];
+      // Open override: use override's time window
+      windows = [
+        {
+          start: override.start_time,
+          end: override.end_time,
+          buffer_minutes: override.buffer_minutes,
+        },
+      ];
     } else {
-      // Use regular availability rules
+      // Weekly schedule
       const { data: rules } = await supabase
         .from("availability_rules")
         .select("*")
         .eq("day_of_week", dayOfWeek)
         .eq("is_active", true);
 
-      windows = (rules || []).map((r) => ({ start: r.start_time, end: r.end_time, buffer_minutes: r.buffer_minutes || 0 }));
+      windows = (rules || []).map((r) => ({
+        start: r.start_time,
+        end: r.end_time,
+        buffer_minutes: r.buffer_minutes || 0,
+      }));
     }
 
-    // Fetch existing bookings for this date using security definer function
-    const { data: bookings } = await supabase
-      .rpc("get_booked_slots", { target_date: dateStr });
+    const bookedSlots = (bookingsResult.data || []).map(
+      (b: { start_time: string; end_time: string }) => ({
+        start: parseISO(b.start_time),
+        end: parseISO(b.end_time),
+      })
+    );
 
-    const bookedSlots = (bookings || []).map((b: { start_time: string; end_time: string }) => ({
-      start: parseISO(b.start_time),
-      end: parseISO(b.end_time),
-    }));
+    const computed = computeSlots(
+      date,
+      windows,
+      bookedSlots,
+      durationMinutes,
+      noticeHours,
+      now
+    );
 
-    // Generate time slots
-    const now = new Date();
-    const available: TimeSlot[] = [];
+    console.log(
+      JSON.stringify({
+        event: "slots_filtered",
+        date: dateStr,
+        appliedRules: {
+          horizon: horizonDays,
+          minimumNotice: noticeHours,
+          override: override ? (override.is_available ? "open" : "closed") : null,
+        },
+        slotsBeforeFiltering: computed.length + computed.filter((s) => s.disabled).length,
+        slotsAfterFiltering: computed.filter((s) => !s.disabled).length,
+        disabledByNotice: computed.filter((s) => s.disabled).length,
+      })
+    );
 
-    for (const window of windows) {
-      const [startH, startM] = window.start.split(":").map(Number);
-      const [endH, endM] = window.end.split(":").map(Number);
-
-      let cursor = new Date(date);
-      cursor.setHours(startH, startM, 0, 0);
-
-      const windowEnd = new Date(date);
-      windowEnd.setHours(endH, endM, 0, 0);
-
-      while (isBefore(addMinutes(cursor, durationMinutes), windowEnd) || 
-             addMinutes(cursor, durationMinutes).getTime() === windowEnd.getTime()) {
-        const slotEnd = addMinutes(cursor, durationMinutes);
-
-        // Skip past slots
-        if (isBefore(cursor, now) && format(date, "yyyy-MM-dd") === format(now, "yyyy-MM-dd")) {
-          cursor = addMinutes(cursor, 30);
-          continue;
-        }
-
-        // Check overlap with booked slots (including buffer time)
-        const overlaps = bookedSlots.some(
-          (b) => isBefore(cursor, addMinutes(b.end, window.buffer_minutes)) && isAfter(slotEnd, b.start)
-        );
-
-        if (!overlaps) {
-          available.push({
-            start: format(cursor, "HH:mm"),
-            end: format(slotEnd, "HH:mm"),
-          });
-        }
-
-        cursor = addMinutes(cursor, 30); // 30-min intervals
-      }
-    }
-
-    setSlots(available);
+    setSlots(computed);
     setLoading(false);
   }, [date, durationMinutes]);
 
@@ -126,5 +186,5 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
     fetchSlots();
   }, [fetchSlots]);
 
-  return { slots, loading };
+  return { slots, loading, minimumNoticeHours };
 }

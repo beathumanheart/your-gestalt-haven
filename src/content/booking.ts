@@ -70,6 +70,10 @@ export interface BookingContent {
   back: string;
   next: string;
   optional: string;
+  // Availability enforcement (client-facing)
+  horizonNote: string;      // contains [date] placeholder
+  minNoticeTooltip: string; // contains [N] placeholder
+  closedDateTooltip: string;
 }
 
 export const bookingEN: BookingContent = {
@@ -129,6 +133,9 @@ export const bookingEN: BookingContent = {
   back: "Back",
   next: "Next",
   optional: "optional",
+  horizonNote: "Bookings available up to [date]. For later dates, please contact directly.",
+  minNoticeTooltip: "Please book at least [N] hours in advance.",
+  closedDateTooltip: "Unavailable on this date.",
 };
 
 export const bookingRU: BookingContent = {
@@ -188,4 +195,7 @@ export const bookingRU: BookingContent = {
   back: "Назад",
   next: "Далее",
   optional: "необязательно",
+  horizonNote: "Запись доступна до [date]. Для более поздних дат свяжитесь напрямую.",
+  minNoticeTooltip: "Пожалуйста, записывайтесь минимум за [N] часов.",
+  closedDateTooltip: "Дата недоступна.",
 };

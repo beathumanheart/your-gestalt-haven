@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Calendar } from "@/components/ui/calendar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useAvailableDates } from "@/hooks/useAvailableDates";
 import { useAvailableSlots } from "@/hooks/useAvailability";
@@ -51,34 +52,50 @@ const DateTimeSelector = ({
   today.setHours(0, 0, 0, 0);
 
   const [displayMonth, setDisplayMonth] = useState(new Date());
-  const { availableDays } = useAvailableDates(displayMonth);
-  const { slots, loading: loadingSlots } = useAvailableSlots(selectedDate, durationMinutes);
+  const { availableDays, horizonDate } = useAvailableDates(displayMonth);
+  const { slots, loading: loadingSlots, minimumNoticeHours } = useAvailableSlots(
+    selectedDate,
+    durationMinutes
+  );
 
   const timezone = useMemo(() => getUserTimezone(), []);
 
   const isDateAvailable = (date: Date) =>
     availableDays.has(format(date, "yyyy-MM-dd"));
 
+  const isBeyondHorizon = (date: Date) =>
+    horizonDate !== null && date > horizonDate;
+
   const availableModifier = useMemo(
-    () => (date: Date) => isDateAvailable(date) && date >= today,
-    [availableDays]
+    () => (date: Date) => isDateAvailable(date) && date >= today && !isBeyondHorizon(date),
+    [availableDays, horizonDate]
   );
 
   const unavailableModifier = useMemo(
-    () => (date: Date) => !isDateAvailable(date) && date >= today,
-    [availableDays]
+    () => (date: Date) => !isDateAvailable(date) && date >= today && !isBeyondHorizon(date),
+    [availableDays, horizonDate]
   );
+
+  const beyondHorizonModifier = useMemo(
+    () => (date: Date) => date >= today && isBeyondHorizon(date),
+    [horizonDate]
+  );
+
+  const availableSlots = slots.filter((s) => !s.disabled);
+  const noticeSlots = slots.filter((s) => s.disabled && s.disabledReason === "min_notice");
 
   return (
     <div className="space-y-4">
       {/* Timezone display */}
       <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
         <Globe className="w-3.5 h-3.5" />
-        <span>{t.timezone}: {formatTimezone(timezone)}</span>
+        <span>
+          {t.timezone}: {formatTimezone(timezone)}
+        </span>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-        {/* Calendar — fixed width, no shrink */}
+        {/* Calendar */}
         <div className="flex-shrink-0 w-full sm:w-auto">
           <p className="font-body text-sm text-muted-foreground mb-3">
             {selectedDate ? format(selectedDate, "EEEE, MMMM d, yyyy") : t.selectDate}
@@ -98,21 +115,30 @@ const DateTimeSelector = ({
             selected={selectedDate}
             onSelect={(d) => d && onSelectDate(d)}
             onMonthChange={setDisplayMonth}
-            disabled={(date) => date < today || !isDateAvailable(date)}
+            disabled={(date) =>
+              date < today || !isDateAvailable(date) || isBeyondHorizon(date)
+            }
             modifiers={{
               available: availableModifier,
               unavailable: unavailableModifier,
+              beyondHorizon: beyondHorizonModifier,
             }}
             modifiersClassNames={{
               available:
                 "!bg-primary/15 !text-foreground font-semibold hover:!bg-primary/25 border border-primary/40 rounded-lg",
               unavailable: "!text-muted-foreground/40",
+              beyondHorizon: "!text-muted-foreground/20",
             }}
             className={cn("p-3 pointer-events-auto rounded-xl border border-border")}
           />
+          {horizonDate && (
+            <p className="font-body text-xs text-muted-foreground mt-2 max-w-[280px]">
+              {t.horizonNote.replace("[date]", format(horizonDate, "MMM d, yyyy"))}
+            </p>
+          )}
         </div>
 
-        {/* Time slots — fills remaining space, scrollable */}
+        {/* Time slots */}
         <div className="flex-1 min-w-0">
           <p className="font-body text-sm text-muted-foreground mb-3">{t.selectTime}</p>
 
@@ -138,21 +164,41 @@ const DateTimeSelector = ({
           )}
 
           {selectedDate && !loadingSlots && slots.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
-              {slots.map((slot) => (
-                <button
-                  key={slot.start}
-                  onClick={() => onSelectTime(slot.start)}
-                  className={`py-2.5 px-3 rounded-lg border font-body text-sm font-medium transition-all duration-200 ${
-                    selectedTime === slot.start
-                      ? "bg-primary text-primary-foreground border-primary font-bold shadow-md"
-                      : "border-primary/40 bg-primary/15 text-foreground hover:bg-primary/25"
-                  }`}
-                >
-                  {slot.start}
-                </button>
-              ))}
-            </div>
+            <TooltipProvider delayDuration={200}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
+                {/* Available slots */}
+                {availableSlots.map((slot) => (
+                  <button
+                    key={slot.start}
+                    onClick={() => onSelectTime(slot.start)}
+                    className={`py-2.5 px-3 rounded-lg border font-body text-sm font-medium transition-all duration-200 ${
+                      selectedTime === slot.start
+                        ? "bg-primary text-primary-foreground border-primary font-bold shadow-md"
+                        : "border-primary/40 bg-primary/15 text-foreground hover:bg-primary/25"
+                    }`}
+                  >
+                    {slot.start}
+                  </button>
+                ))}
+
+                {/* Notice-filtered slots (disabled with tooltip) */}
+                {noticeSlots.map((slot) => (
+                  <Tooltip key={`disabled-${slot.start}`}>
+                    <TooltipTrigger asChild>
+                      <button
+                        disabled
+                        className="py-2.5 px-3 rounded-lg border border-border font-body text-sm text-muted-foreground/40 bg-muted/30 cursor-not-allowed"
+                      >
+                        {slot.start}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="text-xs max-w-[180px] text-center">
+                      {t.minNoticeTooltip.replace("[N]", String(minimumNoticeHours))}
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipProvider>
           )}
         </div>
       </div>

@@ -48,8 +48,7 @@ const DateTimeSelector = ({
   onSelectDate,
   onSelectTime,
 }: Props) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
 
   const [displayMonth, setDisplayMonth] = useState(new Date());
   const { availableDays, horizonDate } = useAvailableDates(displayMonth);
@@ -60,26 +59,26 @@ const DateTimeSelector = ({
 
   const timezone = useMemo(() => getUserTimezone(), []);
 
-  const isDateAvailable = (date: Date) =>
-    availableDays.has(format(date, "yyyy-MM-dd"));
+  const availableModifier = useMemo(() => {
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return (date: Date) =>
+      availableDays.has(format(date, "yyyy-MM-dd")) &&
+      date >= t &&
+      !(horizonDate !== null && date > horizonDate);
+  }, [availableDays, horizonDate]);
 
-  const isBeyondHorizon = (date: Date) =>
-    horizonDate !== null && date > horizonDate;
+  const unavailableModifier = useMemo(() => {
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return (date: Date) =>
+      !availableDays.has(format(date, "yyyy-MM-dd")) &&
+      date >= t &&
+      !(horizonDate !== null && date > horizonDate);
+  }, [availableDays, horizonDate]);
 
-  const availableModifier = useMemo(
-    () => (date: Date) => isDateAvailable(date) && date >= today && !isBeyondHorizon(date),
-    [availableDays, horizonDate]
-  );
-
-  const unavailableModifier = useMemo(
-    () => (date: Date) => !isDateAvailable(date) && date >= today && !isBeyondHorizon(date),
-    [availableDays, horizonDate]
-  );
-
-  const beyondHorizonModifier = useMemo(
-    () => (date: Date) => date >= today && isBeyondHorizon(date),
-    [horizonDate]
-  );
+  const beyondHorizonModifier = useMemo(() => {
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return (date: Date) => date >= t && horizonDate !== null && date > horizonDate;
+  }, [horizonDate]);
 
   const availableSlots = slots.filter((s) => !s.disabled);
   const noticeSlots = slots.filter((s) => s.disabled && s.disabledReason === "min_notice");
@@ -116,7 +115,9 @@ const DateTimeSelector = ({
             onSelect={(d) => d && onSelectDate(d)}
             onMonthChange={setDisplayMonth}
             disabled={(date) =>
-              date < today || !isDateAvailable(date) || isBeyondHorizon(date)
+              date < today ||
+              !availableDays.has(format(date, "yyyy-MM-dd")) ||
+              (horizonDate !== null && date > horizonDate)
             }
             modifiers={{
               available: availableModifier,

@@ -11,12 +11,15 @@ export function useAvailableDates(month: Date) {
   const [horizonDate, setHorizonDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Extract primitives so the effect dep array contains stable values, not a
+  // Date object reference that may change identity without changing month/year.
+  const year = month.getFullYear();
+  const m = month.getMonth();
+
   useEffect(() => {
     async function fetchAvailability() {
       setLoading(true);
 
-      const year = month.getFullYear();
-      const m = month.getMonth();
       const firstDay = format(new Date(year, m, 1), "yyyy-MM-dd");
       const lastDay = format(new Date(year, m + 1, 0), "yyyy-MM-dd");
 
@@ -75,7 +78,7 @@ export function useAvailableDates(month: Date) {
     }
 
     fetchAvailability();
-  }, [month.getFullYear(), month.getMonth()]);
+  }, [year, m]);
 
   return { availableDays, horizonDate, loading };
 }

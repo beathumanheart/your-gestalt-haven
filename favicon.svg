@@ -1,0 +1,15 @@
+<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Heart shape: terracotta HSL(18 60% 55%) = #D17147 -->
+  <path
+    d="M20 35L17.5 32.75C9 25.1 4 20.6 4 15C4 10.5 7.5 7 12 7C14.6 7 17.1 8.2 19 10.1L20 11.1L21 10.1C22.9 8.2 25.4 7 28 7C32.5 7 36 10.5 36 15C36 20.6 31 25.1 22.5 32.75L20 35Z"
+    fill="#D17147"
+  />
+  <!-- Pulse line: cream HSL(40 33% 97%) = #FAF8F4 -->
+  <path
+    d="M8 20H14L16 16L20 24L24 18L26 20H32"
+    stroke="#FAF8F4"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

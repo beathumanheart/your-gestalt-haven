@@ -8,6 +8,7 @@ import { Plus, Trash2, Save, AlertTriangle } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { availabilityEN, availabilityEN as t } from "@/content/availability";
 import type { DateOverride } from "@/lib/availability";
+import ScheduleCalendar from "./ScheduleCalendar";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -363,6 +364,12 @@ const AvailabilityManager = () => {
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", id);
     fetchOverrides();
+  };
+
+  const handleQuickAddOverride = (dateStr: string) => {
+    resetAddForm();
+    setAddForm((f) => ({ ...f, startDate: dateStr, endDate: dateStr }));
+    setShowAddDialog(true);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -746,6 +753,16 @@ const AvailabilityManager = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ── Schedule Preview Calendar ── */}
+      {!loading && !loadingOverrides && settingsLoaded && (
+        <ScheduleCalendar
+          rules={rules}
+          overrides={overrides}
+          horizonDays={displayToDays(horizonValue, horizonUnit)}
+          onAddOverride={handleQuickAddOverride}
+        />
+      )}
 
       {/* ── Conflict Dialog ── */}
       <Dialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>

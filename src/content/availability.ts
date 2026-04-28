@@ -57,6 +57,24 @@ export interface AvailabilityContent {
   horizonNote: string;   // contains [date] placeholder
   minNoticeTooltip: string; // contains [N] placeholder
   closedDateTooltip: string;
+
+  // Schedule preview calendar
+  calendarTitle: string;
+  calendarPrev: string;
+  calendarNext: string;
+  calendarLegendOpen: string;
+  calendarLegendClosed: string;
+  calendarLegendOpenOverride: string;
+  calendarLegendClosedOverride: string;
+  calendarLegendPast: string;
+  calendarLegendBeyond: string;
+  calendarTooltipPast: string;
+  calendarTooltipBeyond: string;
+  calendarTooltipOpen: string;
+  calendarTooltipClosed: string;
+  calendarTooltipOpenOverride: string;
+  calendarTooltipClosedOverride: string;
+  calendarClickHint: string;
 }
 
 export const availabilityEN: AvailabilityContent = {
@@ -107,6 +125,23 @@ export const availabilityEN: AvailabilityContent = {
     "Bookings available up to [date]. For later dates, please contact directly.",
   minNoticeTooltip: "Please book at least [N] hours in advance.",
   closedDateTooltip: "Unavailable on this date.",
+
+  calendarTitle: "Schedule preview",
+  calendarPrev: "Previous month",
+  calendarNext: "Next month",
+  calendarLegendOpen: "Available",
+  calendarLegendClosed: "Unavailable",
+  calendarLegendOpenOverride: "Override: open",
+  calendarLegendClosedOverride: "Override: closed",
+  calendarLegendPast: "Past",
+  calendarLegendBeyond: "Beyond booking window",
+  calendarTooltipPast: "Past date",
+  calendarTooltipBeyond: "Outside booking window",
+  calendarTooltipOpen: "Available",
+  calendarTooltipClosed: "Not available",
+  calendarTooltipOpenOverride: "Override: open",
+  calendarTooltipClosedOverride: "Override: closed",
+  calendarClickHint: "Click to add override",
 };
 
 export const availabilityRU: AvailabilityContent = {
@@ -158,4 +193,21 @@ export const availabilityRU: AvailabilityContent = {
     "Запись доступна до [date]. Для более поздних дат свяжитесь напрямую.",
   minNoticeTooltip: "Пожалуйста, записывайтесь минимум за [N] часов.",
   closedDateTooltip: "Дата недоступна.",
+
+  calendarTitle: "Предпросмотр расписания",
+  calendarPrev: "Предыдущий месяц",
+  calendarNext: "Следующий месяц",
+  calendarLegendOpen: "Доступно",
+  calendarLegendClosed: "Недоступно",
+  calendarLegendOpenOverride: "Исключение: открыто",
+  calendarLegendClosedOverride: "Исключение: закрыто",
+  calendarLegendPast: "Прошедшие",
+  calendarLegendBeyond: "За пределами окна записи",
+  calendarTooltipPast: "Прошедшая дата",
+  calendarTooltipBeyond: "Вне окна записи",
+  calendarTooltipOpen: "Доступно",
+  calendarTooltipClosed: "Недоступно",
+  calendarTooltipOpenOverride: "Исключение: открыто",
+  calendarTooltipClosedOverride: "Исключение: закрыто",
+  calendarClickHint: "Нажмите, чтобы добавить исключение",
 };

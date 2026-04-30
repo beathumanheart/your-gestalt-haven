@@ -77,6 +77,8 @@ export interface AvailabilityContent {
   calendarClickHint: string;
   calendarRangeStart: string;
   calendarRangePickEnd: string;
+  calendarHeaderSameYear: string; // "May – June 2026"  — [m1] [m2] [y]
+  calendarHeaderCrossYear: string; // "Dec 2026 – Jan 2027" — [m1] [y1] [m2] [y2]
 }
 
 export const availabilityEN: AvailabilityContent = {
@@ -146,6 +148,8 @@ export const availabilityEN: AvailabilityContent = {
   calendarClickHint: "Click to set range start",
   calendarRangeStart: "From",
   calendarRangePickEnd: "click end date",
+  calendarHeaderSameYear: "[m1] – [m2] [y]",
+  calendarHeaderCrossYear: "[m1] [y1] – [m2] [y2]",
 };
 
 export const availabilityRU: AvailabilityContent = {
@@ -216,4 +220,6 @@ export const availabilityRU: AvailabilityContent = {
   calendarClickHint: "Нажмите, чтобы выбрать начало диапазона",
   calendarRangeStart: "С",
   calendarRangePickEnd: "выберите конечную дату",
+  calendarHeaderSameYear: "[m1] – [m2] [y]",
+  calendarHeaderCrossYear: "[m1] [y1] – [m2] [y2]",
 };

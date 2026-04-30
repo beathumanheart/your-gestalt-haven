@@ -75,6 +75,8 @@ export interface AvailabilityContent {
   calendarTooltipOpenOverride: string;
   calendarTooltipClosedOverride: string;
   calendarClickHint: string;
+  calendarRangeStart: string;
+  calendarRangePickEnd: string;
 }
 
 export const availabilityEN: AvailabilityContent = {
@@ -141,7 +143,9 @@ export const availabilityEN: AvailabilityContent = {
   calendarTooltipClosed: "Not available",
   calendarTooltipOpenOverride: "Override: open",
   calendarTooltipClosedOverride: "Override: closed",
-  calendarClickHint: "Click to add override",
+  calendarClickHint: "Click to set range start",
+  calendarRangeStart: "From",
+  calendarRangePickEnd: "click end date",
 };
 
 export const availabilityRU: AvailabilityContent = {
@@ -209,5 +213,7 @@ export const availabilityRU: AvailabilityContent = {
   calendarTooltipClosed: "Недоступно",
   calendarTooltipOpenOverride: "Исключение: открыто",
   calendarTooltipClosedOverride: "Исключение: закрыто",
-  calendarClickHint: "Нажмите, чтобы добавить исключение",
+  calendarClickHint: "Нажмите, чтобы выбрать начало диапазона",
+  calendarRangeStart: "С",
+  calendarRangePickEnd: "выберите конечную дату",
 };

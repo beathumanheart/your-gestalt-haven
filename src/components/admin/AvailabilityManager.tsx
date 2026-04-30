@@ -366,9 +366,9 @@ const AvailabilityManager = () => {
     fetchOverrides();
   };
 
-  const handleQuickAddOverride = (dateStr: string) => {
+  const handleQuickAddOverride = (startStr: string, endStr: string) => {
     resetAddForm();
-    setAddForm((f) => ({ ...f, startDate: dateStr, endDate: dateStr }));
+    setAddForm((f) => ({ ...f, startDate: startStr, endDate: endStr }));
     setShowAddDialog(true);
   };
 

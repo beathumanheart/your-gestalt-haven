@@ -17,6 +17,7 @@ if (!posthogKey) {
   }
 }
 
+console.log('PostHog key debug:', JSON.stringify(posthogKey), 'length:', posthogKey?.length);
 posthog.init(posthogKey, {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com",
   autocapture: true,

@@ -22,6 +22,7 @@ posthog.init(posthogKey, {
   autocapture: true,
   capture_performance: true,
   capture_pageleave: true,
+  cross_subdomain_cookie: false,
   session_recording: {
     maskAllInputs: true,
   },

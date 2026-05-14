@@ -20,6 +20,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminResetPassword from "./pages/AdminResetPassword";
 import BookingCancelled from "./pages/BookingCancelled";
+import BookOffer from "./pages/BookOffer";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,14 @@ const App = () => (
             element={
               <LangLayout>
                 <BookSession />
+              </LangLayout>
+            }
+          />
+          <Route
+            path="/:lang/book/offer/:slug"
+            element={
+              <LangLayout>
+                <BookOffer />
               </LangLayout>
             }
           />

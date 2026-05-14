@@ -18,9 +18,10 @@ import {
   trackConfirmationView,
 } from "@/hooks/useBookingAnalytics";
 import type { SessionType } from "./SessionTypeSelector";
+import type { HiddenOffer } from "@/types/hiddenOffers";
 
 export interface BookingData {
-  sessionTypeId: string;
+  sessionTypeId?: string;
   sessionTypeName: string;
   durationMinutes: number;
   showSecondEmail: boolean;
@@ -30,6 +31,9 @@ export interface BookingData {
   clientEmail: string;
   clientEmail2: string;
   notes: string;
+  // offer-mode fields
+  hiddenOfferId?: string;
+  offerSlug?: string;
 }
 
 export interface ConfirmedBooking {
@@ -46,7 +50,10 @@ export interface ConfirmedBooking {
 const STEPS = ["session", "datetime", "details"] as const;
 type Step = typeof STEPS[number];
 
-const BookingWidget = ({ initialSessionId }: { initialSessionId?: string } = {}) => {
+const BookingWidget = ({
+  initialSessionId,
+  offer,
+}: { initialSessionId?: string; offer?: HiddenOffer } = {}) => {
   const { language, langPath } = useLanguage();
   const t = language === "ru" ? bookingRU : bookingEN;
   const { sessionTypes, loading: loadingTypes } = useSessionTypes();
@@ -98,6 +105,21 @@ const BookingWidget = ({ initialSessionId }: { initialSessionId?: string } = {})
     }
   }, [sessionTypes, loadingTypes, searchParams, initialSessionId, language]);
 
+  // Offer mode: pre-populate booking from hidden offer and jump straight to datetime.
+  // Runs once when the offer prop is provided; does not depend on sessionTypes.
+  useEffect(() => {
+    if (!offer) return;
+    autoSelectedRef.current = true;
+    setBooking({
+      hiddenOfferId: offer.id,
+      offerSlug: offer.slug,
+      sessionTypeName: offer.title,
+      durationMinutes: offer.duration_minutes,
+      showSecondEmail: false,
+    });
+    setStep("datetime");
+  }, [offer?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const getShareUrl = (sessionId: string) => {
     const st = sessionTypes.find((s) => s.id === sessionId);
     const slug = st?.slug || sessionId;
@@ -106,7 +128,7 @@ const BookingWidget = ({ initialSessionId }: { initialSessionId?: string } = {})
 
   const canNext = () => {
     switch (step) {
-      case "session": return !!booking.sessionTypeId;
+      case "session": return !!booking.sessionTypeId || !!booking.hiddenOfferId;
       case "datetime": return !!booking.date && !!booking.timeSlot;
       default: return false;
     }

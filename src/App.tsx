@@ -21,6 +21,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminResetPassword from "./pages/AdminResetPassword";
 import BookingCancelled from "./pages/BookingCancelled";
 import BookOffer from "./pages/BookOffer";
+import AdminOffers from "./pages/AdminOffers";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const App = () => (
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/reset-password" element={<AdminResetPassword />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/offers" element={<AdminOffers />} />
 
           {/* Language-prefixed routes */}
           <Route

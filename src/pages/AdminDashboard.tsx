@@ -1,7 +1,7 @@
 import { useState, useEffect, type ElementType } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Calendar, Clock, List, Settings } from "lucide-react";
+import { LogOut, Calendar, Clock, List, Settings, Tag } from "lucide-react";
 import AvailabilityManager from "@/components/admin/AvailabilityManager";
 import SessionTypeManager from "@/components/admin/SessionTypeManager";
 import BookingsList from "@/components/admin/BookingsList";
@@ -129,13 +129,22 @@ const AdminDashboard = () => {
             <Calendar className="w-5 h-5 text-primary" />
             <h1 className="font-display text-lg font-medium text-foreground">Admin Dashboard</h1>
           </div>
-          <button
-            onClick={() => supabase.auth.signOut().then(() => navigate("/admin/login"))}
-            className="flex items-center gap-2 font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign out
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/admin/offers"
+              className="flex items-center gap-1.5 font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Tag className="w-4 h-4" />
+              Offers
+            </Link>
+            <button
+              onClick={() => supabase.auth.signOut().then(() => navigate("/admin/login"))}
+              className="flex items-center gap-2 font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 

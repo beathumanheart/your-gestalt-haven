@@ -72,7 +72,7 @@ function offerToForm(offer: HiddenOffer): FormState {
   };
 }
 
-function validateBilingual(form: FormState): string | null {
+export function validateBilingual(form: Pick<FormState, "title_en" | "title_ru" | "description_en" | "description_ru" | "conditions_en" | "conditions_ru">): string | null {
   const enFilled = [form.title_en, form.description_en, form.conditions_en].filter(Boolean).length;
   const ruFilled = [form.title_ru, form.description_ru, form.conditions_ru].filter(Boolean).length;
   if ((enFilled > 0 && enFilled < 3) || (ruFilled > 0 && ruFilled < 3)) {

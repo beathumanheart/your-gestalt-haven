@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { navigationEN, navigationRU } from "@/content/navigation";
 import { trackBookNowClick } from "@/hooks/useBookingAnalytics";
 
-const Header = () => {
+const Header = ({ hideSwitcher = false }: { hideSwitcher?: boolean } = {}) => {
   const { language, langPath } = useLanguage();
   const c = language === "ru" ? navigationRU : navigationEN;
   const navigate = useNavigate();
@@ -81,7 +81,7 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <LanguageSwitcher />
+            {!hideSwitcher && <LanguageSwitcher />}
             <button
               onClick={() => { trackBookNowClick("header_desktop"); navigateToSection("contact"); }}
               className="hidden md:block btn-primary text-sm py-2.5 px-6"

@@ -12,7 +12,7 @@ const LanguageSwitcher = () => {
   return (
     <button
       onClick={toggleLanguage}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/50 bg-background/50 backdrop-blur-sm hover:bg-accent/10 transition-all text-sm font-body text-muted-foreground hover:text-foreground"
+      className="btn-lang-switcher"
       aria-label={`Switch to ${targetLang === "ru" ? "Russian" : "English"}`}
     >
       <svg 

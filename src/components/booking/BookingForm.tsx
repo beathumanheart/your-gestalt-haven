@@ -48,9 +48,12 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
       const startTime = localStart.toISOString();
       const endTime = localEnd.toISOString();
 
+      const isOfferBooking = !!booking.hiddenOfferId;
       const { data: result, error } = await supabase.functions.invoke("process-booking", {
         body: {
-          sessionTypeId: booking.sessionTypeId,
+          ...(isOfferBooking
+            ? { hiddenOfferId: booking.hiddenOfferId }
+            : { sessionTypeId: booking.sessionTypeId }),
           clientName: booking.clientName.trim(),
           clientEmail: booking.clientEmail.trim().toLowerCase(),
           clientEmail2: booking.clientEmail2?.trim().toLowerCase() || null,
@@ -69,6 +72,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
         booking_date: bookingDate,
         booking_time: booking.timeSlot,
         is_new_client: true,
+        offer_slug: booking.offerSlug,
       });
       if (result?.emailSent === false) {
         trackEmailFailed({

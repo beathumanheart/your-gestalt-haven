@@ -383,7 +383,7 @@ async function sendCancellationEmails(booking: any, timezone: string) {
   const dateStr = startDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
   const tz = timezone || "UTC";
   const { time24, tzLabel } = formatTimeWithTz(startDate, tz);
-  const sessionName = booking.session_types?.name || "Session";
+  const sessionName = booking.session_types?.name || (booking as any).hidden_offers?.title || "Session";
   const siteUrl = Deno.env.get("SITE_URL") || "https://humanheart.life";
 
   const tableRows = row("Session", `<strong>${sessionName}</strong>`)
@@ -449,7 +449,7 @@ async function handleCancel(bookingId: string, _timezone: string) {
 
   const { data: booking, error: fetchErr } = await supabase
     .from("bookings")
-    .select("*, session_types(name)")
+    .select("*, session_types(name), hidden_offers(title)")
     .eq("id", bookingId)
     .single();
 
@@ -512,14 +512,31 @@ Deno.serve(async (req) => {
     }
 
     // ── Booking creation ──
-    const { sessionTypeId, clientName, clientEmail, clientEmail2, startTime, endTime, notes, timezone } = body;
+    const { sessionTypeId, hiddenOfferId, clientName, clientEmail, clientEmail2, startTime, endTime, notes, timezone } = body;
 
-    if (!sessionTypeId || !clientName || !clientEmail || !startTime || !endTime) {
+    const isOfferBooking = !!hiddenOfferId;
+    if ((!sessionTypeId && !hiddenOfferId) || !clientName || !clientEmail || !startTime || !endTime) {
       logError(requestId, "validation", "VALIDATION_FAILED");
       return errorResponse(400, "VALIDATION_FAILED", "Missing required fields", requestId);
     }
 
     const supabase = getSupabase();
+
+    // For offer bookings: validate the offer exists and is active
+    let offerRecord: { id: string; title: string; notification_email: string | null } | null = null;
+    if (isOfferBooking) {
+      const { data: offer, error: offerErr } = await supabase
+        .from("hidden_offers")
+        .select("id, title, notification_email")
+        .eq("id", hiddenOfferId)
+        .eq("is_active", true)
+        .single();
+      if (offerErr || !offer) {
+        logError(requestId, "offer_lookup", "VALIDATION_FAILED", "Offer not found or inactive");
+        return errorResponse(400, "VALIDATION_FAILED", "This offer is no longer available.", requestId);
+      }
+      offerRecord = offer;
+    }
 
     // Overlap check
     const { data: existing } = await supabase
@@ -531,16 +548,30 @@ Deno.serve(async (req) => {
       return errorResponse(409, "SLOT_TAKEN", "This time slot is no longer available. Please go back and choose another.", requestId);
     }
 
+    const insertRow = isOfferBooking
+      ? {
+          session_type_id: null,
+          hidden_offer_id: hiddenOfferId,
+          conditions_accepted_at: new Date().toISOString(),
+          client_name: clientName, client_email: clientEmail,
+          client_email_2: clientEmail2 || null,
+          start_time: startTime, end_time: endTime,
+          notes: notes || null, status: "confirmed",
+          client_timezone: timezone || "UTC",
+        }
+      : {
+          session_type_id: sessionTypeId,
+          hidden_offer_id: null,
+          client_name: clientName, client_email: clientEmail,
+          client_email_2: clientEmail2 || null,
+          start_time: startTime, end_time: endTime,
+          notes: notes || null, status: "confirmed",
+          client_timezone: timezone || "UTC",
+        };
+
     const { data: booking, error: insertError } = await supabase
       .from("bookings")
-      .insert({
-        session_type_id: sessionTypeId,
-        client_name: clientName, client_email: clientEmail,
-        client_email_2: clientEmail2 || null,
-        start_time: startTime, end_time: endTime,
-        notes: notes || null, status: "confirmed",
-        client_timezone: timezone || "UTC",
-      })
+      .insert(insertRow)
       .select("*, session_types(name, duration_minutes, notification_email_1, notification_email_2, show_second_email)")
       .single();
 
@@ -568,8 +599,10 @@ Deno.serve(async (req) => {
     if (brevoApiKey) {
       const startDate = new Date(booking.start_time);
       const dateStr = startDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-      const sessionName = booking.session_types?.name || "Session";
-      const duration = booking.session_types?.duration_minutes || 30;
+      const sessionName = isOfferBooking
+        ? (offerRecord?.title || "Session")
+        : (booking.session_types?.name || "Session");
+      const duration = booking.session_types?.duration_minutes || 60;
       const tz = timezone || "UTC";
       const { time24, tzLabel } = formatTimeWithTz(startDate, tz);
 
@@ -634,14 +667,23 @@ Deno.serve(async (req) => {
       const clientIcs = generateIcs(booking, clientLink, sessionName, true);
       const clientIcsBase64 = btoa(unescape(encodeURIComponent(clientIcs)));
 
-      // Determine notification recipients
-      const sessionType = booking.session_types;
-      const notifEmail1 = sessionType?.notification_email_1 || THERAPIST_EMAIL;
-      const notifEmail2 = sessionType?.show_second_email && sessionType?.notification_email_2 ? sessionType.notification_email_2 : null;
-
-      const therapistRecipients = [{ email: notifEmail1, name: THERAPIST_NAME }];
-      if (notifEmail2) {
-        therapistRecipients.push({ email: notifEmail2, name: THERAPIST_NAME });
+      // Determine notification recipients.
+      // Offer bookings use the offer's notification_email (falling back to SENDER_EMAIL env var,
+      // then the hard-coded therapist address). Session-type bookings use the existing
+      // notification_email_1/2 columns on the session type row.
+      const senderFallback = Deno.env.get("SENDER_EMAIL") || THERAPIST_EMAIL;
+      let therapistRecipients: { email: string; name: string }[];
+      if (isOfferBooking) {
+        const notifEmail = offerRecord?.notification_email || senderFallback;
+        therapistRecipients = [{ email: notifEmail, name: THERAPIST_NAME }];
+      } else {
+        const sessionType = booking.session_types;
+        const notifEmail1 = sessionType?.notification_email_1 || THERAPIST_EMAIL;
+        const notifEmail2 = sessionType?.show_second_email && sessionType?.notification_email_2 ? sessionType.notification_email_2 : null;
+        therapistRecipients = [{ email: notifEmail1, name: THERAPIST_NAME }];
+        if (notifEmail2) {
+          therapistRecipients.push({ email: notifEmail2, name: THERAPIST_NAME });
+        }
       }
 
       // Build client recipients list (primary + optional second email)

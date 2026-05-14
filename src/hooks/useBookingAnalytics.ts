@@ -66,6 +66,7 @@ export function trackBookingCompleted(params: {
   booking_date: string;
   booking_time: string;
   is_new_client: boolean;
+  offer_slug?: string;
 }) {
   const date = new Date(params.booking_date);
   trackEvent(FUNNEL_STEPS.BOOKING_COMPLETED, {
@@ -74,6 +75,7 @@ export function trackBookingCompleted(params: {
     booking_time: params.booking_time,
     is_new_client: params.is_new_client,
     day_of_week: DAY_NAMES[date.getDay()],
+    ...(params.offer_slug ? { offer_slug: params.offer_slug } : {}),
   });
 }
 

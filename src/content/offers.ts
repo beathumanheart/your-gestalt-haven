@@ -8,9 +8,13 @@ export interface OffersContent {
   offerUnavailableTitle: string;
   offerUnavailableMessage: string;
   contactUs: string;
+  /** Shown when the URL language is different from the only available content language */
+  languageNotice: string;
 }
 
 export const offersEN: OffersContent = {
+  languageNotice:
+    "This offer is only available in Russian. The content below is shown in Russian.",
   conditionsHeading: "Conditions for this offer",
   conditionsCheckbox: "I have read and agree to these conditions",
   calendarGateHint: "Please read and accept the conditions above to continue.",
@@ -24,6 +28,8 @@ export const offersEN: OffersContent = {
 };
 
 export const offersRU: OffersContent = {
+  languageNotice:
+    "Это предложение доступно только на английском. Содержание ниже на английском.",
   conditionsHeading: "Условия этого предложения",
   conditionsCheckbox: "Я прочитал(а) и согласен(а) с этими условиями",
   calendarGateHint: "Пожалуйста, прочитайте и примите условия выше, чтобы продолжить.",

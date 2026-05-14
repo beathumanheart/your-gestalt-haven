@@ -53,7 +53,8 @@ type Step = typeof STEPS[number];
 const BookingWidget = ({
   initialSessionId,
   offer,
-}: { initialSessionId?: string; offer?: HiddenOffer } = {}) => {
+  offerDisplayTitle,
+}: { initialSessionId?: string; offer?: HiddenOffer; offerDisplayTitle?: string } = {}) => {
   const { language, langPath } = useLanguage();
   const t = language === "ru" ? bookingRU : bookingEN;
   const { sessionTypes, loading: loadingTypes } = useSessionTypes();
@@ -113,7 +114,7 @@ const BookingWidget = ({
     setBooking({
       hiddenOfferId: offer.id,
       offerSlug: offer.slug,
-      sessionTypeName: offer.title,
+      sessionTypeName: offerDisplayTitle || offer.slug,
       durationMinutes: offer.duration_minutes,
       showSecondEmail: false,
     });

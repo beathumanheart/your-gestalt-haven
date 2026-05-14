@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock } from "lucide-react";
+import { useParams, Link } from "react-router-dom";
+import { ArrowLeft, Clock, Info } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -13,10 +13,14 @@ import type { HiddenOffer } from "@/hooks/useHiddenOffers";
 
 const ALLOWED_MARKDOWN = ["p", "h1", "h2", "h3", "ul", "ol", "li", "strong", "em", "a", "code"] as const;
 
+const PROSE = "prose prose-sm font-body text-muted-foreground max-w-none " +
+  "prose-headings:font-display prose-headings:font-light prose-headings:text-foreground " +
+  "prose-a:text-primary prose-a:no-underline hover:prose-a:underline " +
+  "prose-strong:text-foreground prose-code:text-foreground prose-code:bg-muted prose-code:px-1 prose-code:rounded";
+
 const BookOffer = () => {
   const { slug } = useParams<{ slug: string }>();
   const { language, langPath } = useLanguage();
-  const navigate = useNavigate();
   const t = language === "ru" ? offersRU : offersEN;
 
   const [offer, setOffer] = useState<HiddenOffer | null>(null);
@@ -25,49 +29,46 @@ const BookOffer = () => {
   const [conditionsAccepted, setConditionsAccepted] = useState(false);
 
   useEffect(() => {
-    if (!slug) {
-      setAvailable(false);
-      setLoading(false);
-      return;
-    }
+    if (!slug) { setAvailable(false); setLoading(false); return; }
     supabase
       .from("hidden_offers")
       .select("*")
       .eq("slug", slug)
       .single()
       .then(({ data, error }) => {
-        if (error || !data) {
-          setAvailable(false);
-        } else {
-          setOffer(data as HiddenOffer);
-        }
+        if (error || !data) setAvailable(false);
+        else setOffer(data as HiddenOffer);
         setLoading(false);
       });
   }, [slug]);
 
-  // Redirect to the offer's own language URL if it doesn't match the current one.
-  // Keep loading state until redirect completes to avoid a flash of wrong-language content.
-  useEffect(() => {
-    if (!offer) return;
-    if (offer.language !== language) {
-      navigate(`/${offer.language}/book/offer/${slug}`, { replace: true });
-    }
-  }, [offer, language, slug, navigate]);
+  // ── Bilingual content resolution ──────────────────────────────────────────
+  const hasEn = !!(offer?.title_en && offer?.description_en && offer?.conditions_en);
+  const hasRu = !!(offer?.title_ru && offer?.description_ru && offer?.conditions_ru);
 
-  const shouldRedirect = offer !== null && offer.language !== language;
+  let renderLang: "en" | "ru" = "en";
+  if (offer) {
+    if (language === "en" && hasEn) renderLang = "en";
+    else if (language === "ru" && hasRu) renderLang = "ru";
+    else if (hasEn && hasRu) renderLang = language as "en" | "ru";
+    else if (hasEn) renderLang = "en";
+    else renderLang = "ru";
+  }
 
-  const formatPrice = (priceCents: number) => {
-    if (priceCents === 0) return t.free;
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: "EUR",
-      maximumFractionDigits: 0,
-    }).format(priceCents / 100);
-  };
+  const showLanguageNotice = !!offer && renderLang !== language;
+
+  const offerTitle      = renderLang === "en" ? offer?.title_en       : offer?.title_ru;
+  const offerDesc       = renderLang === "en" ? offer?.description_en : offer?.description_ru;
+  const offerConditions = renderLang === "en" ? offer?.conditions_en  : offer?.conditions_ru;
+
+  const formatPrice = (cents: number) =>
+    cents === 0
+      ? t.free
+      : new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(cents / 100);
 
   return (
     <main className="min-h-screen bg-background">
-      <Header />
+      <Header hideSwitcher={!hasEn || !hasRu} />
       <div className="pt-28 pb-16 section-padding">
         <div className="container-narrow">
           <Link
@@ -79,7 +80,7 @@ const BookOffer = () => {
           </Link>
 
           {/* Loading skeleton */}
-          {(loading || shouldRedirect) && (
+          {loading && (
             <div className="space-y-4 mb-12">
               <div className="h-10 w-2/3 rounded-lg bg-muted animate-pulse" />
               <div className="h-4 w-full rounded bg-muted animate-pulse" />
@@ -106,15 +107,42 @@ const BookOffer = () => {
           )}
 
           {/* Offer content */}
-          {!loading && !shouldRedirect && offer && (
+          {!loading && offer && offerTitle && offerDesc && offerConditions && (
             <>
+              {/* Language-mismatch notice — shown in URL language, above the offer title */}
+              {showLanguageNotice && (
+                <div className="flex items-start gap-3 bg-muted/60 border border-border/60 rounded-xl px-5 py-4 mb-8">
+                  <Info className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed">
+                    {t.languageNotice}
+                  </p>
+                </div>
+              )}
+
+              {/* Bilingual toggle — only when both languages are available */}
+              {hasEn && hasRu && (
+                <div className="flex justify-end mb-6">
+                  <Link
+                    to={`/${language === "en" ? "ru" : "en"}/book/offer/${slug}`}
+                    className="btn-lang-switcher"
+                  >
+                    <svg viewBox="0 0 20 20" className="w-4 h-4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="10" cy="10" r="8" className="stroke-current" strokeWidth="1.5" />
+                      <ellipse cx="10" cy="10" rx="4" ry="8" className="stroke-current" strokeWidth="1.5" />
+                      <path d="M2 10h16" className="stroke-current" strokeWidth="1.5" />
+                    </svg>
+                    <span className="font-medium">{language === "en" ? "RU" : "EN"}</span>
+                  </Link>
+                </div>
+              )}
+
               {/* Header */}
               <div className="mb-8">
                 <p className="font-body text-sm uppercase tracking-[0.2em] text-primary mb-3">
                   {t.bookASession}
                 </p>
                 <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-light text-foreground mb-4">
-                  {offer.title}
+                  {offerTitle}
                 </h1>
                 <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-5">
                   <span className="flex items-center gap-1.5 font-body text-sm">
@@ -125,15 +153,8 @@ const BookOffer = () => {
                     {formatPrice(offer.price_cents)}
                   </span>
                 </div>
-                <div className="prose prose-sm font-body text-muted-foreground max-w-2xl
-                  prose-headings:font-display prose-headings:font-light prose-headings:text-foreground
-                  prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                  prose-strong:text-foreground prose-code:text-foreground prose-code:bg-muted prose-code:px-1 prose-code:rounded">
-                  <ReactMarkdown
-                    allowedElements={[...ALLOWED_MARKDOWN]}
-                  >
-                    {offer.description}
-                  </ReactMarkdown>
+                <div className={PROSE}>
+                  <ReactMarkdown allowedElements={[...ALLOWED_MARKDOWN]}>{offerDesc}</ReactMarkdown>
                 </div>
               </div>
 
@@ -142,15 +163,8 @@ const BookOffer = () => {
                 <h2 className="font-display text-xl font-light text-foreground">
                   {t.conditionsHeading}
                 </h2>
-                <div className="prose prose-sm font-body text-muted-foreground
-                  prose-headings:font-display prose-headings:font-light prose-headings:text-foreground
-                  prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                  prose-strong:text-foreground prose-code:text-foreground prose-code:bg-muted prose-code:px-1 prose-code:rounded">
-                  <ReactMarkdown
-                    allowedElements={[...ALLOWED_MARKDOWN]}
-                  >
-                    {offer.conditions}
-                  </ReactMarkdown>
+                <div className={PROSE}>
+                  <ReactMarkdown allowedElements={[...ALLOWED_MARKDOWN]}>{offerConditions}</ReactMarkdown>
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer group">
                   <Checkbox
@@ -164,9 +178,9 @@ const BookOffer = () => {
                 </label>
               </div>
 
-              {/* Booking widget — shown and enabled only after conditions accepted */}
+              {/* Booking widget */}
               {conditionsAccepted ? (
-                <BookingWidget offer={offer} />
+                <BookingWidget offer={offer} offerDisplayTitle={offerTitle} />
               ) : (
                 <div className="card-organic p-8 flex items-center justify-center min-h-[200px]">
                   <p className="font-body text-sm text-muted-foreground text-center">

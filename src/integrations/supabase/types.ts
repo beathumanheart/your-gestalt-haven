@@ -180,48 +180,54 @@ export type Database = {
       }
       hidden_offers: {
         Row: {
-          conditions: string
+          conditions_en: string | null
+          conditions_ru: string | null
           created_at: string
-          description: string
+          description_en: string | null
+          description_ru: string | null
           duration_minutes: number
           id: string
           is_active: boolean
-          language: string
           name: string
           notification_email: string | null
           price_cents: number
           slug: string
-          title: string
+          title_en: string | null
+          title_ru: string | null
           updated_at: string
         }
         Insert: {
-          conditions: string
+          conditions_en?: string | null
+          conditions_ru?: string | null
           created_at?: string
-          description: string
+          description_en?: string | null
+          description_ru?: string | null
           duration_minutes?: number
           id?: string
           is_active?: boolean
-          language?: string
           name: string
           notification_email?: string | null
           price_cents?: number
           slug: string
-          title: string
+          title_en?: string | null
+          title_ru?: string | null
           updated_at?: string
         }
         Update: {
-          conditions?: string
+          conditions_en?: string | null
+          conditions_ru?: string | null
           created_at?: string
-          description?: string
+          description_en?: string | null
+          description_ru?: string | null
           duration_minutes?: number
           id?: string
           is_active?: boolean
-          language?: string
           name?: string
           notification_email?: string | null
           price_cents?: number
           slug?: string
-          title?: string
+          title_en?: string | null
+          title_ru?: string | null
           updated_at?: string
         }
         Relationships: []

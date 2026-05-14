@@ -18,7 +18,7 @@ import {
   trackConfirmationView,
 } from "@/hooks/useBookingAnalytics";
 import type { SessionType } from "./SessionTypeSelector";
-import type { HiddenOffer } from "@/types/hiddenOffers";
+import type { HiddenOffer } from "@/hooks/useHiddenOffers";
 
 export interface BookingData {
   sessionTypeId?: string;

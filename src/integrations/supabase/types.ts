@@ -1,3 +1,4 @@
+Initialising login role...
 export type Json =
   | string
   | number
@@ -10,7 +11,32 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -18,6 +44,8 @@ export type Database = {
         Row: {
           buffer_minutes: number
           created_at: string
+          deleted_at: string | null
+          end_date: string
           end_time: string | null
           id: string
           is_available: boolean
@@ -28,6 +56,8 @@ export type Database = {
         Insert: {
           buffer_minutes?: number
           created_at?: string
+          deleted_at?: string | null
+          end_date: string
           end_time?: string | null
           id?: string
           is_available?: boolean
@@ -38,6 +68,8 @@ export type Database = {
         Update: {
           buffer_minutes?: number
           created_at?: string
+          deleted_at?: string | null
+          end_date?: string
           end_time?: string | null
           id?: string
           is_available?: boolean
@@ -83,12 +115,14 @@ export type Database = {
           client_email_2: string | null
           client_name: string
           client_timezone: string | null
+          conditions_accepted_at: string | null
           created_at: string
           end_time: string
           google_meet_link: string | null
+          hidden_offer_id: string | null
           id: string
           notes: string | null
-          session_type_id: string
+          session_type_id: string | null
           start_time: string
           status: string
           updated_at: string
@@ -98,12 +132,14 @@ export type Database = {
           client_email_2?: string | null
           client_name: string
           client_timezone?: string | null
+          conditions_accepted_at?: string | null
           created_at?: string
           end_time: string
           google_meet_link?: string | null
+          hidden_offer_id?: string | null
           id?: string
           notes?: string | null
-          session_type_id: string
+          session_type_id?: string | null
           start_time: string
           status?: string
           updated_at?: string
@@ -113,17 +149,26 @@ export type Database = {
           client_email_2?: string | null
           client_name?: string
           client_timezone?: string | null
+          conditions_accepted_at?: string | null
           created_at?: string
           end_time?: string
           google_meet_link?: string | null
+          hidden_offer_id?: string | null
           id?: string
           notes?: string | null
-          session_type_id?: string
+          session_type_id?: string | null
           start_time?: string
           status?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_hidden_offer_id_fkey"
+            columns: ["hidden_offer_id"]
+            isOneToOne: false
+            referencedRelation: "hidden_offers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_session_type_id_fkey"
             columns: ["session_type_id"]
@@ -132,6 +177,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hidden_offers: {
+        Row: {
+          conditions: string
+          created_at: string
+          description: string
+          duration_minutes: number
+          id: string
+          is_active: boolean
+          language: string
+          name: string
+          notification_email: string | null
+          price_cents: number
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          conditions: string
+          created_at?: string
+          description: string
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          language?: string
+          name: string
+          notification_email?: string | null
+          price_cents?: number
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          conditions?: string
+          created_at?: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          language?: string
+          name?: string
+          notification_email?: string | null
+          price_cents?: number
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -223,6 +316,27 @@ export type Database = {
           slug?: string
           sort_order?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by_audit: Json | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by_audit?: Json | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by_audit?: Json | null
+          value?: Json
         }
         Relationships: []
       }
@@ -391,9 +505,14 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "user", "editor", "client"],
     },
   },
 } as const
+A new version of Supabase CLI is available: v2.98.2 (currently installed v2.90.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli

@@ -19,7 +19,7 @@ import {
   useUpdateOffer,
 } from "@/hooks/useHiddenOffers";
 import { buildOfferSlug, isValidSlugStem } from "@/lib/offerSlug";
-import type { HiddenOffer } from "@/types/hiddenOffers";
+import type { HiddenOffer } from "@/hooks/useHiddenOffers";
 
 const SITE_URL = window.location.origin;
 

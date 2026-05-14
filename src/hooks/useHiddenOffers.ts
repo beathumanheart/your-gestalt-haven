@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { HiddenOffer, HiddenOfferInsert, HiddenOfferUpdate } from "@/types/hiddenOffers";
+import type { Database } from "@/integrations/supabase/types";
+
+export type HiddenOffer = Database["public"]["Tables"]["hidden_offers"]["Row"];
+export type HiddenOfferInsert = Database["public"]["Tables"]["hidden_offers"]["Insert"];
+export type HiddenOfferUpdate = Database["public"]["Tables"]["hidden_offers"]["Update"];
 
 const QUERY_KEY = ["hidden_offers"] as const;
 

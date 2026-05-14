@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import BookingWidget from "@/components/booking/BookingWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { offersEN, offersRU } from "@/content/offers";
-import type { HiddenOffer } from "@/types/hiddenOffers";
+import type { HiddenOffer } from "@/hooks/useHiddenOffers";
 
 const ALLOWED_MARKDOWN = ["p", "h1", "h2", "h3", "ul", "ol", "li", "strong", "em", "a", "code"] as const;
 

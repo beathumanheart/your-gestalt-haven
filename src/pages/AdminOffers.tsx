@@ -23,31 +23,35 @@ import type { HiddenOffer } from "@/hooks/useHiddenOffers";
 
 const SITE_URL = window.location.origin;
 
-// ── Offer form (create & edit) ────────────────────────────────────────────────
+// ── Form state ────────────────────────────────────────────────────────────────
 
 interface FormState {
   slugStem: string;
   name: string;
-  title: string;
-  description: string;
-  conditions: string;
+  title_en: string;
+  title_ru: string;
+  description_en: string;
+  description_ru: string;
+  conditions_en: string;
+  conditions_ru: string;
   notification_email: string;
   price_euros: string;
   duration_minutes: string;
-  language: string;
   is_active: boolean;
 }
 
 const EMPTY_FORM: FormState = {
   slugStem: "",
   name: "",
-  title: "",
-  description: "",
-  conditions: "",
+  title_en: "",
+  title_ru: "",
+  description_en: "",
+  description_ru: "",
+  conditions_en: "",
+  conditions_ru: "",
   notification_email: "",
   price_euros: "0",
   duration_minutes: "60",
-  language: "en",
   is_active: true,
 };
 
@@ -55,16 +59,32 @@ function offerToForm(offer: HiddenOffer): FormState {
   return {
     slugStem: offer.slug,
     name: offer.name,
-    title: offer.title,
-    description: offer.description,
-    conditions: offer.conditions,
+    title_en: offer.title_en ?? "",
+    title_ru: offer.title_ru ?? "",
+    description_en: offer.description_en ?? "",
+    description_ru: offer.description_ru ?? "",
+    conditions_en: offer.conditions_en ?? "",
+    conditions_ru: offer.conditions_ru ?? "",
     notification_email: offer.notification_email ?? "",
     price_euros: (offer.price_cents / 100).toFixed(2),
     duration_minutes: String(offer.duration_minutes),
-    language: offer.language,
     is_active: offer.is_active,
   };
 }
+
+function validateBilingual(form: FormState): string | null {
+  const enFilled = [form.title_en, form.description_en, form.conditions_en].filter(Boolean).length;
+  const ruFilled = [form.title_ru, form.description_ru, form.conditions_ru].filter(Boolean).length;
+  if ((enFilled > 0 && enFilled < 3) || (ruFilled > 0 && ruFilled < 3)) {
+    return "Each language must be either fully filled (title + description + conditions) or left entirely blank.";
+  }
+  if (enFilled < 3 && ruFilled < 3) {
+    return "At least one language (EN or RU) must have all three fields filled.";
+  }
+  return null;
+}
+
+// ── Offer form ────────────────────────────────────────────────────────────────
 
 interface OfferFormProps {
   editTarget: HiddenOffer | null;
@@ -75,6 +95,7 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
   const [form, setForm] = useState<FormState>(editTarget ? offerToForm(editTarget) : EMPTY_FORM);
   const [slugPreview, setSlugPreview] = useState("");
   const [stemError, setStemError] = useState("");
+  const [saveError, setSaveError] = useState("");
   const createOffer = useCreateOffer();
   const updateOffer = useUpdateOffer();
   const isEdit = editTarget !== null;
@@ -100,27 +121,38 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaveError("");
+
+    const langError = validateBilingual(form);
+    if (langError) { setSaveError(langError); return; }
+
     const priceCents = Math.round(parseFloat(form.price_euros || "0") * 100);
     const duration = parseInt(form.duration_minutes, 10) || 60;
+
+    const bilingualFields = {
+      title_en: form.title_en.trim() || null,
+      title_ru: form.title_ru.trim() || null,
+      description_en: form.description_en.trim() || null,
+      description_ru: form.description_ru.trim() || null,
+      conditions_en: form.conditions_en.trim() || null,
+      conditions_ru: form.conditions_ru.trim() || null,
+    };
 
     if (isEdit) {
       try {
         await updateOffer.mutateAsync({
           id: editTarget.id,
           name: form.name.trim(),
-          title: form.title.trim(),
-          description: form.description.trim(),
-          conditions: form.conditions.trim(),
+          ...bilingualFields,
           notification_email: form.notification_email.trim() || null,
           price_cents: priceCents,
           duration_minutes: duration,
-          language: form.language,
           is_active: form.is_active,
         });
         toast.success("Offer updated.");
         onClose();
       } catch (err) {
-        toast.error("Failed to update offer.");
+        setSaveError("Failed to update offer. Please try again.");
       }
     } else {
       if (!isValidSlugStem(form.slugStem)) { setStemError("Invalid slug stem."); return; }
@@ -129,29 +161,29 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
         await createOffer.mutateAsync({
           slug,
           name: form.name.trim(),
-          title: form.title.trim(),
-          description: form.description.trim(),
-          conditions: form.conditions.trim(),
+          ...bilingualFields,
           notification_email: form.notification_email.trim() || null,
           price_cents: priceCents,
           duration_minutes: duration,
-          language: form.language,
           is_active: form.is_active,
         });
         toast.success(`Offer created: ${slug}`);
         onClose();
       } catch (err: unknown) {
-        const msg = (err as any)?.message || "";
+        const msg = (err as { message?: string })?.message || "";
         if (msg.includes("duplicate") || msg.includes("unique")) {
-          toast.error("Slug collision — try a different stem and create again.");
+          setSaveError("Slug collision — try a different stem and create again.");
         } else {
-          toast.error("Failed to create offer.");
+          setSaveError("Failed to create offer. Please try again.");
         }
       }
     }
   };
 
   const pending = createOffer.isPending || updateOffer.isPending;
+
+  const textareaClass =
+    "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-body ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y";
 
   return (
     <div className="card-organic p-6 space-y-5">
@@ -164,7 +196,7 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Slug */}
         <div>
           <label className="font-body text-sm font-medium text-foreground block mb-1">
@@ -207,52 +239,65 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
           />
         </div>
 
-        {/* Page title */}
+        {/* Bilingual content — two columns */}
         <div>
-          <label className="font-body text-sm font-medium text-foreground block mb-1">
-            Page title (shown as h1)
-          </label>
-          <Input
-            required
-            value={form.title}
-            onChange={(e) => set("title", e.target.value)}
-            placeholder="Free session for grief support"
-            className="font-body text-sm"
-          />
+          <p className="font-body text-sm font-medium text-foreground mb-3">
+            Content{" "}
+            <span className="font-normal text-muted-foreground text-xs">
+              — fill one or both languages; each must be complete (title + description + conditions) or fully blank
+            </span>
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {(["en", "ru"] as const).map((lang) => (
+              <div key={lang} className="space-y-3 rounded-xl border border-border/60 p-4">
+                <p className="font-body text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {lang === "en" ? "English" : "Русский"}
+                </p>
+
+                <div>
+                  <label className="font-body text-xs text-muted-foreground block mb-1">
+                    Page title (h1)
+                  </label>
+                  <Input
+                    value={form[`title_${lang}`]}
+                    onChange={(e) => set(`title_${lang}`, e.target.value)}
+                    placeholder={lang === "en" ? "Free session for grief support" : "Бесплатная сессия"}
+                    className="font-body text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-body text-xs text-muted-foreground block mb-1">
+                    Description <span className="italic">(Markdown)</span>
+                  </label>
+                  <textarea
+                    value={form[`description_${lang}`]}
+                    onChange={(e) => set(`description_${lang}`, e.target.value)}
+                    rows={4}
+                    className={textareaClass}
+                    placeholder={lang === "en" ? "Describe the offer…" : "Опишите предложение…"}
+                  />
+                </div>
+
+                <div>
+                  <label className="font-body text-xs text-muted-foreground block mb-1">
+                    Conditions <span className="italic">(Markdown — client must accept)</span>
+                  </label>
+                  <textarea
+                    value={form[`conditions_${lang}`]}
+                    onChange={(e) => set(`conditions_${lang}`, e.target.value)}
+                    rows={4}
+                    className={textareaClass}
+                    placeholder={lang === "en" ? "Terms for this offer…" : "Условия предложения…"}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Description */}
-        <div>
-          <label className="font-body text-sm font-medium text-foreground block mb-1">
-            Description
-          </label>
-          <p className="font-body text-xs text-muted-foreground mb-1">Supports Markdown</p>
-          <textarea
-            required
-            value={form.description}
-            onChange={(e) => set("description", e.target.value)}
-            rows={4}
-            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-body ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
-          />
-        </div>
-
-        {/* Conditions */}
-        <div>
-          <label className="font-body text-sm font-medium text-foreground block mb-1">
-            Conditions
-          </label>
-          <p className="font-body text-xs text-muted-foreground mb-1">Supports Markdown — client must accept before booking</p>
-          <textarea
-            required
-            value={form.conditions}
-            onChange={(e) => set("conditions", e.target.value)}
-            rows={4}
-            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-body ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
-          />
-        </div>
-
-        {/* Row: price + duration + language */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* Row: price + duration */}
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="font-body text-sm font-medium text-foreground block mb-1">Price (€)</label>
             <Input
@@ -275,23 +320,13 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
               className="font-body text-sm"
             />
           </div>
-          <div>
-            <label className="font-body text-sm font-medium text-foreground block mb-1">Language</label>
-            <select
-              value={form.language}
-              onChange={(e) => set("language", e.target.value)}
-              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-body ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-11"
-            >
-              <option value="en">English</option>
-              <option value="ru">Русский</option>
-            </select>
-          </div>
         </div>
 
         {/* Notification email */}
         <div>
           <label className="font-body text-sm font-medium text-foreground block mb-1">
-            Notification email <span className="font-normal text-muted-foreground">(optional — defaults to sender address)</span>
+            Notification email{" "}
+            <span className="font-normal text-muted-foreground">(optional — defaults to sender address)</span>
           </label>
           <Input
             type="email"
@@ -313,7 +348,11 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
           <span className="font-body text-sm text-foreground">Active (visible to clients)</span>
         </label>
 
-        <div className="flex gap-3 pt-2">
+        {saveError && (
+          <p className="font-body text-sm text-destructive">{saveError}</p>
+        )}
+
+        <div className="flex gap-3 pt-1">
           <button
             type="submit"
             disabled={pending}
@@ -358,6 +397,27 @@ const SlugCell = ({ slug }: { slug: string }) => {
         <Copy className="w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
       )}
     </button>
+  );
+};
+
+// ── Language badges ───────────────────────────────────────────────────────────
+
+const LangBadges = ({ offer }: { offer: HiddenOffer }) => {
+  const hasEn = !!(offer.title_en && offer.description_en && offer.conditions_en);
+  const hasRu = !!(offer.title_ru && offer.description_ru && offer.conditions_ru);
+  return (
+    <div className="flex gap-1">
+      {hasEn && (
+        <span className="font-body text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary uppercase tracking-wide">
+          EN
+        </span>
+      )}
+      {hasRu && (
+        <span className="font-body text-[10px] font-semibold px-1.5 py-0.5 rounded bg-accent/10 text-accent uppercase tracking-wide">
+          RU
+        </span>
+      )}
+    </div>
   );
 };
 
@@ -432,7 +492,9 @@ const AdminOffers = () => {
   const formatPrice = (cents: number) =>
     cents === 0
       ? "Free"
-      : new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(cents / 100);
+      : new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(
+          cents / 100
+        );
 
   return (
     <div className="min-h-screen bg-background">
@@ -465,14 +527,13 @@ const AdminOffers = () => {
 
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8">
         {/* Form */}
-        {showForm && (
-          <OfferForm editTarget={editTarget} onClose={closeForm} />
-        )}
+        {showForm && <OfferForm editTarget={editTarget} onClose={closeForm} />}
 
         {/* List header */}
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-light text-foreground">
-            All offers <span className="text-muted-foreground text-sm font-body">({offers.length})</span>
+            All offers{" "}
+            <span className="text-muted-foreground text-sm font-body">({offers.length})</span>
           </h2>
           {!showForm && (
             <button onClick={handleNew} className="flex items-center gap-2 btn-primary text-sm py-2 px-4">
@@ -501,7 +562,7 @@ const AdminOffers = () => {
                   <TableHead className="font-body text-xs">Name</TableHead>
                   <TableHead className="font-body text-xs">Slug (click to copy URL)</TableHead>
                   <TableHead className="font-body text-xs">Price</TableHead>
-                  <TableHead className="font-body text-xs">Lang</TableHead>
+                  <TableHead className="font-body text-xs">Languages</TableHead>
                   <TableHead className="font-body text-xs">Active</TableHead>
                   <TableHead className="font-body text-xs text-right">Bookings</TableHead>
                   <TableHead className="font-body text-xs text-right">Edit</TableHead>
@@ -515,9 +576,7 @@ const AdminOffers = () => {
                     <TableCell className="font-body text-sm text-muted-foreground">
                       {formatPrice(offer.price_cents)}
                     </TableCell>
-                    <TableCell className="font-body text-xs text-muted-foreground uppercase">
-                      {offer.language}
-                    </TableCell>
+                    <TableCell><LangBadges offer={offer} /></TableCell>
                     <TableCell><ActiveToggle offer={offer} /></TableCell>
                     <TableCell className="font-body text-sm text-muted-foreground text-right">
                       {bookingCounts[offer.id] ?? 0}

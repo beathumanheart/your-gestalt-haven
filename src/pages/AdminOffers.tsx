@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Calendar, Copy, Check, LogOut, Pencil, Plus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -445,21 +446,47 @@ const ActiveToggle = ({ offer }: { offer: HiddenOffer }) => {
 
 const AdminOffers = () => {
   const navigate = useNavigate();
-  const [authorized, setAuthorized] = useState<boolean | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(true);
   const [editTarget, setEditTarget] = useState<HiddenOffer | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  const adminEmail = import.meta.env.VITE_PUBLIC_ADMIN_EMAIL as string | undefined;
+  useEffect(() => {
+    let isMounted = true;
+    const wait = (ms: number) => new Promise<void>((resolve) => { window.setTimeout(resolve, ms); });
+
+    const initializeSession = async () => {
+      const retryDelays = [0, 150, 350, 700];
+      let resolvedSession: Session | null = null;
+      for (const delay of retryDelays) {
+        if (delay > 0) await wait(delay);
+        const { data: { session: s } } = await supabase.auth.getSession();
+        if (!isMounted) return;
+        if (s) { resolvedSession = s; break; }
+      }
+      if (!isMounted) return;
+      setSession(resolvedSession);
+      setLoading(false);
+    };
+
+    initializeSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!isMounted) return;
+      setSession(nextSession);
+      if (nextSession) setLoading(false);
+    });
+
+    return () => { isMounted = false; subscription.unsubscribe(); };
+  }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session || session.user.email !== adminEmail) {
-        navigate("/", { replace: true });
-      } else {
-        setAuthorized(true);
-      }
+    if (!session) { setIsAdmin(null); return; }
+    supabase.rpc("has_role", { _user_id: session.user.id, _role: "admin" }).then(({ data }) => {
+      setIsAdmin(!!data);
     });
-  }, [adminEmail, navigate]);
+  }, [session]);
 
   const { data: offers = [], isLoading } = useHiddenOffers();
   const { data: bookingCounts = {} } = useOfferBookingCounts();
@@ -481,13 +508,25 @@ const AdminOffers = () => {
     setEditTarget(null);
   };
 
-  if (authorized === null) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse font-body text-muted-foreground">Loading…</div>
       </div>
     );
   }
+
+  if (!session) return <Navigate to="/admin/login" replace />;
+
+  if (isAdmin === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse font-body text-muted-foreground">Loading…</div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) return <Navigate to="/admin" replace />;
 
   const formatPrice = (cents: number) =>
     cents === 0

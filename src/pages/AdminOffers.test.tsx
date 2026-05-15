@@ -5,11 +5,14 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import AdminOffers, { validateBilingual } from "./AdminOffers";
 
 const mockGetSession = vi.fn();
+const mockOnAuthStateChange = vi.fn();
+const mockRpc = vi.fn();
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
       getSession: (...args: unknown[]) => mockGetSession(...args),
+      onAuthStateChange: (...args: unknown[]) => mockOnAuthStateChange(...args),
       signOut: vi.fn().mockResolvedValue({}),
     },
     from: vi.fn().mockReturnValue({
@@ -19,6 +22,7 @@ vi.mock("@/integrations/supabase/client", () => ({
       neq: vi.fn().mockReturnThis(),
       then: vi.fn().mockResolvedValue({ data: [], error: null }),
     }),
+    rpc: (...args: unknown[]) => mockRpc(...args),
   },
 }));
 
@@ -39,7 +43,7 @@ vi.mock("@/hooks/useHiddenOffers", () => ({
   useUpdateOffer: () => ({ mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false }),
 }));
 
-const ADMIN_SESSION = { data: { session: { user: { email: "be@humanheart.life" } } } };
+const ADMIN_SESSION = { user: { id: "user-1", email: "be@humanheart.life" } };
 
 const renderPage = () =>
   render(
@@ -47,6 +51,7 @@ const renderPage = () =>
       <Routes>
         <Route path="/admin/offers" element={<AdminOffers />} />
         <Route path="/" element={<div data-testid="home">Home</div>} />
+        <Route path="/admin" element={<div data-testid="admin-dashboard">Dashboard</div>} />
         <Route path="/admin/login" element={<div data-testid="login">Login</div>} />
       </Routes>
     </MemoryRouter>
@@ -57,29 +62,32 @@ const renderPage = () =>
 describe("AdminOffers auth gate", () => {
   beforeEach(() => {
     mockGetSession.mockReset();
-    vi.stubEnv("VITE_PUBLIC_ADMIN_EMAIL", "be@humanheart.life");
+    mockOnAuthStateChange.mockReset();
+    mockRpc.mockReset();
+    mockOnAuthStateChange.mockReturnValue({
+      data: { subscription: { unsubscribe: vi.fn() } },
+    });
+    mockRpc.mockResolvedValue({ data: true, error: null });
   });
 
-  it("redirects to home when there is no session", async () => {
+  it("redirects to login when there is no session", async () => {
     mockGetSession.mockResolvedValue({ data: { session: null } });
     renderPage();
-    await waitFor(() => expect(screen.getByTestId("home")).toBeInTheDocument());
+    // Retry loop takes ~1200ms (delays: 150+350+700ms) before loading resolves
+    await waitFor(() => expect(screen.getByTestId("login")).toBeInTheDocument(), { timeout: 2500 });
   });
 
-  it("redirects to home when the session email does not match the admin email", async () => {
-    mockGetSession.mockResolvedValue({
-      data: { session: { user: { email: "other@example.com" } } },
-    });
+  it("redirects to admin dashboard when session exists but user lacks admin role", async () => {
+    mockGetSession.mockResolvedValue({ data: { session: ADMIN_SESSION } });
+    mockRpc.mockResolvedValue({ data: false, error: null });
     renderPage();
-    await waitFor(() => expect(screen.getByTestId("home")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("admin-dashboard")).toBeInTheDocument());
   });
 
-  it("renders the offers page when the session email matches the admin email", async () => {
-    mockGetSession.mockResolvedValue(ADMIN_SESSION);
+  it("renders the offers page for authenticated admin users", async () => {
+    mockGetSession.mockResolvedValue({ data: { session: ADMIN_SESSION } });
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByText("Hidden Offers")).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText("Hidden Offers")).toBeInTheDocument());
   });
 });
 
@@ -88,8 +96,13 @@ describe("AdminOffers auth gate", () => {
 describe("AdminOffers form — inline error via UI", () => {
   beforeEach(() => {
     mockGetSession.mockReset();
-    vi.stubEnv("VITE_PUBLIC_ADMIN_EMAIL", "be@humanheart.life");
-    mockGetSession.mockResolvedValue(ADMIN_SESSION);
+    mockOnAuthStateChange.mockReset();
+    mockRpc.mockReset();
+    mockOnAuthStateChange.mockReturnValue({
+      data: { subscription: { unsubscribe: vi.fn() } },
+    });
+    mockRpc.mockResolvedValue({ data: true, error: null });
+    mockGetSession.mockResolvedValue({ data: { session: ADMIN_SESSION } });
   });
 
   it("shows inline error when neither language has any content", async () => {
@@ -98,7 +111,6 @@ describe("AdminOffers form — inline error via UI", () => {
     fireEvent.click(screen.getByRole("button", { name: /new offer/i }));
     await waitFor(() => screen.getByText("New offer"));
 
-    // Fill only meta fields; leave all bilingual content empty
     fireEvent.change(screen.getByPlaceholderText("Grief support — May 2026"), {
       target: { value: "Test offer" },
     });

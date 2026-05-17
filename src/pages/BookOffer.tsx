@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import BookingWidget from "@/components/booking/BookingWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { offersEN, offersRU } from "@/content/offers";
+import PageMeta from "@/components/PageMeta";
 import type { HiddenOffer } from "@/hooks/useHiddenOffers";
 
 const ALLOWED_MARKDOWN = ["p", "h1", "h2", "h3", "ul", "ol", "li", "strong", "em", "a", "code"] as const;
@@ -73,6 +74,12 @@ const BookOffer = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      {offerTitle && (
+        <PageMeta
+          titleEn={offer?.title_en ?? offerTitle}
+          titleRu={offer?.title_ru ?? offerTitle}
+        />
+      )}
       <Header hideSwitcher={!hasEn || !hasRu} />
       <div className="pt-28 pb-16 section-padding">
         <div className="container-narrow">

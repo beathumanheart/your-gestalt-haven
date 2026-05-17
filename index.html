@@ -6,8 +6,6 @@
 
     <!-- Favicon: heart-pulse SVG matching site header (terracotta #D17147) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- apple-touch-icon.png (180×180) must be generated manually from favicon.svg
-         and placed at public/apple-touch-icon.png — SVG is not supported on iOS. -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#D17147" />
 
@@ -17,13 +15,18 @@
     <meta name="author" content="Genia" />
     <link rel="canonical" href="https://humanheart.life" />
 
-    <!-- Open Graph -->
+    <!-- Open Graph
+         Static fallback read by Telegram, Twitter, WhatsApp (bots don't run JS).
+         React-side PageMeta overrides these for Google and JS-capable crawlers. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Human Heart Beat" />
     <meta property="og:title" content="Genia | Psychotherapist" />
     <meta property="og:description" content="A warm, compassionate space for therapy. I offer short-term and long-term Gestalt psychotherapy for grief, relationships, and life's existential questions." />
     <meta property="og:url" content="https://humanheart.life" />
-    <meta property="og:image" content="https://humanheart.life/og-image.png" />
+    <meta property="og:image" content="https://humanheart.life/og-image-en.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Genia — Gestalt psychotherapist" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="ru_RU" />
 
@@ -31,7 +34,8 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Genia | Psychotherapist" />
     <meta name="twitter:description" content="A warm, compassionate space for therapy. I offer short-term and long-term Gestalt psychotherapy for grief, relationships, and life's existential questions." />
-    <meta name="twitter:image" content="https://humanheart.life/og-image.png" />
+    <meta name="twitter:image" content="https://humanheart.life/og-image-en.png" />
+    <meta name="twitter:image:alt" content="Genia — Gestalt psychotherapist" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

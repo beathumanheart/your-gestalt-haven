@@ -8,6 +8,7 @@ import Credentials from "@/components/Credentials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { trackHomepageView } from "@/hooks/useBookingAnalytics";
+import PageMeta from "@/components/PageMeta";
 
 const Index = () => {
   const location = useLocation();
@@ -30,6 +31,7 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      <PageMeta />
       <Header />
       <Hero />
       <About />

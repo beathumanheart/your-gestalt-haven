@@ -78,6 +78,7 @@ const BookOffer = () => {
         <PageMeta
           titleEn={offer?.title_en ?? offerTitle}
           titleRu={offer?.title_ru ?? offerTitle}
+          noIndex
         />
       )}
       <Header hideSwitcher={!hasEn || !hasRu} />

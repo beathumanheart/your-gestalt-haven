@@ -16,7 +16,9 @@ test.describe("Landing page", () => {
 
   test("OG image is self-hosted (not r2.dev or lovable CDN)", async ({ page }) => {
     await page.goto("/");
-    const ogImage = page.locator('meta[property="og:image"]');
+    // index.html provides a static tag for bots; PageMeta adds a second with data-rh="true".
+    // Both carry identical content — use .first() to avoid strict-mode failure.
+    const ogImage = page.locator('meta[property="og:image"]').first();
     const content = await ogImage.getAttribute("content");
     expect(content).toBeTruthy();
     expect(content).not.toMatch(/r2\.dev/i);

@@ -1,6 +1,7 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CheckCircle, XCircle } from "lucide-react";
+import PageMeta from "@/components/PageMeta";
 
 const BookingCancelled = () => {
   const [searchParams] = useSearchParams();
@@ -35,6 +36,11 @@ const BookingCancelled = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <PageMeta
+        titleEn="Booking Cancelled | Human Heart Beat"
+        titleRu="Запись отменена | Human Heart Beat"
+        noIndex
+      />
       <div className="max-w-md w-full text-center space-y-6">
         {success ? (
           <CheckCircle className="w-16 h-16 text-primary mx-auto" />

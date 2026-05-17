@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Clock, Info } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
@@ -12,6 +13,10 @@ import { offersEN, offersRU } from "@/content/offers";
 import type { HiddenOffer } from "@/hooks/useHiddenOffers";
 
 const ALLOWED_MARKDOWN = ["p", "h1", "h2", "h3", "ul", "ol", "li", "strong", "em", "a", "code"] as const;
+
+// Markdown in the DB uses single \n for paragraph breaks; standard MD needs \n\n.
+// Normalize so each isolated newline becomes a blank line, creating <p> elements.
+const normalizeMd = (text: string) => text.replace(/(?<!\n)\n(?!\n)/g, "\n\n");
 
 const PROSE = "prose prose-sm font-body text-muted-foreground max-w-none " +
   "prose-headings:font-display prose-headings:font-light prose-headings:text-foreground " +
@@ -154,7 +159,7 @@ const BookOffer = () => {
                   </span>
                 </div>
                 <div className={PROSE}>
-                  <ReactMarkdown allowedElements={[...ALLOWED_MARKDOWN]}>{offerDesc}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} allowedElements={[...ALLOWED_MARKDOWN]}>{normalizeMd(offerDesc)}</ReactMarkdown>
                 </div>
               </div>
 
@@ -164,7 +169,7 @@ const BookOffer = () => {
                   {t.conditionsHeading}
                 </h2>
                 <div className={PROSE}>
-                  <ReactMarkdown allowedElements={[...ALLOWED_MARKDOWN]}>{offerConditions}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} allowedElements={[...ALLOWED_MARKDOWN]}>{normalizeMd(offerConditions)}</ReactMarkdown>
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer group">
                   <Checkbox

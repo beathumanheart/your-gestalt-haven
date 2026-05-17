@@ -315,7 +315,7 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
             <Input
               type="number"
               min="15"
-              step="15"
+              step="5"
               value={form.duration_minutes}
               onChange={(e) => set("duration_minutes", e.target.value)}
               className="font-body text-sm"

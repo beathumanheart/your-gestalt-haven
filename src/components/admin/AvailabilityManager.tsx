@@ -118,12 +118,13 @@ const AvailabilityManager = () => {
     const { data } = await supabase
       .from("settings")
       .select("key, value")
-      .in("key", ["booking_horizon_days", "minimum_notice_hours"]);
+      .in("key", ["booking_horizon_days", "booking_min_lead_time_minutes"]);
 
     if (data) {
       const map = new Map(data.map((s) => [s.key, s.value as number]));
       const horizonDays = map.get("booking_horizon_days") ?? 180;
-      const noticeHrs = map.get("minimum_notice_hours") ?? 24;
+      // stored in minutes; convert to hours for display
+      const noticeHrs = Math.round((map.get("booking_min_lead_time_minutes") ?? 1200) / 60);
       const h = daysToDisplay(horizonDays);
       setHorizonValue(h.value);
       setHorizonUnit(h.unit);
@@ -251,7 +252,8 @@ const AvailabilityManager = () => {
 
   const handleSaveNotice = () => {
     const hours = displayToHours(noticeValue, noticeUnit);
-    saveSetting("minimum_notice_hours", hours, setSavingNotice, setSavedNotice, setNoticeError);
+    // stored as minutes in the DB
+    saveSetting("booking_min_lead_time_minutes", hours * 60, setSavingNotice, setSavedNotice, setNoticeError);
   };
 
   // ── Date overrides handlers ───────────────────────────────────────────────

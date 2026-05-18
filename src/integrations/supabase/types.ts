@@ -187,6 +187,7 @@ export type Database = {
           duration_minutes: number
           id: string
           is_active: boolean
+          min_lead_time_minutes: number | null
           name: string
           notification_email: string | null
           price_cents: number
@@ -204,6 +205,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           is_active?: boolean
+          min_lead_time_minutes?: number | null
           name: string
           notification_email?: string | null
           price_cents?: number
@@ -221,6 +223,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           is_active?: boolean
+          min_lead_time_minutes?: number | null
           name?: string
           notification_email?: string | null
           price_cents?: number

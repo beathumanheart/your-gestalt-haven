@@ -8,7 +8,7 @@ import type { SessionType } from "@/components/booking/SessionTypeSelector";
 export type { ComputedSlot };
 
 const DEFAULT_HORIZON_DAYS = 180;
-const DEFAULT_NOTICE_HOURS = 24;
+const DEFAULT_LEAD_TIME_MINUTES = 1200; // 20 hours
 
 export function useSessionTypes() {
   const [sessionTypes, setSessionTypes] = useState<SessionType[]>([]);
@@ -29,10 +29,14 @@ export function useSessionTypes() {
   return { sessionTypes, loading };
 }
 
-export function useAvailableSlots(date: Date | undefined, durationMinutes: number) {
+export function useAvailableSlots(
+  date: Date | undefined,
+  durationMinutes: number,
+  overrideLeadMinutes?: number
+) {
   const [slots, setSlots] = useState<ComputedSlot[]>([]);
   const [loading, setLoading] = useState(false);
-  const [minimumNoticeHours, setMinimumNoticeHours] = useState(DEFAULT_NOTICE_HOURS);
+  const [minimumNoticeMinutes, setMinimumNoticeMinutes] = useState(DEFAULT_LEAD_TIME_MINUTES);
 
   const fetchSlots = useCallback(async () => {
     if (!date) return;
@@ -47,7 +51,7 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
       supabase
         .from("settings")
         .select("key, value")
-        .in("key", ["booking_horizon_days", "minimum_notice_hours"]),
+        .in("key", ["booking_horizon_days", "booking_min_lead_time_minutes"]),
       supabase
         .from("availability_overrides")
         .select("*")
@@ -65,12 +69,14 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
       typeof settingsMap.get("booking_horizon_days") === "number"
         ? (settingsMap.get("booking_horizon_days") as number)
         : DEFAULT_HORIZON_DAYS;
-    const noticeHours =
-      typeof settingsMap.get("minimum_notice_hours") === "number"
-        ? (settingsMap.get("minimum_notice_hours") as number)
-        : DEFAULT_NOTICE_HOURS;
+    const globalLeadMinutes =
+      typeof settingsMap.get("booking_min_lead_time_minutes") === "number"
+        ? (settingsMap.get("booking_min_lead_time_minutes") as number)
+        : DEFAULT_LEAD_TIME_MINUTES;
 
-    setMinimumNoticeHours(noticeHours);
+    // Per-offer override takes precedence when provided
+    const noticeMinutes = overrideLeadMinutes !== undefined ? overrideLeadMinutes : globalLeadMinutes;
+    setMinimumNoticeMinutes(noticeMinutes);
 
     // Horizon check
     const today = new Date();
@@ -84,7 +90,7 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
         JSON.stringify({
           event: "slots_filtered",
           date: dateStr,
-          appliedRules: { horizon: horizonDays, minimumNotice: noticeHours, override: null },
+          appliedRules: { horizon: horizonDays, minimumNoticeMinutes: noticeMinutes, override: null },
           slotsBeforeFiltering: 0,
           slotsAfterFiltering: 0,
           reason: date < today ? "past_date" : "beyond_horizon",
@@ -111,7 +117,7 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
         JSON.stringify({
           event: "slots_filtered",
           date: dateStr,
-          appliedRules: { horizon: horizonDays, minimumNotice: noticeHours, override: "closed" },
+          appliedRules: { horizon: horizonDays, minimumNoticeMinutes: noticeMinutes, override: "closed" },
           slotsBeforeFiltering: null,
           slotsAfterFiltering: 0,
         })
@@ -124,7 +130,6 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
     let windows: { start: string; end: string; buffer_minutes: number }[] = [];
 
     if (override && override.is_available && override.start_time && override.end_time) {
-      // Open override: use override's time window
       windows = [
         {
           start: override.start_time,
@@ -133,7 +138,6 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
         },
       ];
     } else {
-      // Weekly schedule
       const { data: rules } = await supabase
         .from("availability_rules")
         .select("*")
@@ -159,7 +163,7 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
       windows,
       bookedSlots,
       durationMinutes,
-      noticeHours,
+      noticeMinutes,
       now
     );
 
@@ -169,7 +173,7 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
         date: dateStr,
         appliedRules: {
           horizon: horizonDays,
-          minimumNotice: noticeHours,
+          minimumNoticeMinutes: noticeMinutes,
           override: override ? (override.is_available ? "open" : "closed") : null,
         },
         slotsBeforeFiltering: computed.length + computed.filter((s) => s.disabled).length,
@@ -180,11 +184,11 @@ export function useAvailableSlots(date: Date | undefined, durationMinutes: numbe
 
     setSlots(computed);
     setLoading(false);
-  }, [date, durationMinutes]);
+  }, [date, durationMinutes, overrideLeadMinutes]);
 
   useEffect(() => {
     fetchSlots();
   }, [fetchSlots]);
 
-  return { slots, loading, minimumNoticeHours };
+  return { slots, loading, minimumNoticeMinutes };
 }

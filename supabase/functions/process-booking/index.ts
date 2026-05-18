@@ -32,7 +32,7 @@ function logError(requestId: string, step: string, errorCode: string, errorMessa
 
 function errorResponse(
   status: number,
-  code: "VALIDATION_FAILED" | "SLOT_TAKEN" | "BREVO_UNREACHABLE" | "BREVO_REJECTED" | "INTERNAL",
+  code: "VALIDATION_FAILED" | "SLOT_TAKEN" | "LEAD_TIME_VIOLATION" | "BREVO_UNREACHABLE" | "BREVO_REJECTED" | "INTERNAL",
   message: string,
   requestId: string
 ): Response {
@@ -523,11 +523,11 @@ Deno.serve(async (req) => {
     const supabase = getSupabase();
 
     // For offer bookings: validate the offer exists and is active
-    let offerRecord: { id: string; title: string; notification_email: string | null } | null = null;
+    let offerRecord: { id: string; title: string; notification_email: string | null; min_lead_time_minutes: number | null } | null = null;
     if (isOfferBooking) {
       const { data: offer, error: offerErr } = await supabase
         .from("hidden_offers")
-        .select("id, title, notification_email")
+        .select("id, title, notification_email, min_lead_time_minutes")
         .eq("id", hiddenOfferId)
         .eq("is_active", true)
         .single();
@@ -535,7 +535,31 @@ Deno.serve(async (req) => {
         logError(requestId, "offer_lookup", "VALIDATION_FAILED", "Offer not found or inactive");
         return errorResponse(400, "VALIDATION_FAILED", "This offer is no longer available.", requestId);
       }
-      offerRecord = offer;
+      offerRecord = offer as typeof offerRecord;
+    }
+
+    // Lead time check
+    {
+      const DEFAULT_LEAD_MINUTES = 1200;
+      const { data: settingsRows } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "booking_min_lead_time_minutes")
+        .single();
+      const globalLeadMinutes: number =
+        typeof settingsRows?.value === "number"
+          ? settingsRows.value
+          : DEFAULT_LEAD_MINUTES;
+      const leadMinutes =
+        offerRecord?.min_lead_time_minutes != null
+          ? offerRecord.min_lead_time_minutes
+          : globalLeadMinutes;
+      const sessionStartMs = new Date(startTime).getTime();
+      const leadTimeMs = leadMinutes * 60 * 1000;
+      if (sessionStartMs - Date.now() < leadTimeMs) {
+        logError(requestId, "lead_time_check", "LEAD_TIME_VIOLATION");
+        return errorResponse(400, "LEAD_TIME_VIOLATION", "This time slot is no longer available. Please choose a later time.", requestId);
+      }
     }
 
     // Overlap check

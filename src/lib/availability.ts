@@ -16,7 +16,7 @@ export interface DateOverride {
 
 export interface AvailabilitySettings {
   bookingHorizonDays: number;
-  minimumNoticeHours: number;
+  minimumNoticeMinutes: number;
 }
 
 export interface TimeWindow {
@@ -69,13 +69,13 @@ export function computeSlots(
   windows: TimeWindow[],
   bookedSlots: BookedSlot[],
   durationMinutes: number,
-  minimumNoticeHours: number,
+  minimumNoticeMinutes: number,
   now: Date
 ): ComputedSlot[] {
   const dateStr = format(date, "yyyy-MM-dd");
   const todayStr = format(now, "yyyy-MM-dd");
   const isToday = dateStr === todayStr;
-  const minimumNoticeMs = minimumNoticeHours * 60 * 60 * 1000;
+  const minimumNoticeMs = minimumNoticeMinutes * 60 * 1000;
   const available: ComputedSlot[] = [];
 
   for (const window of windows) {

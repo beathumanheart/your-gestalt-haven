@@ -15,6 +15,7 @@ interface Props {
   t: BookingContent;
   onSelectDate: (date: Date) => void;
   onSelectTime: (slot: string) => void;
+  overrideLeadMinutes?: number;
 }
 
 export function getUserTimezone(): string {
@@ -47,14 +48,16 @@ const DateTimeSelector = ({
   t,
   onSelectDate,
   onSelectTime,
+  overrideLeadMinutes,
 }: Props) => {
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
 
   const [displayMonth, setDisplayMonth] = useState(new Date());
-  const { availableDays, horizonDate } = useAvailableDates(displayMonth);
-  const { slots, loading: loadingSlots, minimumNoticeHours } = useAvailableSlots(
+  const { availableDays, horizonDate } = useAvailableDates(displayMonth, overrideLeadMinutes);
+  const { slots, loading: loadingSlots, minimumNoticeMinutes } = useAvailableSlots(
     selectedDate,
-    durationMinutes
+    durationMinutes,
+    overrideLeadMinutes
   );
 
   const timezone = useMemo(() => getUserTimezone(), []);
@@ -194,7 +197,7 @@ const DateTimeSelector = ({
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="text-xs max-w-[180px] text-center">
-                      {t.minNoticeTooltip.replace("[N]", String(minimumNoticeHours))}
+                      {t.minNoticeTooltip.replace("[N]", String(Math.round(minimumNoticeMinutes / 60)))}
                     </TooltipContent>
                   </Tooltip>
                 ))}

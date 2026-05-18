@@ -38,6 +38,7 @@ interface FormState {
   notification_email: string;
   price_euros: string;
   duration_minutes: string;
+  min_lead_time_hours: string; // "" = use global default
   is_active: boolean;
 }
 
@@ -53,6 +54,7 @@ const EMPTY_FORM: FormState = {
   notification_email: "",
   price_euros: "0",
   duration_minutes: "60",
+  min_lead_time_hours: "",
   is_active: true,
 };
 
@@ -69,6 +71,9 @@ function offerToForm(offer: HiddenOffer): FormState {
     notification_email: offer.notification_email ?? "",
     price_euros: (offer.price_cents / 100).toFixed(2),
     duration_minutes: String(offer.duration_minutes),
+    min_lead_time_hours: offer.min_lead_time_minutes != null
+      ? String(offer.min_lead_time_minutes / 60)
+      : "",
     is_active: offer.is_active,
   };
 }
@@ -130,6 +135,17 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
     const priceCents = Math.round(parseFloat(form.price_euros || "0") * 100);
     const duration = parseInt(form.duration_minutes, 10) || 60;
 
+    const rawLeadHours = form.min_lead_time_hours.trim();
+    let minLeadTimeMinutes: number | null = null;
+    if (rawLeadHours !== "") {
+      const h = parseInt(rawLeadHours, 10);
+      if (isNaN(h) || h < 0 || h > 168) {
+        setSaveError("Lead time must be between 0 and 168 hours.");
+        return;
+      }
+      minLeadTimeMinutes = h * 60;
+    }
+
     const bilingualFields = {
       title_en: form.title_en.trim() || null,
       title_ru: form.title_ru.trim() || null,
@@ -148,6 +164,7 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
           notification_email: form.notification_email.trim() || null,
           price_cents: priceCents,
           duration_minutes: duration,
+          min_lead_time_minutes: minLeadTimeMinutes,
           is_active: form.is_active,
         });
         toast.success("Offer updated.");
@@ -166,6 +183,7 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
           notification_email: form.notification_email.trim() || null,
           price_cents: priceCents,
           duration_minutes: duration,
+          min_lead_time_minutes: minLeadTimeMinutes,
           is_active: form.is_active,
         });
         toast.success(`Offer created: ${slug}`);
@@ -321,6 +339,26 @@ const OfferForm = ({ editTarget, onClose }: OfferFormProps) => {
               className="font-body text-sm"
             />
           </div>
+        </div>
+
+        {/* Minimum lead time */}
+        <div>
+          <label className="font-body text-sm font-medium text-foreground block mb-1">
+            Minimum lead time (hours)
+          </label>
+          <Input
+            type="number"
+            min="0"
+            max="168"
+            step="1"
+            value={form.min_lead_time_hours}
+            onChange={(e) => set("min_lead_time_hours", e.target.value)}
+            placeholder="Default: 20"
+            className="font-body text-sm"
+          />
+          <p className="font-body text-xs text-muted-foreground mt-1">
+            Hours required between booking time and session start. Leave empty to use the site-wide default. Set to 0 to allow same-day bookings for this specific offer.
+          </p>
         </div>
 
         {/* Notification email */}

@@ -259,6 +259,7 @@ const BookingWidget = ({
               }
               setBooking({ ...booking, timeSlot: slot });
             }}
+            overrideLeadMinutes={offer?.min_lead_time_minutes ?? undefined}
           />
         )}
 

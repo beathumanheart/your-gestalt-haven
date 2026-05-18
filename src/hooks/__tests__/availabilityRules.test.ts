@@ -75,9 +75,9 @@ describe("computeSlots", () => {
   });
 
   it("slots within minimum notice window are marked disabled with min_notice reason", () => {
-    // now = 09:00 local, min notice = 2h → slots before 11:00 are too soon
+    // now = 09:00 local, min notice = 120 min (2h) → slots before 11:00 are too soon
     const now = new Date(2026, 5, 10, 9, 0, 0);
-    const slots = computeSlots(DATE_JUN_10, [WINDOW_9_17], [], 60, 2, now);
+    const slots = computeSlots(DATE_JUN_10, [WINDOW_9_17], [], 60, 120, now);
     const disabled = slots.filter((s) => s.disabled);
     const enabled = slots.filter((s) => !s.disabled);
     expect(disabled.length).toBeGreaterThan(0);

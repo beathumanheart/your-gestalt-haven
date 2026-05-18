@@ -9,14 +9,15 @@ interface Props {
   selected?: Date;
   t: BookingContent;
   onSelect: (date: Date) => void;
+  overrideLeadMinutes?: number;
 }
 
-const DateSelector = ({ selected, t, onSelect }: Props) => {
+const DateSelector = ({ selected, t, onSelect, overrideLeadMinutes }: Props) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const [displayMonth, setDisplayMonth] = useState(new Date());
-  const { availableDays } = useAvailableDates(displayMonth);
+  const { availableDays } = useAvailableDates(displayMonth, overrideLeadMinutes);
 
   const isDateAvailable = (date: Date) => {
     return availableDays.has(format(date, "yyyy-MM-dd"));

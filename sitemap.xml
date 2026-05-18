@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
+<url>
+    <loc>https://humanheart.life/en</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en" />
+    <xhtml:link rel="alternate" hreflang="ru"        href="https://humanheart.life/ru" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en" />
+  </url>
+  <url>
+    <loc>https://humanheart.life/ru</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en" />
+    <xhtml:link rel="alternate" hreflang="ru"        href="https://humanheart.life/ru" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en" />
+  </url>
+<url>
+    <loc>https://humanheart.life/en/offer-agreement</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/offer-agreement" />
+    <xhtml:link rel="alternate" hreflang="ru"        href="https://humanheart.life/ru/offer-agreement" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/offer-agreement" />
+  </url>
+  <url>
+    <loc>https://humanheart.life/ru/offer-agreement</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/offer-agreement" />
+    <xhtml:link rel="alternate" hreflang="ru"        href="https://humanheart.life/ru/offer-agreement" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/offer-agreement" />
+  </url>
+</urlset>

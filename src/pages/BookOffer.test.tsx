@@ -2,6 +2,7 @@ import { render } from "@testing-library/react";
 import { screen, waitFor } from "@testing-library/dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import BookOffer from "./BookOffer";
 
 const mockFrom = vi.fn();
@@ -76,11 +77,13 @@ const renderPage = (slug = "grief-may-2026-x7k2", lang = "en") => {
   languageMock.language = lang;
   languageMock.langPath = (p: string) => `/${lang}${p}`;
   return render(
-    <MemoryRouter initialEntries={[`/${lang}/book/offer/${slug}`]}>
-      <Routes>
-        <Route path="/:lang/book/offer/:slug" element={<BookOffer />} />
-      </Routes>
-    </MemoryRouter>
+    <HelmetProvider>
+      <MemoryRouter initialEntries={[`/${lang}/book/offer/${slug}`]}>
+        <Routes>
+          <Route path="/:lang/book/offer/:slug" element={<BookOffer />} />
+        </Routes>
+      </MemoryRouter>
+    </HelmetProvider>
   );
 };
 

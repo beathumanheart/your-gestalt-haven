@@ -8,6 +8,7 @@ import {
   type Section,
 } from "@/content/offerAgreement";
 import Footer from "@/components/Footer";
+import PageMeta from "@/components/PageMeta";
 
 const SectionBlock = ({ section }: { section: Section }) => (
   <section>
@@ -32,6 +33,13 @@ const OfferAgreement = () => {
 
   return (
     <>
+      <PageMeta
+        titleEn="Offer Agreement | Human Heart Beat"
+        titleRu="Договор оферты | Human Heart Beat"
+        descriptionEn="Terms and conditions for therapy sessions at Human Heart Beat — Gestalt psychotherapy with Genia."
+        descriptionRu="Условия оказания терапевтических услуг на Human Heart Beat — гештальт-психотерапия с Женей."
+        canonicalPath={`/${language}/offer-agreement`}
+      />
       <main className="min-h-screen bg-background py-20 px-6">
         <div className="container-narrow max-w-3xl">
           <Link

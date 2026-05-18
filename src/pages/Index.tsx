@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
@@ -8,9 +9,12 @@ import Credentials from "@/components/Credentials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { trackHomepageView } from "@/hooks/useBookingAnalytics";
+import PageMeta from "@/components/PageMeta";
+import { HomepageJsonLd } from "@/components/JsonLd";
 
 const Index = () => {
   const location = useLocation();
+  const { language } = useLanguage();
 
   useEffect(() => {
     trackHomepageView();
@@ -30,6 +34,8 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      <PageMeta canonicalPath={`/${language}`} />
+      <HomepageJsonLd />
       <Header />
       <Hero />
       <About />

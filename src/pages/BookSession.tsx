@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import BookingWidget from "@/components/booking/BookingWidget";
 import { supabase } from "@/integrations/supabase/client";
 import type { SessionType } from "@/components/booking/SessionTypeSelector";
+import PageMeta from "@/components/PageMeta";
+import { ServiceJsonLd } from "@/components/JsonLd";
 
 const BookSession = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -51,8 +53,38 @@ const BookSession = () => {
       maximumFractionDigits: 0,
     }).format(value);
 
+  const metaTitleEn = session
+    ? `${session.name} — Book with Genia | Human Heart Beat`
+    : "Book a session — Human Heart Beat";
+  const metaTitleRu = session
+    ? `${(session.name_ru || session.name)} — Записаться к Жене | Human Heart Beat`
+    : "Записаться на сессию — Human Heart Beat";
+  const metaDescEn = session?.description
+    ? session.description.slice(0, 155).trimEnd() + (session.description.length > 155 ? "…" : "")
+    : "Book a therapy session with Genia.";
+  const metaDescRu = (session?.description_ru || session?.description)
+    ? (session?.description_ru || session?.description || "").slice(0, 155).trimEnd() +
+      ((session?.description_ru || session?.description || "").length > 155 ? "…" : "")
+    : "Запись на терапевтическую сессию с Genia.";
+
   return (
     <main className="min-h-screen bg-background">
+      <PageMeta
+        titleEn={metaTitleEn}
+        titleRu={metaTitleRu}
+        descriptionEn={metaDescEn}
+        descriptionRu={metaDescRu}
+        canonicalPath={session ? `/${language}/book/${session.slug ?? sessionId}` : undefined}
+      />
+      {session && (
+        <ServiceJsonLd
+          nameEn={session.name}
+          nameRu={session.name_ru || session.name}
+          descriptionEn={session.description || ""}
+          descriptionRu={session.description_ru || session.description || ""}
+          urlPath={`/${language}/book/${session.slug ?? sessionId}`}
+        />
+      )}
       <Header />
       <div className="pt-28 pb-16 section-padding">
         <div className="container-narrow">

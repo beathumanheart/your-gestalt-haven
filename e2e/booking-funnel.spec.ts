@@ -8,15 +8,18 @@ test.describe("Landing page", () => {
     expect(title).not.toMatch(/Eugenia/i);
   });
 
-  test("canonical URL is humanheart.life", async ({ page }) => {
+  test("canonical URL is humanheart.life/en", async ({ page }) => {
     await page.goto("/");
-    const canonical = page.locator('link[rel="canonical"]');
-    await expect(canonical).toHaveAttribute("href", "https://humanheart.life");
+    // PageMeta (data-rh="true") is the authoritative tag — check it specifically.
+    const canonical = page.locator('link[rel="canonical"][data-rh="true"]');
+    await expect(canonical).toHaveAttribute("href", "https://humanheart.life/en");
   });
 
   test("OG image is self-hosted (not r2.dev or lovable CDN)", async ({ page }) => {
     await page.goto("/");
-    const ogImage = page.locator('meta[property="og:image"]');
+    // index.html provides a static tag for bots; PageMeta adds a second with data-rh="true".
+    // Both carry identical content — use .first() to avoid strict-mode failure.
+    const ogImage = page.locator('meta[property="og:image"]').first();
     const content = await ogImage.getAttribute("content");
     expect(content).toBeTruthy();
     expect(content).not.toMatch(/r2\.dev/i);

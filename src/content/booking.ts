@@ -61,11 +61,8 @@ export interface BookingContent {
   confidential: string;
   telegramLabel: string;
   telegramUrl: string;
-  signalLabel: string;
-  signalUrl: string;
-  sessionLabel: string;
-  sessionId: string;
-  orText: string;
+  emailLabel: string;
+  emailUrl: string;
   // Navigation
   back: string;
   next: string;
@@ -118,18 +115,15 @@ export const bookingEN: BookingContent = {
   emailWarning: "We had trouble sending your confirmation email, but your booking is saved. Please save the meeting link below — it's your way in.",
   errorGeneral: "Something went wrong. Please try again or reach out directly.",
   errorNetwork: "We couldn't reach our booking system. Please check your connection and try again.",
-  errorServer: "Our booking system is having trouble. Please try again in a moment, or reach out via Telegram or Signal.",
+  errorServer: "Our booking system is having trouble. Please try again in a moment, or reach out via Telegram.",
   errorNameRequired: "Name is required",
   errorEmailRequired: "Email is required",
   errorEmailInvalid: "Please enter a valid email",
   confidential: "If you prefer, just reach out directly on ",
   telegramLabel: "Telegram",
   telegramUrl: "https://t.me/humanheartbeat",
-  signalLabel: "Signal",
-  signalUrl: "https://signal.me/#eu/54EL7BMiWPJCsLFzC0PY4J6uP4Ds7eu4cL243diq7MXIk1-L8oJGyIcY05eV_gCN",
-  sessionLabel: "Session",
-  sessionId: "05e95070d5641f3eaefb760ff151e043e5cc27df1bed974b575d98c32e1cc56c2e",
-  orText: ", ",
+  emailLabel: "be@humanheart.life",
+  emailUrl: "mailto:be@humanheart.life",
   back: "Back",
   next: "Next",
   optional: "optional",
@@ -180,18 +174,15 @@ export const bookingRU: BookingContent = {
   emailWarning: "Не удалось отправить письмо с подтверждением, но ваша запись сохранена. Сохраните ссылку на встречу — она откроет вам доступ к сессии.",
   errorGeneral: "Что-то пошло не так. Попробуйте ещё раз или напишите нам напрямую.",
   errorNetwork: "Не удалось подключиться к системе записи. Проверьте интернет-соединение и попробуйте ещё раз.",
-  errorServer: "В системе записи возникли проблемы. Попробуйте через минуту или свяжитесь через Telegram или Signal.",
+  errorServer: "В системе записи возникли проблемы. Попробуйте через минуту или свяжитесь через Telegram.",
   errorNameRequired: "Имя обязательно",
   errorEmailRequired: "Email обязателен",
   errorEmailInvalid: "Введите корректный email",
   confidential: "Если хотите — просто напишите в ",
   telegramLabel: "Telegram",
   telegramUrl: "https://t.me/humanheartbeat",
-  signalLabel: "Signal",
-  signalUrl: "https://signal.me/#eu/54EL7BMiWPJCsLFzC0PY4J6uP4Ds7eu4cL243diq7MXIk1-L8oJGyIcY05eV_gCN",
-  sessionLabel: "Session",
-  sessionId: "05e95070d5641f3eaefb760ff151e043e5cc27df1bed974b575d98c32e1cc56c2e",
-  orText: ", ",
+  emailLabel: "be@humanheart.life",
+  emailUrl: "mailto:be@humanheart.life",
   back: "Назад",
   next: "Далее",
   optional: "необязательно",

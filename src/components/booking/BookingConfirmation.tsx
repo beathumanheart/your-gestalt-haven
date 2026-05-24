@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarDays, Clock, Mail, Video, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { CalendarDays, Clock, Mail, Video, CheckCircle, XCircle, AlertTriangle, Copy, Check } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
 import type { ConfirmedBooking } from "./BookingWidget";
@@ -16,6 +16,13 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
   const startDate = parseISO(booking.start_time);
   const timezone = useMemo(() => getUserTimezone(), []);
   const [copied, setCopied] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(t.emailLabel);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
 
   const handleCopyLink = () => {
     if (!booking.google_meet_link) return;
@@ -42,7 +49,14 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
               {t.confidential}
               <a href={t.telegramUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{t.telegramLabel}</a>
               {" or "}
-              <a href={t.emailUrl} className="underline underline-offset-2">{t.emailLabel}</a>
+              <button
+                onClick={handleCopyEmail}
+                className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-amber-900 transition-colors cursor-pointer"
+                title={copiedEmail ? "Copied!" : "Click to copy email"}
+              >
+                {t.emailLabel}
+                {copiedEmail ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              </button>
             </p>
           </div>
         </div>

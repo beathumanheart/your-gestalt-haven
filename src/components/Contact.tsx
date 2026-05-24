@@ -1,10 +1,23 @@
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { bookingEN, bookingRU } from "@/content/booking";
 import BookingWidget from "./booking/BookingWidget";
+import { Copy, Check } from "lucide-react";
 
 const Contact = () => {
   const { language } = useLanguage();
   const t = language === "ru" ? bookingRU : bookingEN;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(t.emailLabel);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback
+    }
+  };
 
   return (
     <section id="contact" className="section-padding">
@@ -27,7 +40,14 @@ const Contact = () => {
           {t.confidential}
           <a href={t.telegramUrl} target="_blank" rel="noopener noreferrer" className="text-foreground font-medium underline underline-offset-2 hover:text-primary transition-colors">{t.telegramLabel}</a>
           {language === "ru" ? " или " : " or "}
-          <a href={t.emailUrl} className="text-foreground font-medium underline underline-offset-2 hover:text-primary transition-colors">{t.emailLabel}</a>
+          <button
+            onClick={handleCopyEmail}
+            className="inline-flex items-center gap-1 text-foreground font-medium underline underline-offset-2 hover:text-primary transition-colors cursor-pointer"
+            title={copied ? (language === "ru" ? "Скопировано!" : "Copied!") : (language === "ru" ? "Нажмите, чтобы скопировать email" : "Click to copy email")}
+          >
+            {t.emailLabel}
+            {copied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
+          </button>
         </p>
       </div>
     </section>

@@ -26,6 +26,8 @@ const Contact = () => {
         <p className="font-body text-sm text-muted-foreground text-center mt-6 max-w-2xl mx-auto">
           {t.confidential}
           <a href={t.telegramUrl} target="_blank" rel="noopener noreferrer" className="text-foreground font-medium underline underline-offset-2 hover:text-primary transition-colors">{t.telegramLabel}</a>
+          {language === "ru" ? " или " : " or "}
+          <a href={t.emailUrl} className="text-foreground font-medium underline underline-offset-2 hover:text-primary transition-colors">{t.emailLabel}</a>
         </p>
       </div>
     </section>

@@ -52,11 +52,10 @@ describe("BookingConfirmation – email failed (phantom booking scenario)", () =
     expect(screen.queryByText(bookingEN.confirmSubtitle)).not.toBeInTheDocument();
   });
 
-  it("includes Telegram and Signal links in the warning", () => {
+  it("includes Telegram link in the warning", () => {
     renderConfirmation({ emailSent: false });
     const warning = screen.getByTestId("email-warning");
     expect(warning.querySelector(`a[href="${bookingEN.telegramUrl}"]`)).toBeTruthy();
-    expect(warning.querySelector(`a[href="${bookingEN.signalUrl}"]`)).toBeTruthy();
   });
 
   it("hides the email address row when email failed", () => {

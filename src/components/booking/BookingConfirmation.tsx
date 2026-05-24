@@ -41,6 +41,8 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
             <p className="font-body text-xs text-amber-700">
               {t.confidential}
               <a href={t.telegramUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{t.telegramLabel}</a>
+              {" or "}
+              <a href={t.emailUrl} className="underline underline-offset-2">{t.emailLabel}</a>
             </p>
           </div>
         </div>

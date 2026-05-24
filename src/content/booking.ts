@@ -61,6 +61,8 @@ export interface BookingContent {
   confidential: string;
   telegramLabel: string;
   telegramUrl: string;
+  emailLabel: string;
+  emailUrl: string;
   // Navigation
   back: string;
   next: string;
@@ -120,6 +122,8 @@ export const bookingEN: BookingContent = {
   confidential: "If you prefer, just reach out directly on ",
   telegramLabel: "Telegram",
   telegramUrl: "https://t.me/humanheartbeat",
+  emailLabel: "be@humanheart.life",
+  emailUrl: "mailto:be@humanheart.life",
   back: "Back",
   next: "Next",
   optional: "optional",
@@ -177,6 +181,8 @@ export const bookingRU: BookingContent = {
   confidential: "Если хотите — просто напишите в ",
   telegramLabel: "Telegram",
   telegramUrl: "https://t.me/humanheartbeat",
+  emailLabel: "be@humanheart.life",
+  emailUrl: "mailto:be@humanheart.life",
   back: "Назад",
   next: "Далее",
   optional: "необязательно",

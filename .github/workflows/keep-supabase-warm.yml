@@ -1,0 +1,17 @@
+name: Keep Supabase warm
+
+on:
+  schedule:
+    - cron: '0 6 * * *'    # daily at 06:00 UTC
+  workflow_dispatch:         # allow manual runs
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the Data API (read-only)
+        run: |
+          curl -sf --max-time 30 \
+            "https://ljjgokbrodfdhazeehgl.supabase.co/rest/v1/availability_rules?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"

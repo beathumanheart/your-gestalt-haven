@@ -9,9 +9,11 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping the Data API (read-only)
+      - name: Write heartbeat row
         run: |
-          curl -sf --max-time 30 \
-            "https://ljjgokbrodfdhazeehgl.supabase.co/rest/v1/availability_rules?select=id&limit=1" \
+          curl -sf --max-time 30 -X POST \
+            "https://ljjgokbrodfdhazeehgl.supabase.co/rest/v1/keep_alive" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d '{}'

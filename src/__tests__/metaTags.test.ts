@@ -10,8 +10,8 @@ describe("index.html meta tags", () => {
     expect(html).not.toContain("lovable.dev");
   });
 
-  it("title is exactly 'Genia | Psychotherapist'", () => {
-    expect(html).toContain("<title>Genia | Psychotherapist</title>");
+  it("title is exactly 'Genia | Counselling & Accompaniment'", () => {
+    expect(html).toContain("<title>Genia | Counselling &amp; Accompaniment</title>");
   });
 
   it("og:title is present and non-empty", () => {

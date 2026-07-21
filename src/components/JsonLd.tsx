@@ -27,7 +27,7 @@ export const ServiceJsonLd = ({ nameEn, nameRu, descriptionEn, descriptionRu, ur
     inLanguage: language,
     provider: { "@id": CANONICAL_ID },
     areaServed: isRu ? "Весь мир (онлайн)" : "Worldwide (online)",
-    serviceType: isRu ? "Психотерапия" : "Psychotherapy",
+    serviceType: isRu ? "Консультирование" : "Counselling",
     offers: {
       "@type": "Offer",
       availability: "https://schema.org/InStock",

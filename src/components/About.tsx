@@ -35,7 +35,7 @@ const About = () => {
                   <div className="w-full h-full rounded-full bg-cream shadow-card overflow-hidden">
                     <img 
                       src={portraitImage} 
-                      alt="Gestalt Psychotherapist" 
+                      alt={language === "ru" ? "Женя, психолог-консультант" : "Genia, Gestalt counsellor"}
                       className="w-full h-full object-cover"
                     />
                   </div>

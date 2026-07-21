@@ -37,6 +37,42 @@
     <meta name="twitter:image" content="https://humanheart.life/og-image-en.png" />
     <meta name="twitter:image:alt" content="Genia — Gestalt psychotherapist" />
 
+    <!-- Site-wide JSON-LD (static, so non-JS crawlers see it).
+         Migrated from src/components/JsonLd.tsx (EN values), plus knowsLanguage. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": "https://humanheart.life/#genia",
+      "name": "Genia",
+      "jobTitle": "Gestalt psychotherapist",
+      "url": "https://humanheart.life/en",
+      "image": "https://humanheart.life/og-image-en.png",
+      "knowsAbout": ["Gestalt therapy", "grief counselling", "existential therapy", "relationship therapy"],
+      "knowsLanguage": ["en", "ru"]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "@id": "https://humanheart.life/#service",
+      "name": "Human Heart Beat — Gestalt Psychotherapy",
+      "description": "A warm, compassionate space for individual Gestalt psychotherapy. Working with grief, relationships, and life's existential questions.",
+      "url": "https://humanheart.life/en",
+      "provider": { "@id": "https://humanheart.life/#genia" },
+      "areaServed": "Worldwide (online)",
+      "serviceType": "Psychotherapy",
+      "offers": {
+        "@type": "AggregateOffer",
+        "lowPrice": "40",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock"
+      },
+      "knowsLanguage": ["en", "ru"]
+    }
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

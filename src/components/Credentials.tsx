@@ -58,7 +58,30 @@ const Credentials = () => {
                     key={index}
                     className="font-body text-sm text-muted-foreground leading-relaxed"
                   >
-                    {item.text.toLowerCase().includes("gestalt") || item.text.toLowerCase().includes("гештальт") ? (
+                    {item.link ? (
+                      (() => {
+                        const linkText = item.linkText ?? item.text;
+                        const idx = item.text.indexOf(linkText);
+                        const anchor = (
+                          <a
+                            href={item.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline decoration-primary/50 underline-offset-4 hover:text-foreground transition-colors"
+                          >
+                            {linkText}
+                          </a>
+                        );
+                        if (idx === -1) return anchor;
+                        return (
+                          <>
+                            {item.text.slice(0, idx)}
+                            {anchor}
+                            {item.text.slice(idx + linkText.length)}
+                          </>
+                        );
+                      })()
+                    ) : item.text.toLowerCase().includes("gestalt") || item.text.toLowerCase().includes("гештальт") ? (
                       (() => {
                         const gestaltRegex = /(gestalt|гештальт\S*)/i;
                         const match = item.text.match(gestaltRegex);

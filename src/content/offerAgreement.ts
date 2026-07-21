@@ -27,16 +27,16 @@ export const offerAgreementEN: OfferAgreementContent = {
     {
       heading: "1. General Provisions",
       paragraphs: [
-        "This offer agreement defines the terms of psychotherapy services provided in the Gestalt therapy format. Payment for a session constitutes acceptance of these terms.",
+        "This offer agreement defines the terms of counselling services provided in the Gestalt tradition. Payment for a session constitutes acceptance of these terms.",
       ],
     },
     {
-      heading: "2. Therapist Rights and Responsibilities",
+      heading: "2. Counsellor Rights and Responsibilities",
       bullets: [
-        "Adherence to ethical standards of the European Association for Gestalt Therapy (EAGT)",
-        "Maintaining confidentiality of all information obtained during therapy",
+        "Adherence to the ethical standards published by the European Association for Gestalt Therapy (EAGT)",
+        "Maintaining confidentiality of all information obtained during the work",
         "Regular personal therapy and supervision",
-        "Providing a safe space for therapeutic work",
+        "Providing a safe space for the work",
         "Right to terminate work if boundaries or ethical standards are violated",
         "Referral to another specialist when necessary",
       ],
@@ -44,28 +44,32 @@ export const offerAgreementEN: OfferAgreementContent = {
     {
       heading: "3. Client Rights and Responsibilities",
       bullets: [
-        "Right to confidentiality and respectful treatment",
-        "Right to terminate therapy at any time",
+        "Right to confidentiality and to be treated with respect",
+        "Right to end the work at any time",
         "Right to ask questions about methods of work",
         "Obligation to notify of session cancellation 24 hours in advance",
-        "Obligation to disclose prescribed medications and psychiatric care",
+        "Obligation to inform the counsellor of any prescribed medication or ongoing psychiatric care",
+        "Obligation to provide current location and an emergency contact before the first session",
         "Timely payment for sessions",
       ],
     },
     {
       heading: "4. Limitations and Risks",
       bullets: [
-        "Psychotherapy is not a substitute for psychiatric treatment for clinical diagnoses",
-        "Therapy outcomes are individual and cannot be guaranteed",
-        "Temporary intensification of experiences may occur during therapy — this is part of the process",
-        "The therapist does not give advice or make decisions for the client",
-        "In case of suicidal thoughts or acute conditions, contact emergency services",
+        "Counselling is not a substitute for psychiatric or medical treatment for clinical diagnoses",
+        "This work does not include diagnosis, medical treatment, prescription of medication, or the issuing of clinical reports or certificates",
+        "Outcomes are individual and cannot be guaranteed",
+        "Temporary intensification of feelings may occur during the work — this is part of the process",
+        "The counsellor does not give advice or make decisions for the client",
+        "In case of suicidal thoughts or acute conditions, contact emergency services in your location",
       ],
     },
     {
       heading: "5. Confidentiality",
       paragraphs: [
-        "All information obtained during therapy is strictly confidential. Exceptions are cases provided by law: threat to the life of the client or third parties.",
+        "All information shared in our work is confidential. I work to the ethical standards published by the European Association for Gestalt Therapy (EAGT).",
+        "Confidentiality may be set aside only where there is a serious risk to the life or safety of the client or another person, or where disclosure is required by law applicable at the time.",
+        "Anonymised material may be discussed in professional supervision, which is itself bound by confidentiality.",
       ],
     },
     {
@@ -80,7 +84,7 @@ export const offerAgreementEN: OfferAgreementContent = {
     {
       heading: "7. Session Format",
       paragraphs: [
-        "Sessions are conducted online via Google Meet, duration — 50 minutes. Weekly sessions at the same time are recommended.",
+        "Sessions are held online, or occasionally in person by prior agreement. Duration — 50 minutes. Weekly sessions at the same time are recommended.",
       ],
     },
   ],

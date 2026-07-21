@@ -83,9 +83,9 @@ export const servicesEN: ServicesContent = {
     title: "Short-Term Support",
     subtitle: "Up to 10 sessions",
     description:
-      "Sometimes you need focused support for something specific — a crisis, a decision, a transition. We work with clarity and intention.",
+      "Sometimes you need focused support for something specific — a sudden change, a decision, a transition. We work with clarity and intention.",
     features: [
-      "Crisis support",
+      "Something pressing",
       "Life transitions",
       "Focused goals",
       "Clear timeline",
@@ -149,9 +149,9 @@ export const servicesRU: ServicesContent = {
     title: "Краткосрочная поддержка",
     subtitle: "До 10 сессий",
     description:
-      "Иногда нужна точечная помощь — кризис, решение, перемены. Работаем с ясностью и намерением.",
+      "Иногда нужна точечная помощь — внезапная перемена, решение, переход. Работаем с ясностью и намерением.",
     features: [
-      "Поддержка в кризисе",
+      "Поддержка в трудный момент",
       "Жизненные переходы",
       "Конкретные цели",
       "Понятные сроки",

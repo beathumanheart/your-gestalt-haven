@@ -1,23 +1,7 @@
 import { GraduationCap, Award, Shield, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { credentialsEN, credentialsRU } from "@/content/credentials";
-import GestaltTooltip from "./GestaltTooltip";
-
-const GESTALT_REGEX = /(gestalt|гештальт\S*)/i;
-
-/** Wraps the first Gestalt/гештальт occurrence in a tooltip, as elsewhere on the page. */
-const withGestaltTooltip = (text: string) => {
-  const match = text.match(GESTALT_REGEX);
-  if (!match) return text;
-  const idx = match.index!;
-  return (
-    <>
-      {text.slice(0, idx)}
-      <GestaltTooltip>{match[0]}</GestaltTooltip>
-      {text.slice(idx + match[0].length)}
-    </>
-  );
-};
+import { withGestaltTooltip } from "./GestaltTooltip";
 
 const Credentials = () => {
   const { language } = useLanguage();

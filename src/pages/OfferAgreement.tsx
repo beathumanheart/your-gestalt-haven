@@ -9,17 +9,18 @@ import {
 } from "@/content/offerAgreement";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
+import { withGestaltTooltip } from "@/components/GestaltTooltip";
 
 const SectionBlock = ({ section }: { section: Section }) => (
   <section>
     <h2 className="font-display text-xl text-foreground mb-4">{section.heading}</h2>
     {section.paragraphs?.map((p, i) => (
-      <p key={i}>{p}</p>
+      <p key={i}>{withGestaltTooltip(p)}</p>
     ))}
     {section.bullets && (
       <ul className="list-disc pl-6 space-y-2">
         {section.bullets.map((b, i) => (
-          <li key={i}>{b}</li>
+          <li key={i}>{withGestaltTooltip(b)}</li>
         ))}
       </ul>
     )}

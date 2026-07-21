@@ -34,4 +34,20 @@ const GestaltTooltip = ({ children }: GestaltTooltipProps) => {
   );
 };
 
+const GESTALT_REGEX = /(gestalt|гештальт\S*)/i;
+
+/** Wraps the first Gestalt/гештальт occurrence in `text` with a GestaltTooltip. */
+export const withGestaltTooltip = (text: string) => {
+  const match = text.match(GESTALT_REGEX);
+  if (!match) return text;
+  const idx = match.index!;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <GestaltTooltip>{match[0]}</GestaltTooltip>
+      {text.slice(idx + match[0].length)}
+    </>
+  );
+};
+
 export default GestaltTooltip;

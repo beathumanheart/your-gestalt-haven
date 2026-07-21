@@ -44,8 +44,9 @@ describe("index.html meta tags", () => {
     expect(html).toContain("favicon.svg");
   });
 
-  it("canonical URL is present", () => {
-    expect(html).toContain('rel="canonical"');
-    expect(html).toContain("humanheart.life");
+  it("does not hardcode a canonical URL (PageMeta emits a per-route canonical at runtime)", () => {
+    // A static canonical in index.html applies to every route, so /ru and
+    // booking pages would wrongly declare themselves duplicates of /en.
+    expect(html).not.toContain('rel="canonical"');
   });
 });

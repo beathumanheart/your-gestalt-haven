@@ -10,7 +10,6 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { trackHomepageView } from "@/hooks/useBookingAnalytics";
 import PageMeta from "@/components/PageMeta";
-import { HomepageJsonLd } from "@/components/JsonLd";
 
 const Index = () => {
   const location = useLocation();
@@ -35,7 +34,6 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background">
       <PageMeta canonicalPath={`/${language}`} />
-      <HomepageJsonLd />
       <Header />
       <Hero />
       <About />

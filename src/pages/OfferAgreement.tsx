@@ -36,8 +36,8 @@ const OfferAgreement = () => {
       <PageMeta
         titleEn="Offer Agreement | Human Heart Beat"
         titleRu="Договор оферты | Human Heart Beat"
-        descriptionEn="Terms and conditions for therapy sessions at Human Heart Beat — Gestalt psychotherapy with Genia."
-        descriptionRu="Условия оказания терапевтических услуг на Human Heart Beat — гештальт-психотерапия с Женей."
+        descriptionEn="Terms and conditions for therapy sessions at Human Heart Beat — Gestalt counselling with Genia."
+        descriptionRu="Условия оказания терапевтических услуг на Human Heart Beat — гештальт-консультирование с Женей."
         canonicalPath={`/${language}/offer-agreement`}
       />
       <main className="min-h-screen bg-background py-20 px-6">

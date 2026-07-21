@@ -22,7 +22,7 @@ const defaults = {
   descriptionEn:
     "A warm, compassionate space for therapy. I offer short-term and long-term Gestalt counselling for grief, relationships, and life's existential questions.",
   descriptionRu:
-    "Тёплое пространство для терапии. Краткосрочная и долгосрочная гештальт-психотерапия — горе, отношения, экзистенциальные вопросы.",
+    "Тёплое пространство для терапии. Краткосрочное и долгосрочное гештальт-консультирование — горе, отношения, экзистенциальные вопросы.",
 };
 
 /** Given "/en/book/foo", returns "/ru/book/foo" and vice-versa. */

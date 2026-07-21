@@ -3,6 +3,22 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { credentialsEN, credentialsRU } from "@/content/credentials";
 import GestaltTooltip from "./GestaltTooltip";
 
+const GESTALT_REGEX = /(gestalt|гештальт\S*)/i;
+
+/** Wraps the first Gestalt/гештальт occurrence in a tooltip, as elsewhere on the page. */
+const withGestaltTooltip = (text: string) => {
+  const match = text.match(GESTALT_REGEX);
+  if (!match) return text;
+  const idx = match.index!;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <GestaltTooltip>{match[0]}</GestaltTooltip>
+      {text.slice(idx + match[0].length)}
+    </>
+  );
+};
+
 const Credentials = () => {
   const { language } = useLanguage();
   const c = language === "ru" ? credentialsRU : credentialsEN;
@@ -69,7 +85,7 @@ const Credentials = () => {
                             rel="noopener noreferrer"
                             className="underline decoration-primary/50 underline-offset-4 hover:text-foreground transition-colors"
                           >
-                            {linkText}
+                            {withGestaltTooltip(linkText)}
                           </a>
                         );
                         if (idx === -1) return anchor;
@@ -81,22 +97,8 @@ const Credentials = () => {
                           </>
                         );
                       })()
-                    ) : item.text.toLowerCase().includes("gestalt") || item.text.toLowerCase().includes("гештальт") ? (
-                      (() => {
-                        const gestaltRegex = /(gestalt|гештальт\S*)/i;
-                        const match = item.text.match(gestaltRegex);
-                        if (!match) return item.text;
-                        const idx = match.index!;
-                        return (
-                          <>
-                            {item.text.slice(0, idx)}
-                            <GestaltTooltip>{match[0]}</GestaltTooltip>
-                            {item.text.slice(idx + match[0].length)}
-                          </>
-                        );
-                      })()
                     ) : (
-                      item.text
+                      withGestaltTooltip(item.text)
                     )}
                   </li>
                 ))}

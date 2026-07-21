@@ -17,12 +17,12 @@ interface PageMetaProps {
 }
 
 const defaults = {
-  titleEn: "Genia | Psychotherapist",
-  titleRu: "Женя | Психотерапевт",
+  titleEn: "Genia | Counselling & Accompaniment",
+  titleRu: "Genia | Психолог-консультант",
   descriptionEn:
-    "A warm, compassionate space for therapy. I offer short-term and long-term Gestalt psychotherapy for grief, relationships, and life's existential questions.",
+    "A warm, compassionate space for therapy. I offer short-term and long-term Gestalt counselling for grief, relationships, and life's existential questions.",
   descriptionRu:
-    "Тёплое пространство для терапии. Краткосрочная и долгосрочная гештальт-психотерапия — горе, отношения, экзистенциальные вопросы.",
+    "Тёплое пространство для терапии. Краткосрочное и долгосрочное гештальт-консультирование — горе, отношения, экзистенциальные вопросы.",
 };
 
 /** Given "/en/book/foo", returns "/ru/book/foo" and vice-versa. */
@@ -47,7 +47,7 @@ const PageMeta = ({
   const title       = isRu ? titleRu : titleEn;
   const description = isRu ? descriptionRu : descriptionEn;
   const ogImage     = `${SITE_URL}/og-image-${language}.png`;
-  const ogImageAlt  = isRu ? "Женя — гештальт-психотерапевт" : "Genia — Gestalt psychotherapist";
+  const ogImageAlt  = isRu ? "Женя — психолог-консультант" : "Genia — Gestalt counsellor";
   const locale      = isRu ? "ru_RU" : "en_US";
   const altLocale   = isRu ? "en_US" : "ru_RU";
 

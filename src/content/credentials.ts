@@ -11,6 +11,8 @@ export interface CredentialItem {
   text: string;
   /** Optional URL — item will be rendered as a link when present. */
   link?: string;
+  /** When `link` is set, only this substring of `text` is linkified (defaults to whole text). */
+  linkText?: string;
 }
 
 export interface CredentialGroup {
@@ -41,9 +43,14 @@ export const credentialsEN: CredentialsContent = {
   education: {
     title: "Education",
     items: [
-      { text: "MA in Philosophy" },
-      { text: "MSc in Psychology & Bioethics" },
-      { text: "Training at International Gestalt Institute (ongoing)" },
+      { text: "Diploma in Psychological Counselling (Saint Petersburg, Russia)" },
+      { text: "MSc in Bioethics (KU Leuven, Belgium)" },
+      { text: "MA in Philosophy (University of Tartu, Estonia)" },
+      {
+        text: "Training at International Institute of Gestalt, Montenegro (ongoing)",
+        link: "https://mig.institute/",
+        linkText: "International Institute of Gestalt",
+      },
     ],
   },
 
@@ -51,7 +58,7 @@ export const credentialsEN: CredentialsContent = {
     title: "Ethics & Practice",
     items: [
       {
-        text: "Working under EAGT (European Association for Gestalt Therapy) ethical standards",
+        text: "I work to the ethical standards published by the European Association for Gestalt Therapy (EAGT)",
       },
       { text: "Weekly personal therapy and supervision" },
       { text: "I welcome everyone — all backgrounds, identities, and ways of being" },
@@ -59,9 +66,9 @@ export const credentialsEN: CredentialsContent = {
   },
 
   clinical: {
-    title: "Clinical Work",
+    title: "Working Alongside",
     items: [
-      { text: "I work with clinical cases alongside your psychiatrist" },
+      { text: "If you are already working with a psychiatrist or doctor, I can work alongside that care — with your consent." },
     ],
   },
 
@@ -79,9 +86,14 @@ export const credentialsRU: CredentialsContent = {
   education: {
     title: "Образование",
     items: [
-      { text: "Магистр философии" },
-      { text: "Магистр психологии и биоэтики" },
-      { text: "Обучение в Международном Институте Гештальта (в процессе)" },
+      { text: "Диплом психолога-консультанта (Санкт-Петербург, Россия)" },
+      { text: "Магистр биоэтики (KU Leuven, Бельгия)" },
+      { text: "Магистр философии (Тартуский университет, Эстония)" },
+      {
+        text: "Обучение в Международном Институте Гештальта, Черногория (вторая ступень)",
+        link: "https://mig.institute/",
+        linkText: "Международном Институте Гештальта",
+      },
     ],
   },
 
@@ -89,7 +101,7 @@ export const credentialsRU: CredentialsContent = {
     title: "Этика и практика",
     items: [
       {
-        text: "Работаю по этическим стандартам EAGT (Европейская Ассоциация Гештальт-терапии)",
+        text: "Работаю в соответствии с этическими стандартами, опубликованными Европейской ассоциацией гештальт-терапии (EAGT)",
       },
       { text: "Еженедельная личная терапия и супервизии" },
       { text: "Принимаю всех — любого происхождения, идентичности и способа быть" },
@@ -97,9 +109,9 @@ export const credentialsRU: CredentialsContent = {
   },
 
   clinical: {
-    title: "Клиническая работа",
+    title: "Совместная работа",
     items: [
-      { text: "Работаю с клиническими случаями вместе с вашим психиатром" },
+      { text: "Если вы уже наблюдаетесь у психиатра или врача, я могу работать параллельно с этим лечением — с вашего согласия." },
     ],
   },
 

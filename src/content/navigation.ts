@@ -13,6 +13,12 @@ export interface NavItem {
   sectionId: string;
 }
 
+export interface SocialLinks {
+  substack: string;
+  instagram: string;
+  youtube: string;
+}
+
 export interface NavigationContent {
   bookSession: string;
   navItems: NavItem[];
@@ -23,7 +29,16 @@ export interface NavigationContent {
   footerOfferAgreement: string;
   footerRights: string;
   footerEmail: string;
+
+  social: SocialLinks;
 }
+
+// Same URLs for both languages; kept here (not in the component) so they're easy to swap.
+const SOCIAL_LINKS: SocialLinks = {
+  substack: "https://humanheartbeat.substack.com/",
+  instagram: "https://www.instagram.com/human.heartbeat",
+  youtube: "https://www.youtube.com/@beathumanheart",
+};
 
 export const navigationEN: NavigationContent = {
   bookSession: "Book a Session",
@@ -40,6 +55,7 @@ export const navigationEN: NavigationContent = {
   footerOfferAgreement: "Offer Agreement",
   footerRights: "All rights reserved.",
   footerEmail: "be@humanheart.life",
+  social: SOCIAL_LINKS,
 };
 
 export const navigationRU: NavigationContent = {
@@ -57,4 +73,5 @@ export const navigationRU: NavigationContent = {
   footerOfferAgreement: "Договор оферты",
   footerRights: "Все права защищены.",
   footerEmail: "be@humanheart.life",
+  social: SOCIAL_LINKS,
 };

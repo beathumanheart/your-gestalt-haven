@@ -177,6 +177,51 @@
   }
 }
 
+/* Solidarity-pricing range slider (Services) — token-based so it follows the theme */
+.solidarity-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 26px;
+}
+.solidarity-slider::-webkit-slider-runnable-track {
+  height: 2px;
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+.solidarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  margin-top: -12px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  border: 4px solid hsl(var(--background));
+  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.25);
+  cursor: grab;
+}
+.solidarity-slider:active::-webkit-slider-thumb { cursor: grabbing; }
+.solidarity-slider::-moz-range-track {
+  height: 2px;
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+.solidarity-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  border: 4px solid hsl(var(--background));
+  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.25);
+  cursor: grab;
+}
+.solidarity-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
 @layer utilities {
   .animate-fade-up {
     animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;

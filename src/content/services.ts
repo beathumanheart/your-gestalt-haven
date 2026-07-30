@@ -127,8 +127,8 @@ export const servicesEN: ServicesContent = {
       note: "Choose here if you're studying, between jobs, carrying debt or medical costs, or supporting others financially. No explanation asked for.",
     },
     {
-      label: "A fair rate for most",
-      note: "Choose here if your income covers your needs with some room left over. This is what most people pay.",
+      label: "Fair rate",
+      note: "Choose here if your income covers your needs with some room left over.",
     },
     {
       label: "Helping someone else access care",
@@ -214,8 +214,8 @@ export const servicesRU: ServicesContent = {
       note: "Выбирайте здесь, если учитесь, между работами, несёте долги или медицинские расходы, или финансово поддерживаете других. Объяснений не нужно.",
     }, // DRAFT RU
     {
-      label: "Справедливо для большинства",
-      note: "Выбирайте здесь, если доход покрывает ваши потребности и остаётся немного сверху. Так платит большинство.",
+      label: "Честная цена",
+      note: "Выбирайте здесь, если доход покрывает ваши потребности и остаётся немного сверху.",
     }, // DRAFT RU
     {
       label: "Помогая кому-то ещё получить помощь",

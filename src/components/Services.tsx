@@ -9,8 +9,8 @@ const Services = () => {
   const { language } = useLanguage();
   const c = language === "ru" ? servicesRU : servicesEN;
 
-  const [rate, setRate] = useState(80);
-  const band = rate < 70 ? 0 : rate <= 110 ? 1 : 2;
+  const [rate, setRate] = useState(50);
+  const band = rate < 60 ? 0 : rate <= 80 ? 1 : 2;
   const { label: bandLabel, note: bandNote } = c.bands[band];
 
   return (
@@ -97,7 +97,7 @@ const Services = () => {
             <input
               type="range"
               min={40}
-              max={190}
+              max={100}
               step={5}
               value={rate}
               onChange={(e) => setRate(Number(e.target.value))}
@@ -106,7 +106,7 @@ const Services = () => {
             />
             <div className="flex justify-between font-body text-[12.5px] text-muted-foreground">
               <span>€40</span>
-              <span>€190</span>
+              <span>€100</span>
             </div>
             <p className="font-body text-[13.5px] text-muted-foreground leading-relaxed mt-2.5 min-h-[44px]">
               {bandNote}

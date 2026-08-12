@@ -13,6 +13,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Pure, runtime-agnostic modules shared with the process-booking edge
+      // function. The guardrail tests import the real code rather than a copy
+      // of it, so drift in the function shows up here.
+      "@edge": path.resolve(__dirname, "./supabase/functions/process-booking/lib"),
     },
   },
 });

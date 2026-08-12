@@ -22,6 +22,8 @@ import AdminResetPassword from "./pages/AdminResetPassword";
 import BookingCancelled from "./pages/BookingCancelled";
 import BookOffer from "./pages/BookOffer";
 import AdminOffers from "./pages/AdminOffers";
+import SessionJoin from "./pages/SessionJoin";
+import SessionCancel from "./pages/SessionCancel";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +69,12 @@ const App = () => (
               </LangLayout>
             }
           />
+
+          {/* Short session links — kept language-free so the URL in an email
+              and .ics stays under 60 characters. These pages resolve the
+              visitor's language from localStorage instead of the path. */}
+          <Route path="/s/:slug" element={<SessionJoin />} />
+          <Route path="/c/:slug" element={<SessionCancel />} />
 
           {/* Admin routes */}
           <Route path="/admin/login" element={<AdminLogin />} />

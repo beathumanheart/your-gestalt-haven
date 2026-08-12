@@ -26,8 +26,12 @@ const createStorageMock = (): Storage => {
   } as Storage;
 };
 
+// Some suites (crypto round trips) opt into the node environment, where there
+// is no `window` at all — set up whichever globals actually exist.
+const hasWindow = typeof window !== "undefined";
+
 const storageMock = createStorageMock();
-for (const target of [globalThis, window]) {
+for (const target of hasWindow ? [globalThis, window] : [globalThis]) {
   Object.defineProperty(target, "localStorage", {
     writable: true,
     configurable: true,
@@ -35,16 +39,18 @@ for (const target of [globalThis, window]) {
   });
 }
 
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => {},
-  }),
-});
+if (hasWindow) {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => {},
+    }),
+  });
+}

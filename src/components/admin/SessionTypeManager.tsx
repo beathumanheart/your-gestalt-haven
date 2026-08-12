@@ -22,8 +22,15 @@ interface SessionType {
   notification_email_1: string;
   notification_email_2: string;
   show_second_email: boolean;
+  /** What the client's calendar entry is titled. Blank falls back to a
+   *  deliberately non-specific default — this string syncs to whatever
+   *  calendar service the client uses. */
+  calendar_summary: string;
   isNew?: boolean;
 }
+
+/** Must match DEFAULT_CALENDAR_SUMMARY in the process-booking edge function. */
+const DEFAULT_CALENDAR_SUMMARY = "Session with Genia";
 
 const generateSlug = (name: string) =>
   name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
@@ -49,6 +56,7 @@ const SessionTypeManager = () => {
         notification_email_1: string;
         notification_email_2: string;
         show_second_email: boolean;
+        calendar_summary: string | null;
       };
       return {
         ...row,
@@ -65,6 +73,7 @@ const SessionTypeManager = () => {
         notification_email_1: row.notification_email_1 || "",
         notification_email_2: row.notification_email_2 || "",
         show_second_email: row.show_second_email ?? false,
+        calendar_summary: row.calendar_summary || "",
       };
     }));
     setLoading(false);
@@ -91,6 +100,7 @@ const SessionTypeManager = () => {
       notification_email_1: "",
       notification_email_2: "",
       show_second_email: false,
+      calendar_summary: "",
       isNew: true,
     }]);
   };
@@ -129,6 +139,7 @@ const SessionTypeManager = () => {
         notification_email_1: t.notification_email_1 || null,
         notification_email_2: t.notification_email_2 || null,
         show_second_email: t.show_second_email,
+        calendar_summary: t.calendar_summary.trim() || null,
       };
       if (t.id && !t.isNew) {
         await supabase.from("session_types").update(data).eq("id", t.id);
@@ -336,6 +347,21 @@ const SessionTypeManager = () => {
                     </label>
                   </div>
                 </div>
+              </div>
+              <div className="pl-7 space-y-2">
+                <label className="font-body text-xs text-muted-foreground block">
+                  Client calendar title
+                </label>
+                <Input
+                  value={t.calendar_summary}
+                  onChange={(e) => updateType(i, { calendar_summary: e.target.value })}
+                  placeholder={DEFAULT_CALENDAR_SUMMARY}
+                  className="text-sm"
+                />
+                <p className="font-body text-xs text-muted-foreground">
+                  Shown in the client's own calendar and synced to their calendar
+                  provider. Leave blank for “{DEFAULT_CALENDAR_SUMMARY}”.
+                </p>
               </div>
             </div>
           ))}

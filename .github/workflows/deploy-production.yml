@@ -20,6 +20,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # First, so a missing credential costs two seconds rather than failing
+      # deep in a CLI error after the full test and build run — and so the
+      # reason appears in the run summary instead of buried in a log group.
+      - name: Check deploy secrets are present
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          missing=()
+          [ -n "$SUPABASE_ACCESS_TOKEN" ] || missing+=(SUPABASE_ACCESS_TOKEN)
+          [ -n "$SUPABASE_DB_PASSWORD" ] || missing+=(SUPABASE_DB_PASSWORD)
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error title=Missing repository secrets::${missing[*]} — nothing was deployed."
+            echo "Add them with:"
+            for name in "${missing[@]}"; do echo "  gh secret set $name"; done
+            echo
+            echo "SUPABASE_ACCESS_TOKEN: https://supabase.com/dashboard/account/tokens (Generate new token)"
+            echo "SUPABASE_DB_PASSWORD:  Project Settings -> Database -> Reset database password"
+            exit 1
+          fi
+          echo "Both deploy secrets are present."
+
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
         with:

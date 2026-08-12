@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+# Never let two deploys apply migrations at once, and never cancel one midway:
+# an interrupted `db push` leaves the schema half-migrated.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Test, Build & Deploy to Production
@@ -50,6 +56,39 @@ jobs:
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
           VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.POSTHOG_KEY_PRODUCTION }}
           VITE_PUBLIC_POSTHOG_HOST: https://eu.i.posthog.com
+
+      # ── Backend, before the frontend ──────────────────────────────
+      # The SPA's short-link pages depend on columns and an Edge Function that
+      # must already exist. Deploying Pages first leaves a window where the new
+      # frontend talks to an old backend. If either step below fails, the job
+      # stops and the frontend is not published at all.
+      #
+      # Schema and function go to the SAME project used by the staging branch,
+      # which is why these steps live only in the production workflow.
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Supabase project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          # Same ref as supabase/config.toml and the keep-alive workflow.
+          SUPABASE_PROJECT_REF: ljjgokbrodfdhazeehgl
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      # Migrations first: the Edge Function inserts into columns this creates.
+      - name: Apply database migrations
+        run: supabase db push
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      - name: Deploy Edge Functions
+        run: supabase functions deploy process-booking
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Copy index.html to 404.html for SPA routing
         run: cp dist/index.html dist/404.html

@@ -107,8 +107,14 @@ async function withinRateLimit(supabase: any, bucket: string): Promise<boolean> 
 
 // ── Session lookup by slug ─────────────────────────────────────
 
+// hidden_offers.title was dropped in 20260514000002 and replaced by
+// title_en/title_ru; `name` is the internal admin label and is NOT NULL, so it
+// is the safe last resort. Asking for a column that does not exist makes
+// PostgREST reject the whole statement — and this select runs on every booking
+// insert, so a wrong name here takes down the entire booking flow, not just
+// offer bookings.
 const BOOKING_SELECT =
-  "*, session_types(name, duration_minutes, calendar_summary, notification_email_1, notification_email_2, show_second_email), hidden_offers(title, calendar_summary, notification_email)";
+  "*, session_types(name, duration_minutes, calendar_summary, notification_email_1, notification_email_2, show_second_email), hidden_offers(name, title_en, title_ru, calendar_summary, notification_email)";
 
 interface ResolvedBooking {
   booking: any;
@@ -130,8 +136,15 @@ async function findBookingBySlug(
   return { booking: data, isModerator: data.moderator_slug === slug };
 }
 
+/** Display title for an offer: preferred language, then the other, then the
+ *  internal admin label. `title` itself no longer exists (see BOOKING_SELECT). */
+function offerTitleOf(offer: any): string | null {
+  if (!offer) return null;
+  return offer.title_en || offer.title_ru || offer.name || null;
+}
+
 function sessionNameOf(booking: any): string {
-  return booking.session_types?.name || booking.hidden_offers?.title || "Session";
+  return booking.session_types?.name || offerTitleOf(booking.hidden_offers) || "Session";
 }
 
 function calendarSummaryOf(booking: any): string {
@@ -451,7 +464,9 @@ async function sendCancellationEmails(
 
 interface OfferRecord {
   id: string;
-  title: string;
+  name: string;
+  title_en: string | null;
+  title_ru: string | null;
   min_lead_time_minutes: number | null;
 }
 
@@ -638,7 +653,7 @@ Deno.serve(async (req) => {
     if (isOfferBooking) {
       const { data: offer, error: offerErr } = await supabase
         .from("hidden_offers")
-        .select("id, title, min_lead_time_minutes")
+        .select("id, name, title_en, title_ru, min_lead_time_minutes")
         .eq("id", hiddenOfferId)
         .eq("is_active", true)
         .single();
@@ -731,7 +746,7 @@ Deno.serve(async (req) => {
         booking,
         organizer: { name: THERAPIST_NAME, email: THERAPIST_EMAIL },
         sessionName: isOfferBooking
-          ? offerRecord?.title || "Session"
+          ? offerTitleOf(offerRecord) || "Session"
           : sessionNameOf(booking),
         calendarSummary: calendarSummaryOf(booking),
         durationMinutes: booking.session_types?.duration_minutes || 60,

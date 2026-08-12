@@ -1,5 +1,21 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.97.0";
 
+import {
+  buildCancellationEmails,
+  buildConfirmationEmails,
+  type BrevoMessage,
+} from "./lib/emails.ts";
+import { formatTimeWithTz } from "./lib/format.ts";
+import {
+  buildJaasPayload,
+  computeJwtWindow,
+  jaasRoomUrl,
+  roomNameForBooking,
+  signJwt,
+} from "./lib/jaas.ts";
+import { msUntilOpen, resolveJoinState, type JoinState } from "./lib/joinWindow.ts";
+import { generateSlug, isValidSlug, shortLink } from "./lib/slug.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -8,6 +24,15 @@ const corsHeaders = {
 
 const THERAPIST_EMAIL = "be@humanheart.life";
 const THERAPIST_NAME = "Human Heart Beat";
+
+/** What a client's calendar shows when a session type has no override.
+ *  Deliberately less specific than the service name — this string syncs to
+ *  third-party calendar infrastructure and every device on that account. */
+const DEFAULT_CALENDAR_SUMMARY = "Session with Genia";
+
+function siteUrl(): string {
+  return Deno.env.get("SITE_URL") || "https://humanheart.life";
+}
 
 // ── Observability ──────────────────────────────────────────────
 
@@ -32,7 +57,7 @@ function logError(requestId: string, step: string, errorCode: string, errorMessa
 
 function errorResponse(
   status: number,
-  code: "VALIDATION_FAILED" | "SLOT_TAKEN" | "LEAD_TIME_VIOLATION" | "BREVO_UNREACHABLE" | "BREVO_REJECTED" | "INTERNAL",
+  code: "VALIDATION_FAILED" | "SLOT_TAKEN" | "LEAD_TIME_VIOLATION" | "BREVO_UNREACHABLE" | "BREVO_REJECTED" | "RATE_LIMITED" | "NOT_FOUND" | "INTERNAL",
   message: string,
   requestId: string
 ): Response {
@@ -42,199 +67,6 @@ function errorResponse(
   });
 }
 
-// ── JaaS JWT Token Generation ──────────────────────────────────
-
-function base64UrlEncode(data: Uint8Array): string {
-  return btoa(String.fromCharCode(...data))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-function textToBase64Url(text: string): string {
-  return base64UrlEncode(new TextEncoder().encode(text));
-}
-
-async function importPrivateKey(pem: string): Promise<CryptoKey> {
-  const pemContents = pem
-    .replace(/-----BEGIN PRIVATE KEY-----/g, "")
-    .replace(/-----END PRIVATE KEY-----/g, "")
-    .replace(/\s/g, "");
-  
-  const binaryDer = Uint8Array.from(atob(pemContents), (c) => c.charCodeAt(0));
-  
-  return await crypto.subtle.importKey(
-    "pkcs8",
-    binaryDer,
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-}
-
-async function signJwt(payload: object, privateKeyPem: string, kid: string): Promise<string> {
-  const header = { alg: "RS256", typ: "JWT", kid };
-  const headerB64 = textToBase64Url(JSON.stringify(header));
-  const payloadB64 = textToBase64Url(JSON.stringify(payload));
-  const signingInput = `${headerB64}.${payloadB64}`;
-  
-  const privateKey = await importPrivateKey(privateKeyPem);
-  const signature = await crypto.subtle.sign(
-    "RSASSA-PKCS1-v1_5",
-    privateKey,
-    new TextEncoder().encode(signingInput)
-  );
-  
-  const signatureB64 = base64UrlEncode(new Uint8Array(signature));
-  return `${signingInput}.${signatureB64}`;
-}
-
-async function generateJaasJwtToken(
-  roomName: string,
-  userName: string,
-  userEmail: string,
-  isModerator: boolean,
-  sessionStart: Date,
-  sessionEnd: Date,
-): Promise<string | null> {
-  // JWT must cover the actual session window, not the booking-creation window.
-  // nbf = 30 min before session start; exp = 30 min after session end.
-  // This keeps the link valid for early arrivals and overruns without
-  // leaving it open indefinitely.
-  const BUFFER_SECS = 30 * 60;
-  const nbf = Math.floor(sessionStart.getTime() / 1000) - BUFFER_SECS;
-  const exp = Math.floor(sessionEnd.getTime() / 1000) + BUFFER_SECS;
-
-  // Throw before signing — never produce a token with a broken window.
-  if (exp <= nbf) {
-    throw new Error(
-      `Invalid session window: exp ${new Date(exp * 1000).toISOString()} ` +
-      `is not after nbf ${new Date(nbf * 1000).toISOString()}`
-    );
-  }
-
-  const appId = Deno.env.get("JAAS_APP_ID");
-  const privateKey = Deno.env.get("JAAS_PRIVATE_KEY");
-  const apiKeyId = Deno.env.get("JAAS_API_KEY_ID");
-
-  if (!appId || !privateKey || !apiKeyId) {
-    console.warn("JaaS credentials not configured (missing appId, privateKey, or apiKeyId), falling back to public Jitsi");
-    return null;
-  }
-
-  const payload = {
-    iss: "chat",
-    aud: "jitsi",
-    sub: appId,
-    room: roomName,
-    exp,
-    nbf,
-    context: {
-      user: {
-        moderator: isModerator ? "true" : "false",
-        name: userName,
-        email: userEmail,
-        avatar: "",
-        id: userEmail,
-      },
-      features: {
-        recording: isModerator ? "true" : "false",
-        livestreaming: isModerator ? "true" : "false",
-        "outbound-call": isModerator ? "true" : "false",
-        transcription: isModerator ? "true" : "false",
-        "lobby": "true",
-      },
-    },
-  };
-
-  try {
-    const normalizedKid = apiKeyId.includes("/") ? apiKeyId : `${appId}/${apiKeyId}`;
-    return await signJwt(payload, privateKey, normalizedKid);
-  } catch (err) {
-    console.error("Failed to generate JaaS JWT:", err);
-    return null;
-  }
-}
-
-function generateRoomName(bookingId: string): string {
-  return `session-${bookingId.slice(0, 8)}-${Date.now().toString(36)}`;
-}
-
-async function generateJitsiLinks(
-  bookingId: string,
-  clientName: string,
-  clientEmail: string,
-  startTimeIso: string,
-  endTimeIso: string,
-): Promise<{ clientLink: string; therapistLink: string; roomName: string }> {
-  const roomName = generateRoomName(bookingId);
-  // Convert ISO timestamptz strings (e.g. "2026-05-10T07:00:00+00:00") to Date.
-  // new Date() handles both +00:00 and Z suffixes correctly; getTime() is always UTC ms.
-  const sessionStart = new Date(startTimeIso);
-  const sessionEnd = new Date(endTimeIso);
-  const appId = Deno.env.get("JAAS_APP_ID");
-
-  // Try to generate JaaS tokens
-  const [clientToken, therapistToken] = await Promise.all([
-    generateJaasJwtToken(roomName, clientName, clientEmail, false, sessionStart, sessionEnd),
-    generateJaasJwtToken(roomName, THERAPIST_NAME, THERAPIST_EMAIL, true, sessionStart, sessionEnd),
-  ]);
-
-  // Structured log for debuggability — no PII (no name, email, or token content)
-  const BUFFER_SECS = 30 * 60;
-  const nbfSec = Math.floor(sessionStart.getTime() / 1000) - BUFFER_SECS;
-  const expSec = Math.floor(sessionEnd.getTime() / 1000) + BUFFER_SECS;
-  console.log(JSON.stringify({
-    event: "jitsi_jwt_generated",
-    bookingId,
-    sessionStartIso: sessionStart.toISOString(),
-    sessionEndIso: sessionEnd.toISOString(),
-    nbfIso: new Date(nbfSec * 1000).toISOString(),
-    expIso: new Date(expSec * 1000).toISOString(),
-    lifetimeSeconds: expSec - nbfSec,
-    usingJaas: clientToken !== null,
-  }));
-
-  if (clientToken && therapistToken && appId) {
-    // JaaS links with JWT tokens
-    const baseUrl = `https://8x8.vc/${appId}/${roomName}`;
-    // Client link: auto-knock on lobby so they wait for moderator approval
-    const clientConfig = "#config.prejoinConfig.enabled=true&config.lobby.autoKnock=true&config.disableModeratorIndicator=false";
-    return {
-      clientLink: `${baseUrl}?jwt=${clientToken}${clientConfig}`,
-      therapistLink: `${baseUrl}?jwt=${therapistToken}`,
-      roomName,
-    };
-  }
-
-  // Fallback to public Jitsi
-  const fallbackLink = `https://meet.jit.si/${roomName}`;
-  return {
-    clientLink: fallbackLink,
-    therapistLink: fallbackLink,
-    roomName,
-  };
-}
-
-function formatTimeWithTz(date: Date, tz: string): { time24: string; tzLabel: string } {
-  const cityName = tz.split("/").pop()?.replace(/_/g, " ") || tz;
-  try {
-    const parts = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "shortOffset" }).formatToParts(date);
-    let offsetPart = parts.find(p => p.type === "timeZoneName")?.value || "";
-    // "GMT" alone means GMT+0 — normalize it
-    if (offsetPart === "GMT") offsetPart = "GMT+0";
-    return {
-      time24: date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: tz }),
-      tzLabel: `${cityName}, ${offsetPart}`,
-    };
-  } catch {
-    return {
-      time24: date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false }),
-      tzLabel: cityName,
-    };
-  }
-}
-
 function getSupabase() {
   return createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -242,103 +74,264 @@ function getSupabase() {
   );
 }
 
-function notesRow(notes: string | null | undefined): string {
-  if (!notes || !notes.trim()) return "";
-  return `<tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px; vertical-align: top;">Enquiry</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${notes}</td></tr>`;
+// ── Rate limiting ──────────────────────────────────────────────
+
+/** The slug is the only secret guarding a room, so it is treated as a
+ *  capability token: unauthenticated lookups are capped per client IP. */
+const JOIN_RATE_MAX = 30;
+const JOIN_RATE_WINDOW_SECS = 300;
+
+async function hashedClientKey(req: Request): Promise<string> {
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown";
+  // Hash so the rate-limit table never stores raw addresses.
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ip));
+  return Array.from(new Uint8Array(digest).slice(0, 12))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-function pad2(n: number): string { return n.toString().padStart(2, "0"); }
-
-function toIcsDateUtc(date: Date): string {
-  return `${date.getUTCFullYear()}${pad2(date.getUTCMonth() + 1)}${pad2(date.getUTCDate())}T${pad2(date.getUTCHours())}${pad2(date.getUTCMinutes())}00Z`;
+async function withinRateLimit(supabase: any, bucket: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc("check_rate_limit", {
+    p_bucket: bucket,
+    p_max: JOIN_RATE_MAX,
+    p_window_seconds: JOIN_RATE_WINDOW_SECS,
+  });
+  // Fail open on infrastructure errors — a broken counter must not lock a
+  // client out of a session that is starting now.
+  if (error) return true;
+  return data !== false;
 }
 
-function generateIcs(booking: any, meetLink: string, sessionName: string, forClient = false): string {
-  const start = new Date(booking.start_time);
-  const end = new Date(booking.end_time);
+// ── Session lookup by slug ─────────────────────────────────────
+
+const BOOKING_SELECT =
+  "*, session_types(name, duration_minutes, calendar_summary, notification_email_1, notification_email_2, show_second_email), hidden_offers(title, calendar_summary, notification_email)";
+
+interface ResolvedBooking {
+  booking: any;
+  isModerator: boolean;
+}
+
+async function findBookingBySlug(
+  supabase: any,
+  slug: string
+): Promise<ResolvedBooking | null> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(BOOKING_SELECT)
+    .or(`slug.eq.${slug},moderator_slug.eq.${slug}`)
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return { booking: data, isModerator: data.moderator_slug === slug };
+}
+
+function sessionNameOf(booking: any): string {
+  return booking.session_types?.name || booking.hidden_offers?.title || "Session";
+}
+
+function calendarSummaryOf(booking: any): string {
+  return (
+    booking.session_types?.calendar_summary ||
+    booking.hidden_offers?.calendar_summary ||
+    DEFAULT_CALENDAR_SUMMARY
+  );
+}
+
+function firstNameOf(fullName: string): string {
+  return fullName.trim().split(/\s+/)[0] || fullName.trim() || "Guest";
+}
+
+/**
+ * Mint a room URL for this booking. Called at click time only — never at
+ * booking time, so the token window never has to be guessed in advance.
+ * Returns null when JaaS is not configured (falls back to public Jitsi).
+ */
+async function mintRoomUrl(
+  booking: any,
+  isModerator: boolean,
+  now: Date
+): Promise<string | null> {
+  const appId = Deno.env.get("JAAS_APP_ID");
+  const privateKey = Deno.env.get("JAAS_PRIVATE_KEY");
+  const apiKeyId = Deno.env.get("JAAS_API_KEY_ID");
+  const roomName = roomNameForBooking(booking.id);
+
+  if (!appId || !privateKey || !apiKeyId) {
+    console.warn("JaaS credentials not configured, falling back to public Jitsi");
+    return `https://meet.jit.si/${roomName}`;
+  }
+
+  const window = computeJwtWindow(now, new Date(booking.end_time));
+  const payload = buildJaasPayload({
+    appId,
+    roomName,
+    displayName: isModerator ? THERAPIST_NAME : firstNameOf(booking.client_name),
+    // Booking UUID, never an email address — this lands in browser history.
+    userId: isModerator ? `practitioner:${booking.id}` : booking.id,
+    isModerator,
+    window,
+  });
+
+  try {
+    const kid = apiKeyId.includes("/") ? apiKeyId : `${appId}/${apiKeyId}`;
+    const jwt = await signJwt(payload, privateKey, kid);
+    return jaasRoomUrl(appId, roomName, jwt, isModerator);
+  } catch (err) {
+    console.error("Failed to generate JaaS JWT:", err instanceof Error ? err.message : "unknown");
+    return null;
+  }
+}
+
+interface JoinOutcome {
+  state: JoinState | "not_found";
+  joinUrl?: string;
+  startsAtIso?: string;
+  endsAtIso?: string;
+  timezone?: string;
+  sessionName?: string;
+  isModerator?: boolean;
+}
+
+async function resolveJoin(
+  supabase: any,
+  slug: string,
+  requestId: string
+): Promise<JoinOutcome> {
+  const found = await findBookingBySlug(supabase, slug);
+
+  // Log the lookup, never the resulting token.
+  logInfo(requestId, "join_lookup", {
+    slugPrefix: slug.slice(0, 4),
+    found: !!found,
+  });
+
+  if (!found) return { state: "not_found" };
+
+  const { booking, isModerator } = found;
   const now = new Date();
-  const uid = `${booking.id}@humanheart.life`;
-  const description = forClient
-    ? [
-        `Session: ${sessionName}`,
-        booking.notes ? `Enquiry: ${booking.notes}` : "",
-        `Video: ${meetLink}`,
-      ].filter(Boolean).join("\\n")
-    : [
-        `Client: ${booking.client_name} (${booking.client_email})`,
-        booking.notes ? `Enquiry: ${booking.notes}` : "",
-        `Video: ${meetLink}`,
-      ].filter(Boolean).join("\\n");
+  const state = resolveJoinState({
+    status: booking.status,
+    startTime: booking.start_time,
+    endTime: booking.end_time,
+    now,
+  });
 
-  return [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//HumanHeartBeat//Booking//EN",
-    "METHOD:REQUEST",
-    "BEGIN:VEVENT",
-    `UID:${uid}`,
-    `DTSTAMP:${toIcsDateUtc(now)}`,
-    `DTSTART:${toIcsDateUtc(start)}`,
-    `DTEND:${toIcsDateUtc(end)}`,
-    `SUMMARY:${sessionName}${forClient ? "" : ` — ${booking.client_name}`}`,
-    `DESCRIPTION:${description}`,
-    `LOCATION:${meetLink}`,
-    `URL:${meetLink}`,
-    `ORGANIZER;CN=${THERAPIST_NAME}:mailto:${THERAPIST_EMAIL}`,
-    `ATTENDEE;CN=${booking.client_name}:mailto:${booking.client_email}`,
-    "STATUS:CONFIRMED",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
+  const common = {
+    startsAtIso: booking.start_time,
+    endsAtIso: booking.end_time,
+    timezone: booking.client_timezone || "UTC",
+    sessionName: sessionNameOf(booking),
+    isModerator,
+  };
+
+  if (state !== "open") {
+    logInfo(requestId, "join_denied", { bookingId: booking.id, state });
+    return { state, ...common };
+  }
+
+  const joinUrl = await mintRoomUrl(booking, isModerator, now);
+  if (!joinUrl) {
+    logError(requestId, "join_mint", "INTERNAL", "Token signing failed");
+    return { state: "expired", ...common };
+  }
+
+  logInfo(requestId, "join_granted", {
+    bookingId: booking.id,
+    isModerator,
+    expIso: new Date(
+      computeJwtWindow(now, new Date(booking.end_time)).exp * 1000
+    ).toISOString(),
+  });
+
+  return { state: "open", joinUrl, ...common };
 }
 
-function generateCancelIcs(booking: any, sessionName: string): string {
-  const start = new Date(booking.start_time);
-  const end = new Date(booking.end_time);
-  const now = new Date();
-  const uid = `${booking.id}@humanheart.life`;
+// ── Server-rendered fallback pages ─────────────────────────────
+// Used when the endpoint is hit directly (GET). The SPA at /s/<slug> renders
+// the same states with the site's own styling; these exist so the function is
+// usable behind a subdomain or proxy without the SPA in front of it.
 
-  return [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//HumanHeartBeat//Booking//EN",
-    "METHOD:CANCEL",
-    "BEGIN:VEVENT",
-    `UID:${uid}`,
-    `DTSTAMP:${toIcsDateUtc(now)}`,
-    `DTSTART:${toIcsDateUtc(start)}`,
-    `DTEND:${toIcsDateUtc(end)}`,
-    `SUMMARY:CANCELLED — ${sessionName} — ${booking.client_name}`,
-    "STATUS:CANCELLED",
-    `ORGANIZER;CN=${THERAPIST_NAME}:mailto:${THERAPIST_EMAIL}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
+function plainPage(title: string, body: string, status: number): Response {
+  return new Response(
+    `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>${title}</title></head>
+<body style="font-family: Georgia, 'Times New Roman', serif; background:#faf8f5; color:#4a4035; margin:0; padding:15vh 24px; text-align:center;">
+<div style="max-width:460px;margin:0 auto;">
+<h1 style="font-weight:400;font-size:26px;margin:0 0 16px;">${title}</h1>
+${body}
+<p style="margin-top:32px;"><a href="${siteUrl()}" style="color:#4a7c5f;">humanheart.life</a></p>
+</div></body></html>`,
+    { status, headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" } }
+  );
 }
 
-async function sendEmail(brevoApiKey: string, opts: {
-  to: { email: string; name: string }[];
-  subject: string;
-  htmlContent: string;
-  attachment?: { content: string; name: string }[];
-}): Promise<EmailResult> {
+function joinPageFor(outcome: JoinOutcome): Response {
+  switch (outcome.state) {
+    case "early": {
+      const { time24, tzLabel } = formatTimeWithTz(
+        new Date(outcome.startsAtIso!),
+        outcome.timezone || "UTC"
+      );
+      return plainPage(
+        "Not quite yet",
+        `<p>Your session with Genia starts at <strong>${time24}</strong> (${tzLabel}).</p>
+         <p>This page will let you in 15 minutes before.</p>`,
+        200
+      );
+    }
+    case "expired":
+      return plainPage(
+        "This session has ended",
+        `<p>The join link for this session is no longer active.</p>
+         <p><a href="${siteUrl()}" style="color:#4a7c5f;">Book another session</a></p>`,
+        410
+      );
+    case "cancelled":
+      return plainPage(
+        "This session was cancelled",
+        `<p>This booking has been cancelled, so the room is closed.</p>
+         <p><a href="${siteUrl()}" style="color:#4a7c5f;">Book another session</a></p>`,
+        410
+      );
+    default:
+      return plainPage(
+        "Link not found",
+        `<p>We couldn't find a session for this link. It may have been mistyped or truncated by an email client.</p>`,
+        404
+      );
+  }
+}
+
+// ── Email transport ────────────────────────────────────────────
+
+async function sendEmail(brevoApiKey: string, message: BrevoMessage): Promise<EmailResult> {
   const senderEmail = Deno.env.get("SENDER_EMAIL") || THERAPIST_EMAIL;
   const senderName = Deno.env.get("SENDER_NAME") || THERAPIST_NAME;
 
-  const payload: any = {
+  const payload: Record<string, unknown> = {
     sender: { name: senderName, email: senderEmail },
-    to: opts.to,
-    subject: opts.subject,
-    htmlContent: opts.htmlContent,
+    to: message.to,
+    subject: message.subject,
+    htmlContent: message.htmlContent,
+    textContent: message.textContent,
   };
-  if (opts.attachment?.length) {
-    payload.attachment = opts.attachment;
-  }
+  if (message.attachment?.length) payload.attachment = message.attachment;
+  if (message.headers) payload.headers = message.headers;
 
   // Guard against Brevo hanging (e.g. IP verification delay) timing out the whole edge function.
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10_000);
   try {
+    // /v3/smtp/email is the transactional endpoint. Campaign sends add
+    // List-Unsubscribe headers, which must never appear on a booking
+    // confirmation — one tap would blocklist the client.
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: { "Content-Type": "application/json", "api-key": brevoApiKey },
@@ -359,113 +352,124 @@ async function sendEmail(brevoApiKey: string, opts: {
   }
 }
 
-function detailsTable(rows: string): string {
-  return `<div style="background: #f0ede8; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <table style="width: 100%; border-collapse: collapse;">${rows}</table>
-  </div>`;
+function practitionerRecipientsFor(booking: any): { email: string; name: string }[] {
+  const senderFallback = Deno.env.get("SENDER_EMAIL") || THERAPIST_EMAIL;
+
+  if (booking.hidden_offer_id) {
+    return [
+      { email: booking.hidden_offers?.notification_email || senderFallback, name: THERAPIST_NAME },
+    ];
+  }
+
+  const sessionType = booking.session_types;
+  const recipients = [
+    { email: sessionType?.notification_email_1 || THERAPIST_EMAIL, name: THERAPIST_NAME },
+  ];
+  if (sessionType?.show_second_email && sessionType?.notification_email_2) {
+    recipients.push({ email: sessionType.notification_email_2, name: THERAPIST_NAME });
+  }
+  return recipients;
 }
 
-function row(label: string, value: string): string {
-  return `<tr><td style="padding: 8px 0; color: #7a7067; font-size: 14px;">${label}</td><td style="padding: 8px 0; color: #4a4035; font-size: 14px; text-align: right;">${value}</td></tr>`;
-}
-
-function timeValue(time24: string, tzLabel: string): string {
-  return `<strong>${time24}</strong> <span style="color: #7a7067; font-size: 12px;">${tzLabel}</span>`;
+function clientRecipientsFor(booking: any): { email: string; name: string }[] {
+  const recipients = [{ email: booking.client_email, name: booking.client_name }];
+  if (booking.client_email_2) {
+    recipients.push({ email: booking.client_email_2, name: booking.client_name });
+  }
+  return recipients;
 }
 
 // ── Cancellation ──────────────────────────────────────────────
 
-async function sendCancellationEmails(booking: any, timezone: string) {
-  const brevoApiKey = Deno.env.get("BREVO_API_KEY");
-  if (!brevoApiKey) { console.warn("BREVO_API_KEY not set"); return false; }
-
-  const startDate = new Date(booking.start_time);
-  const dateStr = startDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-  const tz = timezone || "UTC";
-  const { time24, tzLabel } = formatTimeWithTz(startDate, tz);
-  const sessionName = booking.session_types?.name || (booking as any).hidden_offers?.title || "Session";
-  const siteUrl = Deno.env.get("SITE_URL") || "https://humanheart.life";
-
-  const tableRows = row("Session", `<strong>${sessionName}</strong>`)
-    + row("Date", dateStr)
-    + row("Time", timeValue(time24, tzLabel))
-    + notesRow(booking.notes);
-
-  const clientHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="font-family: Georgia, 'Times New Roman', serif; background: #ffffff; margin: 0; padding: 40px 20px;">
-  <div style="max-width: 560px; margin: 0 auto; background: #faf8f5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-    <div style="background: linear-gradient(135deg, #8b5e5e 0%, #a07070 100%); padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 400;">Booking Cancelled</h1>
-    </div>
-    <div style="padding: 32px;">
-      <p style="color: #4a4035; font-size: 16px; line-height: 1.6;">Hi <strong>${booking.client_name}</strong>,</p>
-      <p style="color: #4a4035; font-size: 16px; line-height: 1.6;">Your session has been cancelled. Here were the details:</p>
-      ${detailsTable(tableRows)}
-      <div style="text-align: center; margin: 28px 0;">
-        <a href="${siteUrl}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Book a New Session →</a>
-      </div>
-    </div>
-  </div>
-</body></html>`;
-
-  const therapistHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="font-family: Georgia, 'Times New Roman', serif; background: #ffffff; margin: 0; padding: 40px 20px;">
-  <div style="max-width: 560px; margin: 0 auto; background: #faf8f5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-    <div style="background: linear-gradient(135deg, #8b5e5e 0%, #a07070 100%); padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 400;">Booking Cancelled</h1>
-    </div>
-    <div style="padding: 32px;">
-      <p style="color: #4a4035; font-size: 16px; line-height: 1.6;"><strong>${booking.client_name}</strong> (${booking.client_email}) has cancelled their session.</p>
-      ${detailsTable(tableRows)}
-    </div>
-  </div>
-</body></html>`;
-
-  const cancelIcs = generateCancelIcs(booking, sessionName);
-  const icsBase64 = btoa(unescape(encodeURIComponent(cancelIcs)));
-
-  const subject = `Booking Cancelled: ${sessionName} on ${dateStr}`;
-
-  const [clientResult, therapistResult] = await Promise.all([
-    sendEmail(brevoApiKey, {
-      to: [{ email: booking.client_email, name: booking.client_name }],
-      subject,
-      htmlContent: clientHtml,
-    }),
-    sendEmail(brevoApiKey, {
-      to: [{ email: THERAPIST_EMAIL, name: THERAPIST_NAME }],
-      subject,
-      htmlContent: therapistHtml,
-      attachment: [{ content: icsBase64, name: "cancel.ics" }],
-    }),
-  ]);
-
-  console.log(`Cancel emails: client=${clientResult.ok}, therapist=${therapistResult.ok}`);
-  return clientResult.ok;
-}
-
-async function handleCancel(bookingId: string, _timezone: string) {
+async function handleCancel(bookingId: string, requestId: string) {
   const supabase = getSupabase();
 
   const { data: booking, error: fetchErr } = await supabase
     .from("bookings")
-    .select("*, session_types(name), hidden_offers(title)")
+    .select(BOOKING_SELECT)
     .eq("id", bookingId)
     .single();
 
   if (fetchErr || !booking) return { success: false, error: "Booking not found" };
   if (booking.status === "cancelled") return { success: false, error: "Already cancelled" };
 
+  // Bump SEQUENCE so calendar clients treat the CANCEL as an update to the
+  // invite they already hold rather than an unrelated event.
+  const nextSequence = (booking.calendar_sequence ?? 0) + 1;
+
   const { error: cancelError } = await supabase
     .from("bookings")
-    .update({ status: "cancelled" })
+    .update({ status: "cancelled", calendar_sequence: nextSequence })
     .eq("id", bookingId);
 
   if (cancelError) return { success: false, error: "Failed to cancel" };
 
-  // Use stored timezone from booking, not the cancel request
-  const emailSent = await sendCancellationEmails(booking, booking.client_timezone || _timezone);
+  const emailSent = await sendCancellationEmails(
+    { ...booking, calendar_sequence: nextSequence },
+    nextSequence,
+    requestId
+  );
   return { success: true, emailSent };
+}
+
+async function sendCancellationEmails(
+  booking: any,
+  sequence: number,
+  requestId: string
+): Promise<boolean> {
+  const brevoApiKey = Deno.env.get("BREVO_API_KEY");
+  if (!brevoApiKey) {
+    logError(requestId, "email_config", "INTERNAL", "BREVO_API_KEY not configured");
+    return false;
+  }
+
+  const messages = buildCancellationEmails({
+    booking,
+    organizer: { name: THERAPIST_NAME, email: THERAPIST_EMAIL },
+    sessionName: sessionNameOf(booking),
+    calendarSummary: calendarSummaryOf(booking),
+    clientTimezone: booking.client_timezone || "UTC",
+    sequence,
+    siteUrl: siteUrl(),
+    clientRecipients: clientRecipientsFor(booking),
+    practitionerRecipients: practitionerRecipientsFor(booking),
+  });
+
+  const [clientResult, practitionerResult] = await Promise.all([
+    sendEmail(brevoApiKey, messages.client),
+    sendEmail(brevoApiKey, messages.practitioner),
+  ]);
+
+  logInfo(requestId, "cancel_email", {
+    clientOk: clientResult.ok,
+    practitionerOk: practitionerResult.ok,
+  });
+  return clientResult.ok;
+}
+
+// ── Booking creation ───────────────────────────────────────────
+
+interface OfferRecord {
+  id: string;
+  title: string;
+  min_lead_time_minutes: number | null;
+}
+
+/** Two independent slugs: the client's link must never confer moderator rights. */
+async function allocateSlugs(supabase: any): Promise<{ slug: string; moderatorSlug: string }> {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const slug = generateSlug();
+    const moderatorSlug = generateSlug();
+    const { data } = await supabase
+      .from("bookings")
+      .select("id")
+      .or(
+        `slug.eq.${slug},slug.eq.${moderatorSlug},moderator_slug.eq.${slug},moderator_slug.eq.${moderatorSlug}`
+      )
+      .limit(1);
+    if (!data || data.length === 0) return { slug, moderatorSlug };
+  }
+  throw new Error("Could not allocate unique slugs");
 }
 
 // ── Main handler ──────────────────────────────────────────────
@@ -478,15 +482,40 @@ Deno.serve(async (req) => {
   const requestId = generateRequestId();
   const startMs = Date.now();
 
-  // GET cancellation (email link)
   if (req.method === "GET") {
     const url = new URL(req.url);
+    const supabase = getSupabase();
+
+    // Short-link join, server-rendered. A 302 into the room when the window is
+    // open; a friendly page otherwise.
+    const slug = url.searchParams.get("slug") || url.searchParams.get("s");
+    if (slug) {
+      if (!isValidSlug(slug)) return joinPageFor({ state: "not_found" });
+
+      const bucket = `join:${await hashedClientKey(req)}`;
+      if (!(await withinRateLimit(supabase, bucket))) {
+        logError(requestId, "join", "RATE_LIMITED");
+        return plainPage("Too many attempts", "<p>Please wait a few minutes and try again.</p>", 429);
+      }
+
+      const outcome = await resolveJoin(supabase, slug, requestId);
+      if (outcome.state === "open" && outcome.joinUrl) {
+        return new Response(null, {
+          status: 302,
+          headers: { ...corsHeaders, Location: outcome.joinUrl, "Cache-Control": "no-store" },
+        });
+      }
+      return joinPageFor(outcome);
+    }
+
+    // Legacy cancellation link (already-sent confirmations). New emails point
+    // at /c/<slug>, which asks for confirmation before cancelling.
     const action = url.searchParams.get("action");
     const id = url.searchParams.get("id");
-    const redirect = url.searchParams.get("redirect") || "https://humanheart.life";
+    const redirect = url.searchParams.get("redirect") || siteUrl();
 
     if (action === "cancel" && id) {
-      const result = await handleCancel(id, "UTC");
+      const result = await handleCancel(id, requestId);
       const redirectUrl = result.success
         ? `${redirect}/en/booking-cancelled?success=true`
         : `${redirect}/en/booking-cancelled?success=false`;
@@ -501,9 +530,91 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
 
-    // POST cancellation (website)
+    // ── Short-link join, JSON (the SPA at /s/<slug>) ──
+    if (body.action === "join" && body.slug) {
+      const supabase = getSupabase();
+      if (!isValidSlug(body.slug)) {
+        return new Response(JSON.stringify({ state: "not_found", requestId }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const bucket = `join:${await hashedClientKey(req)}`;
+      if (!(await withinRateLimit(supabase, bucket))) {
+        logError(requestId, "join", "RATE_LIMITED");
+        return errorResponse(429, "RATE_LIMITED", "Too many attempts. Please wait a few minutes.", requestId);
+      }
+
+      const outcome = await resolveJoin(supabase, body.slug, requestId);
+      // 200 even for "not_found": an unknown slug is an application state the
+      // page renders, not a transport failure. Reserving non-2xx for genuine
+      // errors keeps the client's error handling honest.
+      return new Response(
+        JSON.stringify({
+          ...outcome,
+          msUntilOpen: outcome.startsAtIso ? msUntilOpen(outcome.startsAtIso) : undefined,
+          requestId,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" } }
+      );
+    }
+
+    // ── Short-link cancel details (the SPA at /c/<slug>) ──
+    if (body.action === "cancel_details" && body.slug) {
+      const supabase = getSupabase();
+      if (!isValidSlug(body.slug)) {
+        return errorResponse(404, "NOT_FOUND", "Booking not found", requestId);
+      }
+
+      const bucket = `join:${await hashedClientKey(req)}`;
+      if (!(await withinRateLimit(supabase, bucket))) {
+        return errorResponse(429, "RATE_LIMITED", "Too many attempts. Please wait a few minutes.", requestId);
+      }
+
+      const found = await findBookingBySlug(supabase, body.slug);
+      if (!found) return errorResponse(404, "NOT_FOUND", "Booking not found", requestId);
+
+      const { booking } = found;
+      return new Response(
+        JSON.stringify({
+          sessionName: sessionNameOf(booking),
+          startsAtIso: booking.start_time,
+          timezone: booking.client_timezone || "UTC",
+          status: booking.status,
+          requestId,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" } }
+      );
+    }
+
+    // ── Short-link cancel, confirmed by the client ──
+    // POST-only on purpose: email clients and link scanners prefetch GET URLs,
+    // which would silently cancel bookings.
+    if (body.action === "cancel_by_slug" && body.slug) {
+      const supabase = getSupabase();
+      if (!isValidSlug(body.slug)) {
+        return errorResponse(404, "NOT_FOUND", "Booking not found", requestId);
+      }
+
+      const bucket = `cancel:${await hashedClientKey(req)}`;
+      if (!(await withinRateLimit(supabase, bucket))) {
+        return errorResponse(429, "RATE_LIMITED", "Too many attempts. Please wait a few minutes.", requestId);
+      }
+
+      const found = await findBookingBySlug(supabase, body.slug);
+      if (!found) return errorResponse(404, "NOT_FOUND", "Booking not found", requestId);
+
+      const result = await handleCancel(found.booking.id, requestId);
+      logInfo(requestId, "cancel_by_slug", { success: result.success });
+      return new Response(JSON.stringify({ ...result, requestId }), {
+        status: result.success ? 200 : 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // POST cancellation (admin / website, by id)
     if (body.action === "cancel" && body.bookingId) {
-      const result = await handleCancel(body.bookingId, body.timezone || "UTC");
+      const result = await handleCancel(body.bookingId, requestId);
       logInfo(requestId, "cancel", { success: result.success });
       return new Response(JSON.stringify({ ...result, requestId }), {
         status: result.success ? 200 : 400,
@@ -523,11 +634,11 @@ Deno.serve(async (req) => {
     const supabase = getSupabase();
 
     // For offer bookings: validate the offer exists and is active
-    let offerRecord: { id: string; title: string; notification_email: string | null; min_lead_time_minutes: number | null } | null = null;
+    let offerRecord: OfferRecord | null = null;
     if (isOfferBooking) {
       const { data: offer, error: offerErr } = await supabase
         .from("hidden_offers")
-        .select("id, title, notification_email, min_lead_time_minutes")
+        .select("id, title, min_lead_time_minutes")
         .eq("id", hiddenOfferId)
         .eq("is_active", true)
         .single();
@@ -535,7 +646,7 @@ Deno.serve(async (req) => {
         logError(requestId, "offer_lookup", "VALIDATION_FAILED", "Offer not found or inactive");
         return errorResponse(400, "VALIDATION_FAILED", "This offer is no longer available.", requestId);
       }
-      offerRecord = offer as typeof offerRecord;
+      offerRecord = offer as OfferRecord;
     }
 
     // Lead time check
@@ -572,31 +683,29 @@ Deno.serve(async (req) => {
       return errorResponse(409, "SLOT_TAKEN", "This time slot is no longer available. Please go back and choose another.", requestId);
     }
 
-    const insertRow = isOfferBooking
-      ? {
-          session_type_id: null,
-          hidden_offer_id: hiddenOfferId,
-          conditions_accepted_at: new Date().toISOString(),
-          client_name: clientName, client_email: clientEmail,
-          client_email_2: clientEmail2 || null,
-          start_time: startTime, end_time: endTime,
-          notes: notes || null, status: "confirmed",
-          client_timezone: timezone || "UTC",
-        }
-      : {
-          session_type_id: sessionTypeId,
-          hidden_offer_id: null,
-          client_name: clientName, client_email: clientEmail,
-          client_email_2: clientEmail2 || null,
-          start_time: startTime, end_time: endTime,
-          notes: notes || null, status: "confirmed",
-          client_timezone: timezone || "UTC",
-        };
+    const { slug, moderatorSlug } = await allocateSlugs(supabase);
+
+    const insertRow = {
+      session_type_id: isOfferBooking ? null : sessionTypeId,
+      hidden_offer_id: isOfferBooking ? hiddenOfferId : null,
+      ...(isOfferBooking ? { conditions_accepted_at: new Date().toISOString() } : {}),
+      client_name: clientName,
+      client_email: clientEmail,
+      client_email_2: clientEmail2 || null,
+      start_time: startTime,
+      end_time: endTime,
+      notes: notes || null,
+      status: "confirmed",
+      client_timezone: timezone || "UTC",
+      slug,
+      moderator_slug: moderatorSlug,
+      calendar_sequence: 0,
+    };
 
     const { data: booking, error: insertError } = await supabase
       .from("bookings")
       .insert(insertRow)
-      .select("*, session_types(name, duration_minutes, notification_email_1, notification_email_2, show_second_email)")
+      .select(BOOKING_SELECT)
       .single();
 
     if (insertError || !booking) {
@@ -604,138 +713,46 @@ Deno.serve(async (req) => {
       return errorResponse(500, "INTERNAL", "Failed to create booking. Please try again.", requestId);
     }
 
-    // Generate separate JaaS links for client (non-moderator) and therapist (moderator)
-    const { clientLink, therapistLink } = await generateJitsiLinks(
-      booking.id,
-      booking.client_name,
-      booking.client_email,
-      booking.start_time,
-      booking.end_time,
-    );
-    
-    // Store client link in DB (what client sees)
-    await supabase.from("bookings").update({ google_meet_link: clientLink }).eq("id", booking.id);
+    // Short links on our own domain. No JaaS URL and no JWT is minted here —
+    // the token is signed when the client actually clicks, inside a narrow window.
+    const base = siteUrl();
+    const joinUrl = shortLink(base, "s", slug);
+    const cancelUrl = shortLink(base, "c", slug);
+    const moderatorJoinUrl = shortLink(base, "s", moderatorSlug);
+
+    await supabase.from("bookings").update({ google_meet_link: joinUrl }).eq("id", booking.id);
 
     // ── Send emails ──
     const brevoApiKey = Deno.env.get("BREVO_API_KEY");
     let emailSent = false;
 
     if (brevoApiKey) {
-      const startDate = new Date(booking.start_time);
-      const dateStr = startDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-      const sessionName = isOfferBooking
-        ? (offerRecord?.title || "Session")
-        : (booking.session_types?.name || "Session");
-      const duration = booking.session_types?.duration_minutes || 60;
-      const tz = timezone || "UTC";
-      const { time24, tzLabel } = formatTimeWithTz(startDate, tz);
-
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const siteUrl = Deno.env.get("SITE_URL") || "https://humanheart.life";
-      const cancelUrl = `${supabaseUrl}/functions/v1/process-booking?action=cancel&id=${booking.id}&redirect=${encodeURIComponent(siteUrl)}`;
-
-      const tableRows = row("Session", `<strong>${sessionName}</strong>`)
-        + row("Date", dateStr)
-        + row("Time", timeValue(time24, tzLabel))
-        + row("Duration", `${duration} min`)
-        + notesRow(booking.notes);
-
-      // Client confirmation email (with client link - non-moderator)
-      const clientHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="font-family: Georgia, 'Times New Roman', serif; background: #ffffff; margin: 0; padding: 40px 20px;">
-  <div style="max-width: 560px; margin: 0 auto; background: #faf8f5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-    <div style="background: linear-gradient(135deg, #4a7c5f 0%, #5a9470 100%); padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 400;">Booking Confirmed ✓</h1>
-    </div>
-    <div style="padding: 32px;">
-      <p style="color: #4a4035; font-size: 16px; line-height: 1.6;">Hi <strong>${booking.client_name}</strong>,</p>
-      <p style="color: #4a4035; font-size: 16px; line-height: 1.6;">Your session has been confirmed. Here are the details:</p>
-      ${detailsTable(tableRows)}
-      <div style="text-align: center; margin: 28px 0;">
-        <a href="${clientLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join Video Session →</a>
-      </div>
-      <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5;">📅 A calendar invite (.ics) is attached — open it to add this session to your calendar.</p>
-      <p style="color: #7a7067; font-size: 13px; text-align: center; line-height: 1.5; margin-top: 8px;">Save the video link above — you'll use it to join at the scheduled time.</p>
-      <hr style="border: none; border-top: 1px solid #e5e0da; margin: 24px 0;" />
-      <p style="color: #a09890; font-size: 12px; text-align: center; line-height: 1.5;">
-        Need to cancel? <a href="${cancelUrl}" style="color: #b04040; text-decoration: underline;">Cancel this booking</a>
-      </p>
-    </div>
-  </div>
-</body></html>`;
-
-      // Therapist notification email (with therapist link - moderator)
-      const therapistHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="font-family: Georgia, 'Times New Roman', serif; background: #ffffff; margin: 0; padding: 40px 20px;">
-  <div style="max-width: 560px; margin: 0 auto; background: #faf8f5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-    <div style="background: linear-gradient(135deg, #4a7c5f 0%, #5a9470 100%); padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 400;">New Booking 📅</h1>
-    </div>
-    <div style="padding: 32px;">
-      <p style="color: #4a4035; font-size: 16px; line-height: 1.6;"><strong>${booking.client_name}</strong> (${booking.client_email}) has booked a session.</p>
-      ${detailsTable(tableRows)}
-      <div style="text-align: center; margin: 28px 0;">
-        <a href="${therapistLink}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">Join as Moderator →</a>
-      </div>
-      <div style="background: #fff8e1; border-radius: 8px; padding: 14px 16px; margin: 16px 0;">
-        <p style="color: #7a6520; font-size: 13px; margin: 0; line-height: 1.5;">🔒 <strong>Reminder:</strong> After joining, click the Security icon (shield) and enable <strong>"Lobby mode"</strong> to require your approval before the client can enter.</p>
-      </div>
-    </div>
-  </div>
-</body></html>`;
-
-      // Generate .ics for therapist and client
-      const therapistIcs = generateIcs(booking, therapistLink, sessionName, false);
-      const therapistIcsBase64 = btoa(unescape(encodeURIComponent(therapistIcs)));
-
-      const clientIcs = generateIcs(booking, clientLink, sessionName, true);
-      const clientIcsBase64 = btoa(unescape(encodeURIComponent(clientIcs)));
-
-      // Determine notification recipients.
-      // Offer bookings use the offer's notification_email (falling back to SENDER_EMAIL env var,
-      // then the hard-coded therapist address). Session-type bookings use the existing
-      // notification_email_1/2 columns on the session type row.
-      const senderFallback = Deno.env.get("SENDER_EMAIL") || THERAPIST_EMAIL;
-      let therapistRecipients: { email: string; name: string }[];
-      if (isOfferBooking) {
-        const notifEmail = offerRecord?.notification_email || senderFallback;
-        therapistRecipients = [{ email: notifEmail, name: THERAPIST_NAME }];
-      } else {
-        const sessionType = booking.session_types;
-        const notifEmail1 = sessionType?.notification_email_1 || THERAPIST_EMAIL;
-        const notifEmail2 = sessionType?.show_second_email && sessionType?.notification_email_2 ? sessionType.notification_email_2 : null;
-        therapistRecipients = [{ email: notifEmail1, name: THERAPIST_NAME }];
-        if (notifEmail2) {
-          therapistRecipients.push({ email: notifEmail2, name: THERAPIST_NAME });
-        }
-      }
-
-      // Build client recipients list (primary + optional second email)
-      const clientRecipients = [{ email: booking.client_email, name: booking.client_name }];
-      if (booking.client_email_2) {
-        clientRecipients.push({ email: booking.client_email_2, name: booking.client_name });
-      }
+      const messages = buildConfirmationEmails({
+        booking,
+        organizer: { name: THERAPIST_NAME, email: THERAPIST_EMAIL },
+        sessionName: isOfferBooking
+          ? offerRecord?.title || "Session"
+          : sessionNameOf(booking),
+        calendarSummary: calendarSummaryOf(booking),
+        durationMinutes: booking.session_types?.duration_minutes || 60,
+        clientTimezone: timezone || "UTC",
+        joinUrl,
+        cancelUrl,
+        moderatorJoinUrl,
+        clientRecipients: clientRecipientsFor(booking),
+        practitionerRecipients: practitionerRecipientsFor(booking),
+      });
 
       try {
-        const [clientResult, therapistResult] = await Promise.all([
-          sendEmail(brevoApiKey, {
-            to: clientRecipients,
-            subject: `Booking Confirmed: ${sessionName} on ${dateStr}`,
-            htmlContent: clientHtml,
-            attachment: [{ content: clientIcsBase64, name: "session.ics" }],
-          }),
-          sendEmail(brevoApiKey, {
-            to: therapistRecipients,
-            subject: `New Booking: ${sessionName} — ${booking.client_name} on ${dateStr}`,
-            htmlContent: therapistHtml,
-            attachment: [{ content: therapistIcsBase64, name: "booking.ics" }],
-          }),
+        const [clientResult, practitionerResult] = await Promise.all([
+          sendEmail(brevoApiKey, messages.client),
+          sendEmail(brevoApiKey, messages.practitioner),
         ]);
         emailSent = clientResult.ok;
-        logInfo(requestId, "email", { clientOk: clientResult.ok, therapistOk: therapistResult.ok });
+        logInfo(requestId, "email", { clientOk: clientResult.ok, therapistOk: practitionerResult.ok });
         if (!clientResult.ok) logError(requestId, "email_client", clientResult.code);
-        if (!therapistResult.ok) logError(requestId, "email_therapist", therapistResult.code);
-      } catch (emailErr) {
+        if (!practitionerResult.ok) logError(requestId, "email_therapist", practitionerResult.code);
+      } catch {
         logError(requestId, "email", "INTERNAL", "Unexpected error during email sending");
       }
     } else {
@@ -750,10 +767,10 @@ Deno.serve(async (req) => {
       end_time: booking.end_time,
       session_type_id: booking.session_type_id,
       client_timezone: booking.client_timezone,
-      google_meet_link: clientLink,
+      google_meet_link: joinUrl,
     };
     return new Response(
-      JSON.stringify({ success: true, booking: bookingResponse, meetLink: clientLink, emailSent, requestId }),
+      JSON.stringify({ success: true, booking: bookingResponse, meetLink: joinUrl, emailSent, requestId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {

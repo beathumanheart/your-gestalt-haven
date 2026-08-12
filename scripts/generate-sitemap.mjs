@@ -7,6 +7,7 @@
  *   - /offer-agreement (EN + RU, priority 0.3)
  *
  * Routes excluded:
+ *   - /s/:slug and /c/:slug (short session links — capability tokens, see below)
  *   - /book/offer/:slug (hidden offers — unlisted by design)
  *   - /booking-cancelled (noindex transactional page)
  *   - /admin/* (not public)
@@ -20,6 +21,35 @@ import { createClient } from "@supabase/supabase-js";
 const SITE_URL = "https://humanheart.life";
 const LANGS = ["en", "ru"];
 const TODAY = new Date().toISOString().slice(0, 10);
+
+/**
+ * Path segments that must never reach a sitemap, whatever this script grows into.
+ *
+ * "s" and "c" are the short session links (/s/<slug>, /c/<slug>). The slug is
+ * the only secret guarding a therapy session's video room — publishing one in a
+ * sitemap would hand it to every crawler that reads the file. The generator has
+ * no way to produce these today (it emits a fixed allowlist), so this is a
+ * tripwire for whoever changes that assumption.
+ *
+ * Matched as a whole segment anywhere in the path, not as a prefix: urlEntry()
+ * prepends /en and /ru, so an offending route shows up as /en/s/<slug>.
+ */
+const FORBIDDEN_PATH_SEGMENTS = ["s", "c", "admin"];
+
+function assertNoForbiddenLocs(xml) {
+  const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  const offenders = locs.filter((loc) => {
+    const segments = new URL(loc).pathname.split("/").filter(Boolean);
+    return segments.some((segment) => FORBIDDEN_PATH_SEGMENTS.includes(segment));
+  });
+
+  if (offenders.length > 0) {
+    throw new Error(
+      `[sitemap] Refusing to write a sitemap containing capability-token or ` +
+        `private URLs:\n  ${offenders.join("\n  ")}`
+    );
+  }
+}
 
 // ── Supabase session-type slugs ───────────────────────────────────────────────
 async function fetchSessionSlugs() {
@@ -96,6 +126,8 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
 ${entries.join("\n")}
 </urlset>
 `;
+
+assertNoForbiddenLocs(xml);
 
 const outPath = path.resolve("dist", "sitemap.xml");
 fs.writeFileSync(outPath, xml, "utf8");

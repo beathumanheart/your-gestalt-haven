@@ -114,6 +114,7 @@ export type Database = {
           client_email_2: string | null
           client_name: string
           client_timezone: string | null
+          calendar_sequence: number
           conditions_accepted_at: string | null
           created_at: string
           end_time: string
@@ -124,6 +125,8 @@ export type Database = {
           session_type_id: string | null
           start_time: string
           status: string
+          moderator_slug: string
+          slug: string
           updated_at: string
         }
         Insert: {
@@ -131,6 +134,7 @@ export type Database = {
           client_email_2?: string | null
           client_name: string
           client_timezone?: string | null
+          calendar_sequence?: number
           conditions_accepted_at?: string | null
           created_at?: string
           end_time: string
@@ -141,6 +145,8 @@ export type Database = {
           session_type_id?: string | null
           start_time: string
           status?: string
+          moderator_slug?: string
+          slug?: string
           updated_at?: string
         }
         Update: {
@@ -148,6 +154,7 @@ export type Database = {
           client_email_2?: string | null
           client_name?: string
           client_timezone?: string | null
+          calendar_sequence?: number
           conditions_accepted_at?: string | null
           created_at?: string
           end_time?: string
@@ -158,6 +165,8 @@ export type Database = {
           session_type_id?: string | null
           start_time?: string
           status?: string
+          moderator_slug?: string
+          slug?: string
           updated_at?: string
         }
         Relationships: [
@@ -180,6 +189,7 @@ export type Database = {
       hidden_offers: {
         Row: {
           conditions_en: string | null
+          calendar_summary: string | null
           conditions_ru: string | null
           created_at: string
           description_en: string | null
@@ -198,6 +208,7 @@ export type Database = {
         }
         Insert: {
           conditions_en?: string | null
+          calendar_summary?: string | null
           conditions_ru?: string | null
           created_at?: string
           description_en?: string | null
@@ -216,6 +227,7 @@ export type Database = {
         }
         Update: {
           conditions_en?: string | null
+          calendar_summary?: string | null
           conditions_ru?: string | null
           created_at?: string
           description_en?: string | null
@@ -261,6 +273,7 @@ export type Database = {
       session_types: {
         Row: {
           created_at: string
+          calendar_summary: string | null
           currency: string | null
           description: string | null
           description_ru: string | null
@@ -283,6 +296,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          calendar_summary?: string | null
           currency?: string | null
           description?: string | null
           description_ru?: string | null
@@ -305,6 +319,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          calendar_summary?: string | null
           currency?: string | null
           description?: string | null
           description_ru?: string | null

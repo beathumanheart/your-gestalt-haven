@@ -6,4 +6,10 @@ Disallow: /ru/booking-cancelled
 Disallow: /en/book/offer/
 Disallow: /ru/book/offer/
 
+# Short session links. The slug is a capability token — anyone holding the URL
+# can enter the room. These pages carry a noindex meta tag, but that needs JS to
+# run; this stops the fetch happening at all, which is what a token needs.
+Disallow: /s/
+Disallow: /c/
+
 Sitemap: https://humanheart.life/sitemap.xml

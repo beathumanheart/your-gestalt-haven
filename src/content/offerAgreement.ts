@@ -19,7 +19,7 @@ export interface Section {
  * Bump this whenever the wording below changes — an acceptance record is only
  * meaningful if it says which text was accepted.
  */
-export const TERMS_VERSION = "2026-08-17";
+export const TERMS_VERSION = "2026-08-18";
 
 export interface OfferAgreementContent {
   backLink: string;
@@ -34,7 +34,7 @@ export const offerAgreementEN: OfferAgreementContent = {
     {
       heading: "1. General Provisions",
       paragraphs: [
-        "This offer agreement defines the terms of counselling services provided in the Gestalt tradition. Payment for a session constitutes acceptance of these terms.",
+        "This offer agreement defines the terms of counselling services provided in the Gestalt tradition. Booking a session, and confirming at the time of booking that you have read this agreement, constitutes acceptance of these terms.",
       ],
     },
     {
@@ -82,8 +82,8 @@ export const offerAgreementEN: OfferAgreementContent = {
     {
       heading: "6. Payment and Cancellation",
       bullets: [
-        "Session cost: starting from €40 (solidarity pricing)",
-        "Payment is made 24 hours before or after the session",
+        "Session cost: a sliding scale from €40 to €80 — you choose what fits",
+        "Payment is due after each session, by bank transfer, Wise, Revolut, or cryptocurrency",
         "Cancellations with less than 24 hours notice are charged in full",
         "Missed sessions without notice are charged in full",
       ],
@@ -104,7 +104,7 @@ export const offerAgreementRU: OfferAgreementContent = {
     {
       heading: "1. Общие положения",
       paragraphs: [
-        "Настоящий договор-оферта определяет условия оказания услуг психологического консультирования в гештальт-подходе. Оплата сессии означает принятие настоящих условий.",
+        "Настоящий договор-оферта определяет условия оказания услуг психологического консультирования в гештальт-подходе. Запись на сессию и подтверждение при записи того, что вы ознакомились с настоящим договором, означают принятие настоящих условий.",
       ],
     },
     {
@@ -152,8 +152,8 @@ export const offerAgreementRU: OfferAgreementContent = {
     {
       heading: "6. Оплата и отмена",
       bullets: [
-        "Стоимость сессии: от €40 (солидарное ценообразование)",
-        "Оплата производится за 24 часа до или после сессии",
+        "Стоимость сессии: по свободной шкале от 40 до 80 € — вы выбираете сумму сами",
+        "Оплата производится после каждой сессии: банковским переводом, Wise, Revolut или криптовалютой",
         "При отмене менее чем за 24 часа сессия оплачивается полностью",
         "Пропущенная без предупреждения сессия оплачивается полностью",
       ],

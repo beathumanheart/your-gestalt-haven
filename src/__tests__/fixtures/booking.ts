@@ -15,6 +15,7 @@ export const MODERATOR_SLUG = "Rd7Wq1LnH4sY";
 export const JOIN_URL = `https://humanheart.life/s/${SLUG}`;
 export const CANCEL_URL = `https://humanheart.life/c/${SLUG}`;
 export const MODERATOR_JOIN_URL = `https://humanheart.life/s/${MODERATOR_SLUG}`;
+export const TERMS_URL = "https://humanheart.life/en/offer-agreement";
 
 /** 2026-08-17 09:00–09:50 UTC = 11:00–11:50 Europe/Brussels (CEST). */
 export function makeBooking(overrides: Partial<IcsBooking> = {}): IcsBooking {

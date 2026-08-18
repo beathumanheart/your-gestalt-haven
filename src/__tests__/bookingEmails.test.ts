@@ -20,6 +20,7 @@ import {
   JOIN_URL,
   MODERATOR_JOIN_URL,
   ORGANIZER,
+  TERMS_URL,
   makeBooking,
 } from "./fixtures/booking";
 
@@ -39,6 +40,7 @@ function confirmation(overrides = {}) {
     joinUrl: JOIN_URL,
     cancelUrl: CANCEL_URL,
     moderatorJoinUrl: MODERATOR_JOIN_URL,
+    termsUrl: TERMS_URL,
     clientRecipients: CLIENT_RECIPIENTS,
     practitionerRecipients: PRACTITIONER_RECIPIENTS,
     now: FIXED_NOW,
@@ -109,6 +111,22 @@ describe("no video-provider URLs escape", () => {
   it("the client's join link is short enough to survive any mail client", () => {
     expect(JOIN_URL.length).toBeLessThan(60);
     expect(confirmation().client.htmlContent).toContain(JOIN_URL);
+  });
+});
+
+describe("the confirmation carries the agreement the client accepted", () => {
+  it("links the terms in both MIME parts", () => {
+    const { client } = confirmation();
+    expect(client.htmlContent).toContain(TERMS_URL);
+    expect(client.textContent).toContain(TERMS_URL);
+  });
+
+  // `termsUrl` was interpolated straight into an href with no fallback, so an
+  // omitted one shipped `href="undefined"` to every client rather than failing.
+  it("never ships a placeholder in place of the link", () => {
+    for (const [, message] of allMessages()) {
+      expect(everything(message)).not.toContain("undefined");
+    }
   });
 });
 

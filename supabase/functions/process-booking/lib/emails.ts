@@ -119,6 +119,8 @@ export interface ConfirmationInput {
   cancelUrl: string;
   /** https://humanheart.life/s/<moderator_slug> */
   moderatorJoinUrl: string;
+  /** Link to the agreement the client accepted at booking. */
+  termsUrl: string;
   clientRecipients: { email: string; name: string }[];
   practitionerRecipients: { email: string; name: string }[];
   now?: Date;
@@ -138,6 +140,7 @@ export function buildConfirmationEmails(input: ConfirmationInput): {
     joinUrl,
     cancelUrl,
     moderatorJoinUrl,
+    termsUrl,
     clientRecipients,
     practitionerRecipients,
     now = new Date(),
@@ -169,6 +172,9 @@ export function buildConfirmationEmails(input: ConfirmationInput): {
       <hr style="border: none; border-top: 1px solid #e5e0da; margin: 24px 0;" />
       <p style="color: #a09890; font-size: 12px; text-align: center; line-height: 1.5;">
         Need to cancel? <a href="${cancelUrl}" style="color: #b04040; text-decoration: underline;">Cancel this booking</a>
+      </p>
+      <p style="color: #a09890; font-size: 12px; text-align: center; line-height: 1.5;">
+        <a href="${termsUrl}" style="color: #a09890; text-decoration: underline;">Terms of service</a>
       </p>`
   );
 
@@ -188,6 +194,8 @@ export function buildConfirmationEmails(input: ConfirmationInput): {
     "A calendar invite (.ics) is attached — open it to add this session to your calendar.",
     "",
     `Need to cancel? ${cancelUrl}`,
+    "",
+    `Terms of service: ${termsUrl}`,
     "",
     organizer.name,
   ].join("\n");

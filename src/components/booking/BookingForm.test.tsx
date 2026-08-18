@@ -52,22 +52,42 @@ const validBooking: Partial<BookingData> = {
   clientName: "Test User",
   clientEmail: "test@example.com",
   notes: "",
+  termsAccepted: true,
 };
 
-function renderForm() {
+/** The primary action lives in the widget's sticky bar and reaches the form
+ *  through the `form` attribute — mirror that here rather than a shape the app
+ *  no longer has. */
+const FORM_ID = "test-booking-form";
+
+function SubmitButton() {
+  return (
+    <button type="submit" form={FORM_ID}>
+      {bookingEN.bookSession}
+    </button>
+  );
+}
+
+function renderForm(props: Partial<React.ComponentProps<typeof BookingForm>> = {}) {
   return render(
-    <BookingForm
-      booking={validBooking as BookingData}
-      t={bookingEN}
-      onBooked={vi.fn()}
-      onChange={vi.fn()}
-      onBack={vi.fn()}
-    />
+    <>
+      <BookingForm
+        formId={FORM_ID}
+        booking={validBooking as BookingData}
+        t={bookingEN}
+        language="en"
+        onBooked={vi.fn()}
+        onChange={vi.fn()}
+        onSubmittingChange={vi.fn()}
+        {...props}
+      />
+      <SubmitButton />
+    </>
   );
 }
 
 function submitForm() {
-  fireEvent.click(screen.getByRole("button", { name: bookingEN.bookButton }));
+  fireEvent.click(screen.getByRole("button", { name: bookingEN.bookSession }));
 }
 
 // ── Tests ─────────────────────────────────────────────────────────
@@ -245,15 +265,7 @@ describe("BookingForm – email failure (200 with emailSent: false)", () => {
     const onBooked = vi.fn();
     vi.mocked(supabase.functions.invoke).mockResolvedValueOnce(successWithNoEmail);
 
-    render(
-      <BookingForm
-        booking={validBooking as BookingData}
-        t={bookingEN}
-        onBooked={onBooked}
-        onChange={vi.fn()}
-        onBack={vi.fn()}
-      />
-    );
+    renderForm({ onBooked });
     submitForm();
 
     await waitFor(() => {
@@ -298,15 +310,7 @@ describe("BookingForm – email failure (200 with emailSent: false)", () => {
     const onBooked = vi.fn();
     vi.mocked(supabase.functions.invoke).mockResolvedValueOnce(successWithNoEmail);
 
-    render(
-      <BookingForm
-        booking={validBooking as BookingData}
-        t={bookingEN}
-        onBooked={onBooked}
-        onChange={vi.fn()}
-        onBack={vi.fn()}
-      />
-    );
+    renderForm({ onBooked });
     submitForm();
 
     await waitFor(() => {

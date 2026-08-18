@@ -39,7 +39,26 @@ for (const target of hasWindow ? [globalThis, window] : [globalThis]) {
   });
 }
 
+// jsdom implements none of these, and components legitimately rely on them:
+// scrollIntoView for step changes, ResizeObserver and PointerEvent methods for
+// the Radix primitives behind the dialog and checkbox.
 if (hasWindow) {
+  if (!Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = () => {};
+  }
+  if (!("ResizeObserver" in globalThis)) {
+    class ResizeObserverStub {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+    (globalThis as { ResizeObserver?: unknown }).ResizeObserver = ResizeObserverStub;
+  }
+  if (!Element.prototype.hasPointerCapture) {
+    Element.prototype.hasPointerCapture = () => false;
+    Element.prototype.setPointerCapture = () => {};
+    Element.prototype.releasePointerCapture = () => {};
+  }
   Object.defineProperty(window, "matchMedia", {
     writable: true,
     value: (query: string) => ({

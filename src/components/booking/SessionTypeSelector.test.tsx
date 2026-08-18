@@ -78,9 +78,9 @@ describe("SessionTypeSelector – rendering", () => {
         onSelect={vi.fn()}
       />
     );
-    const selected = screen.getByText("Individual Therapy").closest("button");
+    const selected = screen.getByText("Individual Therapy").closest('[role="radio"]');
     expect(selected).toHaveClass("border-primary");
-    const unselected = screen.getByText("Couples Therapy").closest("button");
+    const unselected = screen.getByText("Couples Therapy").closest('[role="radio"]');
     expect(unselected).not.toHaveClass("border-primary");
   });
 
@@ -136,7 +136,7 @@ describe("SessionTypeSelector – session selection", () => {
         onSelect={onSelect}
       />
     );
-    fireEvent.click(screen.getByText("Individual Therapy").closest("button")!);
+    fireEvent.click(screen.getByText("Individual Therapy").closest('[role="radio"]')!);
     expect(onSelect).toHaveBeenCalledWith(mockSessions[0], 0);
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
@@ -152,7 +152,7 @@ describe("SessionTypeSelector – session selection", () => {
         onSelect={onSelect}
       />
     );
-    fireEvent.click(screen.getByText("Couples Therapy").closest("button")!);
+    fireEvent.click(screen.getByText("Couples Therapy").closest('[role="radio"]')!);
     expect(onSelect).toHaveBeenCalledWith(mockSessions[1], 1);
   });
 });

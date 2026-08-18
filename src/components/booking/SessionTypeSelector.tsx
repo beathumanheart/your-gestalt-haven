@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Clock, ChevronDown, Link, Check } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { Language } from "@/contexts/LanguageContext";
@@ -31,50 +31,46 @@ interface Props {
   getShareUrl?: (id: string) => string;
 }
 
-const DescriptionBlock = ({ text, language, initialExpanded = false }: { text: string; language: Language; initialExpanded?: boolean }) => {
-  const [expanded, setExpanded] = useState(initialExpanded);
-  const lines = text.split("\n").filter(Boolean);
-  const isLong = lines.length > 1 || text.length > 100;
-  const moreLabel = language === "ru" ? "Подробнее" : "More";
-  const lessLabel = language === "ru" ? "Свернуть" : "Less";
+/** A description is worth collapsing only if it would take more than a couple of lines. */
+function isLongDescription(text: string): boolean {
+  return text.split("\n").filter(Boolean).length > 1 || text.length > 100;
+}
 
-  if (!isLong) {
-    return (
-      <p className="font-body text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{text}</p>
-    );
-  }
-
-  return (
-    <div className="mt-2">
-      <div
-        className={`font-body text-sm text-muted-foreground whitespace-pre-wrap transition-all duration-300 overflow-hidden ${
-          expanded ? "" : "line-clamp-2"
-        }`}
-      >
-        {text}
-      </div>
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          setExpanded(!expanded);
-        }}
-        className="flex items-center gap-1 mt-1 font-body text-xs text-primary hover:text-primary/80 transition-colors"
-      >
-        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
-        {expanded ? lessLabel : moreLabel}
-      </button>
-    </div>
-  );
-};
-
-const SessionTypeSelector = ({ sessionTypes, loading, selected, expandedId, t, language, onSelect, getShareUrl }: Props) => {
+const SessionTypeSelector = ({
+  sessionTypes,
+  loading,
+  selected,
+  expandedId,
+  t,
+  language,
+  onSelect,
+  getShareUrl,
+}: Props) => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const getName = (st: SessionType) => (language === "ru" && st.name_ru) ? st.name_ru : st.name;
-  const getDescription = (st: SessionType) => (language === "ru" && st.description_ru) ? st.description_ru : st.description;
 
-  const handleCopyLink = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
+  // Only one description is open at a time, so opening one collapses the others
+  // and the list's total height stays roughly constant. Held here rather than
+  // inside each card precisely so the cards can see each other.
+  const [openId, setOpenId] = useState<string | null>(expandedId ?? null);
+  useEffect(() => {
+    if (expandedId) setOpenId(expandedId);
+  }, [expandedId]);
+
+  // Roving tabindex: the radiogroup is one tab stop, arrows move within it.
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusIndex = (index: number) => {
+    const target = sessionTypes[(index + sessionTypes.length) % sessionTypes.length];
+    if (!target) return;
+    const el = cardRefs.current[target.id];
+    el?.focus();
+    onSelect(target, sessionTypes.indexOf(target));
+  };
+
+  const getName = (st: SessionType) => (language === "ru" && st.name_ru ? st.name_ru : st.name);
+  const getDescription = (st: SessionType) =>
+    language === "ru" && st.description_ru ? st.description_ru : st.description;
+
+  const handleCopyLink = async (id: string) => {
     if (!getShareUrl) return;
     try {
       await navigator.clipboard.writeText(getShareUrl(id));
@@ -84,6 +80,7 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, expandedId, t, l
       // fallback: do nothing silently
     }
   };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -103,62 +100,134 @@ const SessionTypeSelector = ({ sessionTypes, loading, selected, expandedId, t, l
     );
   }
 
+  const moreLabel = language === "ru" ? "Подробнее" : "More";
+  const lessLabel = language === "ru" ? "Свернуть" : "Less";
+  const copyLabel = language === "ru" ? "Скопировать ссылку" : "Copy link";
+
+  // The first card carries the tab stop when nothing is selected yet.
+  const tabStopId = selected ?? sessionTypes[0]?.id;
+
   return (
     <div className="space-y-4">
-      <p className="font-body text-muted-foreground mb-6">{t.selectSession}</p>
-      <div className="grid gap-3">
-        {sessionTypes.map((st, index) => (
-          <button
-            key={st.id}
-            onClick={() => onSelect(st, index)}
-            className={`w-full text-left p-5 rounded-xl border-2 transition-all duration-300 ${
-              selected === st.id
-                ? "border-primary bg-primary/5 shadow-soft"
-                : "border-border hover:border-primary/40 hover:bg-muted/50"
-            }`}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1 flex items-center gap-2">
-                <h3 className="font-display text-lg font-medium text-foreground">{getName(st)}</h3>
-                {getShareUrl && (
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => handleCopyLink(e, st.id)}
-                    onKeyDown={(e) => e.key === "Enter" && handleCopyLink(e as unknown as React.MouseEvent, st.id)}
-                    title={language === "ru" ? "Скопировать ссылку" : "Copy link"}
-                    className="flex-shrink-0 p-1 rounded text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+      <p id="session-type-label" className="font-body text-muted-foreground mb-6">
+        {t.selectSession}
+      </p>
+      <div className="grid gap-3" role="radiogroup" aria-labelledby="session-type-label">
+        {sessionTypes.map((st, index) => {
+          const description = getDescription(st);
+          const expandable = !!description && isLongDescription(description);
+          const isOpen = openId === st.id;
+          const isSelected = selected === st.id;
+
+          return (
+            <div
+              key={st.id}
+              ref={(el) => { cardRefs.current[st.id] = el; }}
+              role="radio"
+              aria-checked={isSelected}
+              tabIndex={st.id === tabStopId ? 0 : -1}
+              onClick={() => onSelect(st, index)}
+              onKeyDown={(e) => {
+                if (e.key === " " || e.key === "Enter") {
+                  e.preventDefault();
+                  onSelect(st, index);
+                } else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+                  e.preventDefault();
+                  focusIndex(index + 1);
+                } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+                  e.preventDefault();
+                  focusIndex(index - 1);
+                }
+              }}
+              className={`w-full text-left p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                isSelected
+                  ? "border-primary bg-primary/5 shadow-soft"
+                  : "border-border hover:border-primary/40 hover:bg-muted/50"
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1 flex items-center gap-2">
+                  <h3 className="font-display text-lg font-medium text-foreground">{getName(st)}</h3>
+                  {getShareUrl && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyLink(st.id);
+                      }}
+                      onKeyDown={(e) => e.stopPropagation()}
+                      title={copyLabel}
+                      aria-label={copyLabel}
+                      className="flex-shrink-0 p-1 rounded text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {copiedId === st.id ? (
+                        <Check className="w-3.5 h-3.5 text-primary" />
+                      ) : (
+                        <Link className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-col items-end gap-1 ml-4">
+                  <span className="flex items-center gap-1 font-body text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    {st.duration_minutes} {t.minutes}
+                  </span>
+                  {st.show_price && st.pricing_type === "solidarity" && st.min_price != null && st.max_price != null && (
+                    <span className="font-body text-sm font-medium text-primary">
+                      {new Intl.NumberFormat(undefined, { style: "currency", currency: st.currency || "USD", maximumFractionDigits: 0 }).format(st.min_price)}
+                      {" – "}
+                      {new Intl.NumberFormat(undefined, { style: "currency", currency: st.currency || "USD", maximumFractionDigits: 0 }).format(st.max_price)}
+                      <span className="text-xs text-muted-foreground ml-1">(sliding scale)</span>
+                    </span>
+                  )}
+                  {st.show_price && st.pricing_type !== "solidarity" && st.price != null && (
+                    <span className="font-body text-sm font-medium text-foreground">
+                      {new Intl.NumberFormat(undefined, { style: "currency", currency: st.currency || "USD" }).format(st.price)}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {description && !expandable && (
+                <p className="font-body text-sm text-muted-foreground mt-2 whitespace-pre-wrap">
+                  {description}
+                </p>
+              )}
+
+              {description && expandable && (
+                <div className="mt-2">
+                  <div
+                    id={`session-desc-${st.id}`}
+                    className={`font-body text-sm text-muted-foreground whitespace-pre-wrap transition-all duration-300 overflow-hidden ${
+                      isOpen ? "" : "line-clamp-2"
+                    }`}
                   >
-                    {copiedId === st.id
-                      ? <Check className="w-3.5 h-3.5 text-primary" />
-                      : <Link className="w-3.5 h-3.5" />
-                    }
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-col items-end gap-1 ml-4">
-                <span className="flex items-center gap-1 font-body text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  {st.duration_minutes} {t.minutes}
-                </span>
-                {st.show_price && st.pricing_type === 'solidarity' && st.min_price != null && st.max_price != null && (
-                  <span className="font-body text-sm font-medium text-primary">
-                    {new Intl.NumberFormat(undefined, { style: 'currency', currency: st.currency || 'USD', maximumFractionDigits: 0 }).format(st.min_price)}
-                    {' – '}
-                    {new Intl.NumberFormat(undefined, { style: 'currency', currency: st.currency || 'USD', maximumFractionDigits: 0 }).format(st.max_price)}
-                    <span className="text-xs text-muted-foreground ml-1">(sliding scale)</span>
-                  </span>
-                )}
-                {st.show_price && st.pricing_type !== 'solidarity' && st.price != null && (
-                  <span className="font-body text-sm font-medium text-foreground">
-                    {new Intl.NumberFormat(undefined, { style: 'currency', currency: st.currency || 'USD' }).format(st.price)}
-                  </span>
-                )}
-              </div>
+                    {description}
+                  </div>
+                  {/* Expanding is deliberately separate from selecting: people need
+                      to read two descriptions before choosing between them. */}
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={`session-desc-${st.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenId(isOpen ? null : st.id);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    className="flex items-center gap-1 mt-1 font-body text-xs text-primary hover:text-primary/80 transition-colors"
+                  >
+                    <ChevronDown
+                      className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                    />
+                    {isOpen ? lessLabel : moreLabel}
+                  </button>
+                </div>
+              )}
             </div>
-            {getDescription(st) && <DescriptionBlock text={getDescription(st)} language={language} initialExpanded={expandedId === st.id} />}
-          </button>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

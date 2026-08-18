@@ -38,7 +38,7 @@ const BookingConfirmation = ({ booking, t, onReset, onCancel }: Props) => {
       </div>
 
       <h3 className="font-display text-2xl md:text-3xl font-light text-foreground mb-2">
-        {t.confirmTitle}
+        {t.sessionBooked}
       </h3>
       {booking.emailSent === false ? (
         <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-8 text-left max-w-sm mx-auto" data-testid="email-warning">

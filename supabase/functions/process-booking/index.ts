@@ -638,12 +638,19 @@ Deno.serve(async (req) => {
     }
 
     // ── Booking creation ──
-    const { sessionTypeId, hiddenOfferId, clientName, clientEmail, clientEmail2, startTime, endTime, notes, timezone } = body;
+    const { sessionTypeId, hiddenOfferId, clientName, clientEmail, clientEmail2, startTime, endTime, notes, timezone, termsAccepted, termsVersion, language } = body;
 
     const isOfferBooking = !!hiddenOfferId;
     if ((!sessionTypeId && !hiddenOfferId) || !clientName || !clientEmail || !startTime || !endTime) {
       logError(requestId, "validation", "VALIDATION_FAILED");
       return errorResponse(400, "VALIDATION_FAILED", "Missing required fields", requestId);
+    }
+
+    // Consent is enforced here, not only in the UI: a disabled button is a
+    // courtesy, not a control.
+    if (termsAccepted !== true || typeof termsVersion !== "string" || !termsVersion.trim()) {
+      logError(requestId, "validation", "VALIDATION_FAILED", "Terms not accepted");
+      return errorResponse(400, "VALIDATION_FAILED", "Please read and agree to the terms before booking.", requestId);
     }
 
     const supabase = getSupabase();
@@ -715,6 +722,9 @@ Deno.serve(async (req) => {
       slug,
       moderator_slug: moderatorSlug,
       calendar_sequence: 0,
+      // Server-side timestamp; the client only tells us which text it showed.
+      terms_accepted_at: new Date().toISOString(),
+      terms_version: termsVersion.trim().slice(0, 64),
     };
 
     const { data: booking, error: insertError } = await supabase
@@ -754,6 +764,7 @@ Deno.serve(async (req) => {
         joinUrl,
         cancelUrl,
         moderatorJoinUrl,
+        termsUrl: `${base}/${language === "ru" ? "ru" : "en"}/offer-agreement`,
         clientRecipients: clientRecipientsFor(booking),
         practitionerRecipients: practitionerRecipientsFor(booking),
       });

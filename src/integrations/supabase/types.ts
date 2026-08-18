@@ -115,6 +115,8 @@ export type Database = {
           client_name: string
           client_timezone: string | null
           calendar_sequence: number
+          terms_accepted_at: string | null
+          terms_version: string | null
           conditions_accepted_at: string | null
           created_at: string
           end_time: string
@@ -138,6 +140,8 @@ export type Database = {
           conditions_accepted_at?: string | null
           created_at?: string
           end_time: string
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           google_meet_link?: string | null
           hidden_offer_id?: string | null
           id?: string
@@ -158,6 +162,8 @@ export type Database = {
           conditions_accepted_at?: string | null
           created_at?: string
           end_time?: string
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           google_meet_link?: string | null
           hidden_offer_id?: string | null
           id?: string

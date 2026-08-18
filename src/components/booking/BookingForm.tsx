@@ -1,27 +1,38 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { format, addMinutes, parse } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
-import { CalendarDays, Clock, User, Mail, ChevronLeft } from "lucide-react";
+import { CalendarDays, Clock, User, Mail } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { BookingData, ConfirmedBooking } from "./BookingWidget";
 import { getUserTimezone, formatTimezone } from "./DateTimeSelector";
 import { trackBookingCompleted, trackEmailFailed, trackBookingFailed, type BookingError } from "@/hooks/useBookingAnalytics";
+import { Checkbox } from "@/components/ui/checkbox";
+import TermsBlock from "./TermsBlock";
+import type { Language } from "@/contexts/LanguageContext";
+import { TERMS_VERSION } from "@/content/offerAgreement";
 
 interface Props {
+  /** The sticky action bar submits this form by id, so the primary action can
+   *  live outside the form element while still being a real submit button. */
+  formId: string;
   booking: BookingData;
   t: BookingContent;
+  language: Language;
   onBooked: (result: ConfirmedBooking) => void;
   onChange: (fields: Partial<BookingData>) => void;
-  onBack: () => void;
+  onSubmittingChange: (submitting: boolean) => void;
 }
 
-const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
+const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmittingChange }: Props) => {
   const [submitting, setSubmitting] = useState(false);
+  const termsRef = useRef<HTMLButtonElement>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState("");
   const [errorId, setErrorId] = useState<string | null>(null);
   const timezone = useMemo(() => getUserTimezone(), []);
+
+  useEffect(() => { onSubmittingChange(submitting); }, [submitting, onSubmittingChange]);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -29,6 +40,9 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
     if (!booking.clientEmail?.trim()) errs.clientEmail = t.errorEmailRequired;
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(booking.clientEmail.trim()))
       errs.clientEmail = t.errorEmailInvalid;
+    // Belt and braces: the bar's button is disabled without consent, but a
+    // submit can still arrive via Enter in a text field.
+    if (!booking.termsAccepted) errs.terms = t.termsRequiredError;
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -61,6 +75,12 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           endTime,
           notes: booking.notes?.trim() || null,
           timezone,
+          // The server records its own timestamp; this only says which text
+          // was on screen when the box was ticked.
+          termsAccepted: booking.termsAccepted === true,
+          termsVersion: TERMS_VERSION,
+          // Used only to pick the language of links in the confirmation email.
+          language,
         },
       });
 
@@ -160,7 +180,7 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form id={formId} onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.yourName}</label>
           <div className="relative">
@@ -236,23 +256,38 @@ const BookingForm = ({ booking, t, onBooked, onChange, onBack }: Props) => {
           </div>
         )}
 
-        <div className="flex items-center gap-3 pt-1">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex items-center gap-1 font-body text-sm text-muted-foreground hover:text-foreground transition-all"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            {t.back}
-          </button>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="flex-1 btn-primary text-sm sm:text-base py-3 disabled:opacity-60"
-          >
-            {submitting ? t.booking : t.bookButton}
-          </button>
+        <TermsBlock t={t} language={language} />
+
+        <div className="space-y-2">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              ref={termsRef}
+              id="terms-accepted"
+              checked={booking.termsAccepted === true}
+              onCheckedChange={(checked) => {
+                onChange({ termsAccepted: checked === true });
+                if (checked === true) {
+                  setErrors((prev) => {
+                    const { terms, ...rest } = prev;
+                    return rest;
+                  });
+                }
+              }}
+              aria-describedby={errors.terms ? "terms-error" : undefined}
+              className="mt-0.5"
+            />
+            <label htmlFor="terms-accepted" className="font-body text-sm text-foreground leading-snug">
+              {t.termsCheckboxLabel}{" "}
+              <TermsBlock.Link t={t} language={language} onClosed={() => termsRef.current?.focus()} />
+            </label>
+          </div>
+          {errors.terms && (
+            <p id="terms-error" className="text-destructive text-xs" data-testid="terms-error">
+              {errors.terms}
+            </p>
+          )}
         </div>
+
       </form>
     </div>
   );

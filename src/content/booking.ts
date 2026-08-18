@@ -67,6 +67,25 @@ export interface BookingContent {
   back: string;
   next: string;
   optional: string;
+  /** Sticky action bar: prompt shown before anything is chosen. */
+  barChooseSession: string;
+  barChooseDateTime: string;
+  barFillDetails: string;
+  barAgreeTerms: string;
+  /** Step 3 primary action. The success state uses the same verb. */
+  bookSession: string;
+  sessionBooked: string;
+  // Terms (task 7)
+  termsHeading: string;
+  termsFee: string;
+  termsCancellation: string;
+  termsPayment: string;
+  termsConfidentiality: string;
+  termsCheckboxLabel: string;
+  termsLinkText: string;
+  termsRequiredError: string;
+  termsVersionLabel: string;
+  termsModalClose: string;
   // Availability enforcement (client-facing)
   horizonNote: string;      // contains [date] placeholder
   minNoticeTooltip: string; // contains [N] placeholder
@@ -126,6 +145,23 @@ export const bookingEN: BookingContent = {
   emailUrl: "mailto:be@humanheart.life",
   back: "Back",
   next: "Next",
+  barChooseSession: "Choose a session type",
+  barChooseDateTime: "Choose a date and time",
+  barFillDetails: "Add your name and email",
+  barAgreeTerms: "Agree to the terms to book",
+  bookSession: "Book session",
+  sessionBooked: "Session booked",
+  termsHeading: "Before you book",
+  termsFee: "Sessions are on a sliding scale from €40 to €80 — you choose what fits.",
+  termsCancellation: "Cancel or reschedule free of charge up to 24 hours before your session.",
+  termsPayment:
+    "Payment is due after each session — by bank transfer, Wise, Revolut, or cryptocurrency.",
+  termsConfidentiality: "Everything you bring stays between us, except where the law requires otherwise.",
+  termsCheckboxLabel: "I've read and agree to the",
+  termsLinkText: "terms of service",
+  termsRequiredError: "Please read and agree to the terms before booking.",
+  termsVersionLabel: "Version",
+  termsModalClose: "Close",
   optional: "optional",
   horizonNote: "Bookings available up to [date]. For later dates, please contact directly.",
   minNoticeTooltip: "Please book at least [N] hours in advance.",
@@ -185,6 +221,23 @@ export const bookingRU: BookingContent = {
   emailUrl: "mailto:be@humanheart.life",
   back: "Назад",
   next: "Далее",
+  barChooseSession: "Выберите тип сессии",
+  barChooseDateTime: "Выберите дату и время",
+  barFillDetails: "Укажите имя и почту",
+  barAgreeTerms: "Примите условия, чтобы записаться",
+  bookSession: "Записаться",
+  sessionBooked: "Вы записаны",
+  termsHeading: "Перед записью",
+  termsFee: "Стоимость сессии — по свободной шкале от 40 до 80 €, вы выбираете сумму сами.",
+  termsCancellation: "Отменить или перенести сессию можно бесплатно не позднее чем за 24 часа.",
+  termsPayment:
+    "Оплата — после каждой сессии: банковским переводом, Wise, Revolut или криптовалютой.",
+  termsConfidentiality: "Всё, что вы приносите на сессию, остаётся между нами — кроме случаев, прямо предусмотренных законом.",
+  termsCheckboxLabel: "Я прочитал(а) и принимаю",
+  termsLinkText: "условия оказания услуг",
+  termsRequiredError: "Пожалуйста, прочитайте и примите условия, чтобы записаться.",
+  termsVersionLabel: "Редакция",
+  termsModalClose: "Закрыть",
   optional: "необязательно",
   horizonNote: "Запись доступна до [date]. Для более поздних дат свяжитесь напрямую.",
   minNoticeTooltip: "Пожалуйста, записывайтесь минимум за [N] часов.",

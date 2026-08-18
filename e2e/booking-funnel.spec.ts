@@ -15,6 +15,20 @@ test.describe("Landing page", () => {
     await expect(canonical).toHaveAttribute("href", "https://humanheart.life/en");
   });
 
+  // Helmet copies props to attributes verbatim, so the JSX spelling of
+  // `hrefLang` decides what search engines actually see. Assert the attribute
+  // on the page rather than trusting the prop name.
+  test("alternate language links carry a real hreflang attribute", async ({ page }) => {
+    await page.goto("/");
+    const alternates = page.locator('link[rel="alternate"][data-rh="true"]');
+    await expect(alternates).toHaveCount(3);
+
+    const langs = await alternates.evaluateAll((links) =>
+      links.map((l) => l.getAttribute("hreflang"))
+    );
+    expect(langs.sort()).toEqual(["en", "ru", "x-default"]);
+  });
+
   test("OG image is self-hosted (not r2.dev or lovable CDN)", async ({ page }) => {
     await page.goto("/");
     // index.html provides a static tag for bots; PageMeta adds a second with data-rh="true".

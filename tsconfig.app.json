@@ -19,6 +19,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@edge/*": [
+        "./supabase/functions/process-booking/lib/*"
       ]
     },
     "skipLibCheck": true,

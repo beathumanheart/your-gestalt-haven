@@ -14,6 +14,13 @@ export interface Section {
   bullets?: string[];
 }
 
+/**
+ * Version of the agreement text, recorded against every booking that accepts it.
+ * Bump this whenever the wording below changes — an acceptance record is only
+ * meaningful if it says which text was accepted.
+ */
+export const TERMS_VERSION = "2026-08-17";
+
 export interface OfferAgreementContent {
   backLink: string;
   pageTitle: string;

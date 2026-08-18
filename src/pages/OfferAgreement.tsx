@@ -4,28 +4,12 @@ import { ArrowLeft } from "lucide-react";
 import {
   offerAgreementEN,
   offerAgreementRU,
+  TERMS_VERSION,
   type OfferAgreementContent,
-  type Section,
 } from "@/content/offerAgreement";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
-import { withGestaltTooltip } from "@/components/GestaltTooltip";
-
-const SectionBlock = ({ section }: { section: Section }) => (
-  <section>
-    <h2 className="font-display text-xl text-foreground mb-4">{section.heading}</h2>
-    {section.paragraphs?.map((p, i) => (
-      <p key={i}>{withGestaltTooltip(p)}</p>
-    ))}
-    {section.bullets && (
-      <ul className="list-disc pl-6 space-y-2">
-        {section.bullets.map((b, i) => (
-          <li key={i}>{withGestaltTooltip(b)}</li>
-        ))}
-      </ul>
-    )}
-  </section>
-);
+import OfferAgreementBody from "@/components/OfferAgreementBody";
 
 const OfferAgreement = () => {
   const { language, langPath } = useLanguage();
@@ -55,11 +39,11 @@ const OfferAgreement = () => {
             {content.pageTitle}
           </h1>
 
-          <div className="prose prose-neutral max-w-none font-body text-muted-foreground space-y-6">
-            {content.sections.map((section, i) => (
-              <SectionBlock key={i} section={section} />
-            ))}
-          </div>
+          <p className="font-body text-xs text-muted-foreground mb-8">
+            {language === "ru" ? "Редакция" : "Version"} {TERMS_VERSION}
+          </p>
+
+          <OfferAgreementBody content={content} />
         </div>
       </main>
       <Footer />

@@ -129,7 +129,13 @@ describe("buildMonthGrid for both displayed months", () => {
     // May 2026 ends on a Sunday (dow=0), so last row has trailing nulls for Mon–Sat
     const grid = buildMonthGrid(2026, 4);
     const lastRow = grid[grid.length - 1];
-    const lastDateIdx = lastRow.findLastIndex((d) => d !== null);
+    // Index loop rather than findLastIndex: that is ES2023, and widening the
+    // app's `lib` to reach it would tell the compiler the browser provides
+    // methods it may not.
+    let lastDateIdx = -1;
+    for (let i = 0; i < lastRow.length; i++) {
+      if (lastRow[i] !== null) lastDateIdx = i;
+    }
     // All cells after the last real date should be null
     for (let i = lastDateIdx + 1; i < 7; i++) {
       expect(lastRow[i]).toBeNull();

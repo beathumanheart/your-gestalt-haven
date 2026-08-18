@@ -68,9 +68,12 @@ const PageMeta = ({
       {noIndex && <meta name="robots" content="noindex,nofollow" />}
 
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-      {canonicalUrl && <link rel="alternate" hreflang={language} href={canonicalUrl} />}
-      {altUrl       && <link rel="alternate" hreflang={lang === "en" ? "ru" : "en"} href={altUrl} />}
-      {xDefaultUrl  && <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />}
+      {/* `hrefLang`, not `hreflang`: Helmet copies props to attributes verbatim,
+          so either spelling lands as the case-insensitive `hreflang` in the DOM,
+          but only this one matches React's JSX types. */}
+      {canonicalUrl && <link rel="alternate" hrefLang={language} href={canonicalUrl} />}
+      {altUrl       && <link rel="alternate" hrefLang={lang === "en" ? "ru" : "en"} href={altUrl} />}
+      {xDefaultUrl  && <link rel="alternate" hrefLang="x-default" href={xDefaultUrl} />}
 
       <meta property="og:title"            content={title} />
       <meta property="og:description"      content={description} />

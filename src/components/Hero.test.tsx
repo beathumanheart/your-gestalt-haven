@@ -82,7 +82,7 @@ describe("Hero – CTA buttons", () => {
 
 describe("Hero – translation key reuse (regression)", () => {
   it("uses navigationEN.bookSession — not a separate hero-level key", () => {
-    expect((heroEN as Record<string, unknown>)["bookSession"]).toBeUndefined();
+    expect((heroEN as unknown as Record<string, unknown>)["bookSession"]).toBeUndefined();
   });
 
   it("navigationEN.bookSession and navigationRU.bookSession are defined and non-empty", () => {

@@ -8,6 +8,7 @@ import { Plus, Trash2, Save, AlertTriangle } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { availabilityEN, availabilityEN as t } from "@/content/availability";
 import type { DateOverride } from "@/lib/availability";
+import type { Json } from "@/integrations/supabase/types";
 import ScheduleCalendar from "./ScheduleCalendar";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -220,10 +221,10 @@ const AvailabilityManager = () => {
         .eq("key", key)
         .single();
 
-      const oldAudit: unknown[] = Array.isArray(current?.updated_by_audit)
-        ? (current.updated_by_audit as unknown[])
+      const oldAudit: Json[] = Array.isArray(current?.updated_by_audit)
+        ? (current.updated_by_audit as Json[])
         : [];
-      const newAudit = [
+      const newAudit: Json[] = [
         ...oldAudit,
         { timestamp: new Date().toISOString(), old_value: current?.value, source: "admin_ui" },
       ];

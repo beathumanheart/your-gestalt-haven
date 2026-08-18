@@ -243,8 +243,11 @@ const BookingWidget = ({
     }} onCancel={handleCancel} />;
   }
 
+  // Deliberately no overflow-hidden on this card: it would become the sticky
+  // bar's containing block and stop it sticking to the viewport. The bar
+  // rounds its own bottom corners instead.
   return (
-    <div className="card-organic overflow-hidden">
+    <div className="card-organic">
       {/* Step indicator */}
       <div ref={stepperRef} className="flex items-center justify-between px-4 md:px-8 pt-6 pb-4 scroll-mt-4">
         {STEPS.map((s, i) => (
@@ -343,7 +346,7 @@ const BookingWidget = ({
           disabled action, so it never appears under the user's finger. */}
       <div
         data-testid="action-bar"
-        className="sticky bottom-0 z-10 border-t border-border bg-card/95 backdrop-blur-sm px-4 md:px-8 py-3"
+        className="sticky bottom-0 z-10 border-t border-border bg-card/95 backdrop-blur-sm px-4 md:px-8 py-3 rounded-b-2xl"
         style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-center justify-between gap-3">

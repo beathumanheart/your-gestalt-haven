@@ -4,6 +4,8 @@
  * ============================================================
  */
 
+import { SOCIAL_URLS } from "@/config/social";
+
 export interface BookingContent {
   label: string;
   title1: string;
@@ -140,7 +142,7 @@ export const bookingEN: BookingContent = {
   errorEmailInvalid: "Please enter a valid email",
   confidential: "If you prefer, just reach out directly on ",
   telegramLabel: "Telegram",
-  telegramUrl: "https://t.me/humanheartbeat",
+  telegramUrl: SOCIAL_URLS.telegram,
   emailLabel: "be@humanheart.life",
   emailUrl: "mailto:be@humanheart.life",
   back: "Back",
@@ -216,7 +218,7 @@ export const bookingRU: BookingContent = {
   errorEmailInvalid: "Введите корректный email",
   confidential: "Если хотите — просто напишите в ",
   telegramLabel: "Telegram",
-  telegramUrl: "https://t.me/humanheartbeat",
+  telegramUrl: SOCIAL_URLS.telegram,
   emailLabel: "be@humanheart.life",
   emailUrl: "mailto:be@humanheart.life",
   back: "Назад",

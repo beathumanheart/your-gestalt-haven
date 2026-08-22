@@ -7,6 +7,8 @@
  * ============================================================
  */
 
+import { SOCIAL_URLS } from "@/config/social";
+
 export interface NavItem {
   label: string;
   /** Section id for scroll-to anchors (e.g. "about", "services"). */
@@ -33,11 +35,12 @@ export interface NavigationContent {
   social: SocialLinks;
 }
 
-// Same URLs for both languages; kept here (not in the component) so they're easy to swap.
+// Same URLs for both languages. The handles themselves live in
+// src/config/social.ts — change them there, not here.
 const SOCIAL_LINKS: SocialLinks = {
-  substack: "https://humanheartbeat.substack.com/",
-  instagram: "https://www.instagram.com/human.heartbeat",
-  youtube: "https://www.youtube.com/@beathumanheart",
+  substack: SOCIAL_URLS.substack,
+  instagram: SOCIAL_URLS.instagram,
+  youtube: SOCIAL_URLS.youtube,
 };
 
 export const navigationEN: NavigationContent = {

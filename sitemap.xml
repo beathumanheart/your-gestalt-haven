@@ -5,7 +5,7 @@
 >
 <url>
     <loc>https://humanheart.life/en</loc>
-    <lastmod>2026-08-18</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en" />
@@ -14,7 +14,7 @@
   </url>
   <url>
     <loc>https://humanheart.life/ru</loc>
-    <lastmod>2026-08-18</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en" />
@@ -23,7 +23,7 @@
   </url>
 <url>
     <loc>https://humanheart.life/en/offer-agreement</loc>
-    <lastmod>2026-08-18</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/offer-agreement" />
@@ -32,7 +32,7 @@
   </url>
   <url>
     <loc>https://humanheart.life/ru/offer-agreement</loc>
-    <lastmod>2026-08-18</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/offer-agreement" />

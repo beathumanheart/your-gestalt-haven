@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Clock, ChevronDown, Link, Check } from "lucide-react";
 import type { BookingContent } from "@/content/booking";
 import type { Language } from "@/contexts/LanguageContext";
+import { sessionPricing } from "@/lib/pricing";
 
 export interface SessionType {
   id: string;
@@ -173,19 +174,29 @@ const SessionTypeSelector = ({
                     <Clock className="w-4 h-4" />
                     {st.duration_minutes} {t.minutes}
                   </span>
-                  {st.show_price && st.pricing_type === "solidarity" && st.min_price != null && st.max_price != null && (
-                    <span className="font-body text-sm font-medium text-primary">
-                      {new Intl.NumberFormat(undefined, { style: "currency", currency: st.currency || "USD", maximumFractionDigits: 0 }).format(st.min_price)}
-                      {" – "}
-                      {new Intl.NumberFormat(undefined, { style: "currency", currency: st.currency || "USD", maximumFractionDigits: 0 }).format(st.max_price)}
-                      <span className="text-xs text-muted-foreground ml-1">(sliding scale)</span>
-                    </span>
-                  )}
-                  {st.show_price && st.pricing_type !== "solidarity" && st.price != null && (
-                    <span className="font-body text-sm font-medium text-foreground">
-                      {new Intl.NumberFormat(undefined, { style: "currency", currency: st.currency || "USD" }).format(st.price)}
-                    </span>
-                  )}
+                  {(() => {
+                    // Shared with the JSON-LD offer so the two cannot disagree.
+                    const pricing = sessionPricing(st);
+                    if (pricing.kind === "range") {
+                      const fmt = new Intl.NumberFormat(undefined, { style: "currency", currency: pricing.currency, maximumFractionDigits: 0 });
+                      return (
+                        <span className="font-body text-sm font-medium text-primary">
+                          {fmt.format(pricing.min)}
+                          {" – "}
+                          {fmt.format(pricing.max)}
+                          <span className="text-xs text-muted-foreground ml-1">(sliding scale)</span>
+                        </span>
+                      );
+                    }
+                    if (pricing.kind === "fixed") {
+                      return (
+                        <span className="font-body text-sm font-medium text-foreground">
+                          {new Intl.NumberFormat(undefined, { style: "currency", currency: pricing.currency }).format(pricing.price)}
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               </div>
 

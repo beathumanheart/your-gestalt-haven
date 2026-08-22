@@ -83,6 +83,7 @@ const BookSession = () => {
           descriptionEn={session.description || ""}
           descriptionRu={session.description_ru || session.description || ""}
           urlPath={`/${language}/book/${session.slug ?? sessionId}`}
+          session={session}
         />
       )}
       <Header />

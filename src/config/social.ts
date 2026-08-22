@@ -20,7 +20,7 @@
  * moved them in lockstep.
  */
 export const HANDLES = {
-  instagram: "human.heartbeat",
+  instagram: "humanheart.life",
   youtube: "beathumanheart",
   telegram: "humanheartbeat",
   substack: "humanheartbeat",

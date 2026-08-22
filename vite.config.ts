@@ -2,25 +2,29 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
-import { SAME_AS } from "./src/config/social";
-
-/** Placeholder sitting in index.html's Person JSON-LD, swapped for the real profile list. */
-const SAME_AS_TOKEN = '["__SOCIAL_SAME_AS__"]';
+import { staticPersonNode, staticServiceNode } from "./src/config/identity";
 
 /**
  * The JSON-LD in index.html is static so non-JS crawlers can read it, which
- * means it can't import from src/. Inject the profile URLs at transform time
- * instead, keeping src/config/social.ts the only place handles are written.
+ * means it can't import from src/. Inject the nodes at transform time instead,
+ * keeping src/config/identity.ts the only place these facts are written.
  */
-const socialSameAs = (): Plugin => ({
-  name: "social-same-as",
+const JSONLD_TOKENS = {
+  '"__JSONLD_PERSON__"': staticPersonNode,
+  '"__JSONLD_SERVICE__"': staticServiceNode,
+} as const;
+
+const siteJsonLd = (): Plugin => ({
+  name: "site-json-ld",
   transformIndexHtml(html) {
-    if (!html.includes(SAME_AS_TOKEN)) {
-      throw new Error(
-        `socialSameAs: ${SAME_AS_TOKEN} not found in index.html — the JSON-LD sameAs placeholder was renamed or removed.`,
-      );
-    }
-    return html.replace(SAME_AS_TOKEN, JSON.stringify(SAME_AS));
+    return Object.entries(JSONLD_TOKENS).reduce((acc, [token, build]) => {
+      if (!acc.includes(token)) {
+        throw new Error(
+          `siteJsonLd: ${token} not found in index.html — the JSON-LD placeholder was renamed or removed.`,
+        );
+      }
+      return acc.replace(token, JSON.stringify(build(), null, 2));
+    }, html);
   },
 });
 
@@ -32,7 +36,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [react(), socialSameAs(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [react(), siteJsonLd(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

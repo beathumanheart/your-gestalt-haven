@@ -7,6 +7,8 @@
  * ============================================================
  */
 
+import { SOCIAL_URLS } from "@/config/social";
+
 export interface ContactContent {
   label: string;
   title1: string;
@@ -33,7 +35,7 @@ export const contactEN: ContactContent = {
   confidential:
     "If you prefer, just reach out directly on ",
   telegramLabel: "Telegram",
-  telegramUrl: "https://t.me/humanheartbeat",
+  telegramUrl: SOCIAL_URLS.telegram,
   signalLabel: "Signal",
   signalUrl: "https://signal.me/#eu/54EL7BMiWPJCsLFzC0PY4J6uP4Ds7eu4cL243diq7MXIk1-L8oJGyIcY05eV_gCN",
   sessionLabel: "Session",
@@ -51,7 +53,7 @@ export const contactRU: ContactContent = {
   confidential:
     "Если хотите — просто напишите в ",
   telegramLabel: "Telegram",
-  telegramUrl: "https://t.me/humanheartbeat",
+  telegramUrl: SOCIAL_URLS.telegram,
   signalLabel: "Signal",
   signalUrl: "https://signal.me/#eu/54EL7BMiWPJCsLFzC0PY4J6uP4Ds7eu4cL243diq7MXIk1-L8oJGyIcY05eV_gCN",
   sessionLabel: "Session",

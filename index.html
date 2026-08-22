@@ -37,46 +37,99 @@
     <meta name="twitter:image:alt" content="Genia — Gestalt counsellor" />
 
     <!-- Site-wide JSON-LD (static, so non-JS crawlers see it).
-         Migrated from src/components/JsonLd.tsx (EN values), plus knowsLanguage. -->
-    <script type="application/ld+json">
+         Both nodes are built from src/config/identity.ts and injected by the
+         siteJsonLd plugin in vite.config.ts — edit the module, not this file.
+
+         Known limitation: one static file serves both /en and /ru, so this
+         prose is English on Russian pages too. Fixing that needs per-language
+         HTML emitted at build time. -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://humanheart.life/#genia",
+  "name": "Genia",
+  "jobTitle": "Gestalt Counsellor",
+  "url": "https://humanheart.life/en",
+  "image": "https://humanheart.life/og-image-en.png",
+  "knowsAbout": [
+    "Gestalt therapy",
+    "grief counselling",
+    "existential therapy",
+    "relationship therapy"
+  ],
+  "knowsLanguage": [
+    "en",
+    "ru"
+  ],
+  "sameAs": [
+    "https://www.instagram.com/humanheart.life",
+    "https://www.youtube.com/@beathumanheart",
+    "https://humanheartbeat.substack.com/"
+  ],
+  "alumniOf": [
     {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "@id": "https://humanheart.life/#genia",
-      "name": "Genia",
-      "jobTitle": "Gestalt Counsellor",
-      "url": "https://humanheart.life/en",
-      "image": "https://humanheart.life/og-image-en.png",
-      "knowsAbout": ["Gestalt therapy", "grief counselling", "existential therapy", "relationship therapy"],
-      "knowsLanguage": ["en", "ru"],
-      "sameAs": ["https://www.instagram.com/humanheart.life","https://www.youtube.com/@beathumanheart","https://humanheartbeat.substack.com/"]
-    }
-    </script>
-    <script type="application/ld+json">
+      "@type": "CollegeOrUniversity",
+      "name": "KU Leuven",
+      "url": "https://www.kuleuven.be/"
+    },
     {
-      "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "@id": "https://humanheart.life/#service",
-      "name": "Human Heart Beat — Gestalt Counselling",
-      "description": "A warm, compassionate space for individual Gestalt counselling. Working with grief, relationships, and life's existential questions.",
-      "url": "https://humanheart.life/en",
-      "provider": { "@id": "https://humanheart.life/#genia" },
-      "areaServed": "Worldwide (online)",
-      "serviceType": "Counselling",
-      "offers": {
-        "@type": "AggregateOffer",
-        "lowPrice": "40",
-        "priceCurrency": "EUR",
-        "availability": "https://schema.org/InStock"
-      },
-      "knowsLanguage": ["en", "ru"]
+      "@type": "CollegeOrUniversity",
+      "name": "University of Tartu",
+      "url": "https://ut.ee/"
     }
-    </script>
+  ],
+  "hasCredential": [
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "diploma",
+      "name": "Diploma in Psychological Counselling",
+      "educationalLevel": "Diploma"
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "degree",
+      "name": "MSc in Bioethics",
+      "educationalLevel": "Master's degree",
+      "recognizedBy": {
+        "@type": "CollegeOrUniversity",
+        "name": "KU Leuven",
+        "url": "https://www.kuleuven.be/"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "degree",
+      "name": "MA in Philosophy",
+      "educationalLevel": "Master's degree",
+      "recognizedBy": {
+        "@type": "CollegeOrUniversity",
+        "name": "University of Tartu",
+        "url": "https://ut.ee/"
+      }
+    }
+  ],
+  "worksFor": {
+    "@id": "https://humanheart.life/#service"
+  }
+}</script>
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": "https://humanheart.life/#service",
+  "name": "Human Heart Beat — Gestalt Counselling",
+  "description": "A warm, compassionate space for individual Gestalt counselling. Working with grief, relationships, and life's existential questions.",
+  "url": "https://humanheart.life/en",
+  "areaServed": "Worldwide (online)",
+  "knowsLanguage": [
+    "en",
+    "ru"
+  ]
+}</script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <script type="module" crossorigin src="/assets/index-BchOUAWA.js"></script>
+    <script type="module" crossorigin src="/assets/index-D9twAWD4.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-D2kOiMC7.css">
   </head>
 

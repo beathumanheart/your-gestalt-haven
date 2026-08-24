@@ -114,6 +114,9 @@ const entries = [
     urlEntry({ path: `/book/${slug}`, priority: "0.8", changefreq: "weekly" })
   ),
 
+  // Free interactive tools
+  urlEntry({ path: "/feeling", priority: "0.7", changefreq: "monthly" }),
+
   // Legal / informational
   urlEntry({ path: "/offer-agreement", priority: "0.3", changefreq: "yearly" }),
 ];
@@ -131,4 +134,5 @@ assertNoForbiddenLocs(xml);
 
 const outPath = path.resolve("dist", "sitemap.xml");
 fs.writeFileSync(outPath, xml, "utf8");
-console.log(`[sitemap] Written ${outPath} (${entries.length / 2} route pairs)`);
+// Each entry already emits an EN and a RU <url>, so it is one pair.
+console.log(`[sitemap] Written ${outPath} (${entries.length} route pairs)`);

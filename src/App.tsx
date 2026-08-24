@@ -24,6 +24,7 @@ import BookOffer from "./pages/BookOffer";
 import AdminOffers from "./pages/AdminOffers";
 import SessionJoin from "./pages/SessionJoin";
 import SessionCancel from "./pages/SessionCancel";
+import Feelings from "./pages/Feelings";
 
 const queryClient = new QueryClient();
 
@@ -126,11 +127,23 @@ const App = () => (
             }
           />
 
+          <Route
+            path="/:lang/feeling"
+            element={
+              <LangLayout>
+                <Feelings />
+              </LangLayout>
+            }
+          />
+
           {/* Root-level offer-agreement defaults to English */}
           <Route
             path="/offer-agreement"
             element={<Navigate to="/en/offer-agreement" replace />}
           />
+
+          {/* Root-level feeling defaults to English */}
+          <Route path="/feeling" element={<Navigate to="/en/feeling" replace />} />
 
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />

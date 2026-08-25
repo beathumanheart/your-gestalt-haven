@@ -4,9 +4,12 @@
  * Routes included:
  *   - Homepage (EN + RU)
  *   - /book/:slug for each active session_type (EN + RU)
+ *   - /take and /take/feelings-map (EN + RU)
  *   - /offer-agreement (EN + RU, priority 0.3)
  *
  * Routes excluded:
+ *   - /feeling (redirects to /take/feelings-map)
+ *   - /take/* items that are not written yet (noindex placeholders)
  *   - /s/:slug and /c/:slug (short session links — capability tokens, see below)
  *   - /book/offer/:slug (hidden offers — unlisted by design)
  *   - /booking-cancelled (noindex transactional page)
@@ -17,6 +20,23 @@
 import fs from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
+
+// Vite loads .env for the app build; this script is plain node and does not,
+// so the booking pages silently vanished from the sitemap on a local build.
+loadDotEnv();
+function loadDotEnv() {
+  for (const file of [".env.local", ".env"]) {
+    const p = path.resolve(file);
+    if (!fs.existsSync(p)) continue;
+    for (const line of fs.readFileSync(p, "utf8").split("\n")) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/i);
+      if (!m) continue;
+      const [, key, raw] = m;
+      if (process.env[key] !== undefined) continue;
+      process.env[key] = raw.replace(/^["\']|["\']$/g, "");
+    }
+  }
+}
 
 const SITE_URL = "https://humanheart.life";
 const LANGS = ["en", "ru"];
@@ -54,11 +74,18 @@ function assertNoForbiddenLocs(xml) {
 // ── Supabase session-type slugs ───────────────────────────────────────────────
 async function fetchSessionSlugs() {
   const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const key = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  // VITE_SUPABASE_PUBLISHABLE_KEY is what the app and the deploy workflow
+  // actually set; the other two names are accepted but were never populated,
+  // which is why the booking pages were missing.
+  const key =
+    process.env.SUPABASE_PUBLISHABLE_KEY ||
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.VITE_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
     console.warn(
-      "[sitemap] SUPABASE_URL / SUPABASE_ANON_KEY not set — session-type pages will be omitted from sitemap."
+      "[sitemap] SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY not set — session-type pages will be omitted from sitemap."
     );
     return [];
   }
@@ -114,8 +141,9 @@ const entries = [
     urlEntry({ path: `/book/${slug}`, priority: "0.8", changefreq: "weekly" })
   ),
 
-  // Free interactive tools
-  urlEntry({ path: "/feeling", priority: "0.7", changefreq: "monthly" }),
+  // Free material. /feeling redirects here and is left out on purpose.
+  urlEntry({ path: "/take", priority: "0.7", changefreq: "monthly" }),
+  urlEntry({ path: "/take/feelings-map", priority: "0.7", changefreq: "monthly" }),
 
   // Legal / informational
   urlEntry({ path: "/offer-agreement", priority: "0.3", changefreq: "yearly" }),

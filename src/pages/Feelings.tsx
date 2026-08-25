@@ -14,7 +14,7 @@ const Feelings = () => {
         titleRu="Что со мной происходит — карта чувств | Human Heart Beat"
         descriptionEn="A free interactive map of feelings in six rings: land in the present, find the felt sense, name the feeling, tell it from the one underneath, and reach the need it points at."
         descriptionRu="Бесплатная интерактивная карта чувств из шести колец: заземлиться в настоящем, найти телесное ощущение, назвать чувство, отличить его от того, что под ним, и дойти до потребности."
-        canonicalPath={`/${language}/feeling`}
+        canonicalPath={`/${language}/take/feelings-map`}
       />
       <Header />
       {/* pt clears the fixed header */}

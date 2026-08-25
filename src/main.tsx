@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import posthog from "posthog-js";
 import { PostHogProvider } from "@posthog/react";
 import { HelmetProvider } from "react-helmet-async";
+import { isTakePath, siteConfig, takeConfig } from "./config/analytics";
 import App from "./App.tsx";
 import "./index.css";
 
@@ -18,16 +19,14 @@ if (!posthogKey) {
   }
 }
 
-posthog.init(posthogKey, {
-  api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com",
-  autocapture: true,
-  capture_performance: true,
-  capture_pageleave: true,
-  cross_subdomain_cookie: false,
-  session_recording: {
-    maskAllInputs: true,
-  },
-});
+/* The free material under /take/* counts page opens and nothing else, and
+   writes nothing to the device. Which configuration applies is decided here,
+   from the entry path; TakeBoundary keeps a client-side navigation from
+   crossing between the two inside one page load. */
+posthog.init(
+  posthogKey,
+  isTakePath(window.location.pathname) ? takeConfig : siteConfig,
+);
 
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>

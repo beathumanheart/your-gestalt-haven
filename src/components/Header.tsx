@@ -42,10 +42,14 @@ const Header = ({ hideSwitcher = false }: { hideSwitcher?: boolean } = {}) => {
             : "bg-transparent py-6"
         }`}
       >
-        <nav className="container-narrow flex items-center justify-between px-6">
+        {/* container-narrow (max-w-4xl) leaves 848px inside the padding at
+            every desktop width, and the RU row needs 879px once the logo gap
+            is fixed rather than collapsible — so the desktop bar gets one step
+            more room. Below md it is container-narrow exactly as before. */}
+        <nav className="mx-auto max-w-4xl md:max-w-5xl grid grid-cols-[auto_1fr_auto] items-center px-6 gap-x-[clamp(1.5rem,4vw,3.5rem)] md:gap-x-[max(32px,clamp(1.5rem,4vw,3.5rem))]">
           <button
             onClick={() => navigateToSection("hero")}
-            className="flex items-center gap-2 font-display text-xl md:text-2xl font-medium text-foreground hover:text-primary transition-colors"
+            className="col-start-1 min-w-max flex items-center gap-2 font-display text-xl md:text-2xl font-medium text-foreground hover:text-primary transition-colors"
           >
             <svg 
               viewBox="0 0 40 40" 
@@ -68,7 +72,7 @@ const Header = ({ hideSwitcher = false }: { hideSwitcher?: boolean } = {}) => {
             <span className="hidden sm:inline">Human Heart Beat</span>
           </button>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="col-start-2 hidden md:flex items-center gap-8">
             {c.navItems.map((item) => (
               <button
                 key={item.sectionId}
@@ -80,7 +84,7 @@ const Header = ({ hideSwitcher = false }: { hideSwitcher?: boolean } = {}) => {
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="col-start-3 justify-self-end flex items-center gap-3">
             {!hideSwitcher && <LanguageSwitcher />}
             <button
               onClick={() => { trackBookNowClick("header_desktop"); navigateToSection("contact"); }}

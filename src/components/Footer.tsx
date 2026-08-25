@@ -58,6 +58,12 @@ const Footer = () => {
             >
               {c.footerOfferAgreement}
             </Link>
+            <Link
+              to={langPath("/take")}
+              className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {c.footerTakeWithYou}
+            </Link>
           </div>
           
           <div className="text-center md:text-right">

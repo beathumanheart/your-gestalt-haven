@@ -29,6 +29,7 @@ export interface NavigationContent {
   footerServices: string;
   footerContact: string;
   footerOfferAgreement: string;
+  footerTakeWithYou: string;
   footerRights: string;
   footerEmail: string;
 
@@ -56,6 +57,7 @@ export const navigationEN: NavigationContent = {
   footerServices: "Services",
   footerContact: "Contact",
   footerOfferAgreement: "Offer Agreement",
+  footerTakeWithYou: "Take with you",
   footerRights: "All rights reserved.",
   footerEmail: "be@humanheart.life",
   social: SOCIAL_LINKS,
@@ -74,6 +76,7 @@ export const navigationRU: NavigationContent = {
   footerServices: "Услуги",
   footerContact: "Контакты",
   footerOfferAgreement: "Договор оферты",
+  footerTakeWithYou: "Материалы",
   footerRights: "Все права защищены.",
   footerEmail: "be@humanheart.life",
   social: SOCIAL_LINKS,

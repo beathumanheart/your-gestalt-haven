@@ -45,26 +45,32 @@ export interface FeelingRing {
 }
 
 export interface FeelingsContent {
-  title: string; intro: string; intro2: string; writeIt: string; suggestive: string;
+  title: string; intro: string; intro2: string; suggestive: string;
   wordsMore: string; wordsLess: string;
   defBody: string; defOut: string; defUnder: string; defNot: string;
   clear: string; behindAsk: string; behindCaveat: string;
   tally: string; step: string; deeper: string; out: string;
   previewLabel: string;
+  /** Names the six ring-3 segments for screen readers — the wheel itself has
+   *  no visible label for them since the ring-name stack was removed. */
+  chooseLabel: string;
+  /** Mobile bottom sheet. */
+  sheetClose: string;
+  /** Support card: the addresses sit behind this disclosure. */
+  showAddresses: string; hideAddresses: string;
   s1: FeelingRing; s2: FeelingRing; s3: FeelingRing;
   s4: FeelingRing; s5: FeelingRing; s6: FeelingRing;
   supportKicker: string; supportTitle: string; supportBody: string; donateNote: string;
   missingKicker: string; missingTitle: string; missingBody: string; missingBodyForm: string;
-  missingNote: string; missingSoon: string; missingOpen: string;
+  missingSoon: string; missingOpen: string;
   copyAddr: string; copyAddrAria: string; addrCopied: string; copied: string; copyFail: string;
-  foot1: string; foot2: string; foot3: string;
+  foot1: string; foot2: string;
 }
 
 export const feelingsEN: FeelingsContent = {
   "title": "What is going on with me",
   "intro": "Six rings, read from the outside in. The middle is the need. Touch any ring to open it, sit there as long as you like, then go a ring deeper. There is no order to keep and no clock running.",
   "intro2": "Keep a notebook beside you. The writing is where the work happens.",
-  "writeIt": "Write this ring down before you go deeper.",
   "suggestive": "Examples, not a list. Your own word, if you have one, is the better word.",
   "wordsMore": "more like these ({n})",
   "wordsLess": "fewer",
@@ -78,7 +84,7 @@ export const feelingsEN: FeelingsContent = {
   "tally": "{n} marked",
   "step": "ring {n} of 6",
   "deeper": "Go deeper: {n}",
-  "out": "Back out: {n}",
+  "out": "The pull: {n}",
   "s1": {
     "ring": "Here and now",
     "short": "Here and now",
@@ -122,7 +128,7 @@ export const feelingsEN: FeelingsContent = {
   "s3": {
     "ring": "The word",
     "short": "The word",
-    "theory": "six regions of feeling, and what sits behind each",
+    "theory": "six places to look, and what sits behind each",
     "q": "Which region is it, and which word inside it?",
     "body": "Choose the region first — that is the easy part. Inside it the words run from the hottest at the start to the quietest at the end; take the one that fits closest, even if it only almost fits.",
     "families": [
@@ -335,6 +341,10 @@ export const feelingsEN: FeelingsContent = {
     ]
   },
   "previewLabel": "Behind this",
+  "chooseLabel": "what you're feeling",
+  "sheetClose": "Close",
+  "showAddresses": "Show addresses",
+  "hideAddresses": "Hide addresses",
   "s4": {
     "ring": "Underneath",
     "short": "Beneath",
@@ -380,8 +390,8 @@ export const feelingsEN: FeelingsContent = {
     ]
   },
   "s6": {
-    "ring": "Back out",
-    "short": "Back out",
+    "ring": "The pull",
+    "short": "The pull",
     "theory": "what the feeling moves you to do",
     "q": "What does it want you to do right now?",
     "body": "Write the honest impulse, including the one you would never act on. Naming it is not doing it — and the gap between the two is where the choice lives. Before anything else: am I hungry, angry, lonely, tired?",
@@ -408,7 +418,6 @@ export const feelingsEN: FeelingsContent = {
   "missingTitle": "What is missing?",
   "missingBody": "A word that should be here, a region that sits in the wrong place, a translation that misses.",
   "missingBodyForm": "A word that should be here, a region that sits in the wrong place, a translation that misses. The form opens in a new tab and asks for no name and no email.",
-  "missingNote": "Answers arrive with no name attached — only the text. This page sends nothing on its own.",
   "missingSoon": "The form is not linked yet.",
   "copyAddr": "Copy",
   "copyAddrAria": "Copy the {c} address",
@@ -417,15 +426,13 @@ export const feelingsEN: FeelingsContent = {
   "copied": "Copied to clipboard",
   "copyFail": "Could not copy — select the text by hand",
   "foot1": "The order of the rings follows the emotion-focused sequence set out by Leslie Greenberg: attend to the body, put the feeling into language, tell a reactive feeling from the one underneath it, and find the need the feeling points at. Each feeling carries a bodily sense, an impulse, and a need.",
-  "foot2": "The map describes and asks. It does not interpret, diagnose or conclude anything about you — that work belongs to you and the person you sit with. It is built to sit beside step work, gestalt awareness practice and analytic counselling without standing in for any of them.",
-  "foot3": "Nothing you touch here leaves this page."
+  "foot2": "The map describes and asks. It does not interpret, diagnose or conclude anything about you — that work belongs to you and the person you sit with. It is built to sit beside step work, gestalt awareness practice and analytic counselling without standing in for any of them."
 };
 
 export const feelingsRU: FeelingsContent = {
   "title": "Что со мной происходит",
   "intro": "Шесть кругов, которые читают снаружи внутрь. В середине — потребность. Коснитесь любого круга, побудьте в нём столько, сколько нужно, потом идите на круг глубже. Порядок соблюдать не обязательно, и никакого таймера здесь нет.",
   "intro2": "Держите блокнот рядом. Работа происходит на бумаге.",
-  "writeIt": "Запишите этот круг, прежде чем идти глубже.",
   "suggestive": "Это примеры, а не список. Своё слово, если оно есть, точнее любого здешнего.",
   "wordsMore": "ещё такие же ({n})",
   "wordsLess": "свернуть",
@@ -483,7 +490,7 @@ export const feelingsRU: FeelingsContent = {
   "s3": {
     "ring": "Слово",
     "short": "Слово",
-    "theory": "шесть областей чувств и то, что стоит за каждой",
+    "theory": "шесть мест, куда посмотреть, и что стоит за каждым",
     "q": "Какая это область и какое слово внутри неё?",
     "body": "Сначала область — это простая часть. Внутри слова идут от самых горячих в начале к самым тихим в конце; подходит то, что ближе всего, даже если только почти.",
     "families": [
@@ -698,6 +705,10 @@ export const feelingsRU: FeelingsContent = {
     ]
   },
   "previewLabel": "Что за этим",
+  "chooseLabel": "что вы чувствуете",
+  "sheetClose": "Закрыть",
+  "showAddresses": "Показать адреса",
+  "hideAddresses": "Скрыть адреса",
   "s4": {
     "ring": "Глубже",
     "short": "Глубже",
@@ -743,11 +754,11 @@ export const feelingsRU: FeelingsContent = {
     ]
   },
   "s6": {
-    "ring": "Импульс",
-    "short": "Импульс",
+    "ring": "Порыв",
+    "short": "Порыв",
     "theory": "к чему чувство подталкивает",
-    "q": "Что оно хочет сделать прямо сейчас?",
-    "body": "Запишите честный импульс, включая тот, который никогда не осуществится. Назвать — не значит сделать; в этом зазоре и живёт выбор. И прежде всего остального: голод, злость, одиночество, усталость?",
+    "q": "Что хочется сделать прямо сейчас?",
+    "body": "Запишите порыв честно — в том числе тот, который никогда не осуществится. Назвать — не значит сделать; в этом зазоре и живёт выбор. И прежде всего остального: голод, злость, одиночество, усталость?",
     "words": [
       "уйти",
       "ответить резко",
@@ -764,14 +775,13 @@ export const feelingsRU: FeelingsContent = {
     ]
   },
   "supportKicker": "Поддержка",
-  "supportTitle": "На развитие карты",
-  "supportBody": "Карта останется бесплатной. Деньги идут на хостинг и на то, чтобы её дописывать: новые слова, переводы, объяснения. Криптовалюта — единственный способ дать, который сохраняет анонимность: без карты, без почты, без квитанции с именем.",
+  "supportTitle": "Чтобы это оставалось бесплатным",
+  "supportBody": "Деньги идут на хостинг и на то, чтобы здесь появлялись новые слова, переводы и объяснения. Криптовалюта — единственный способ дать анонимно: без банковской карты, без почты, без квитанции с именем.",
   "donateNote": "Отправляйте только в той сети, что указана рядом с адресом, и сверьте первые и последние символы перед отправкой.",
   "missingKicker": "Обратная связь",
   "missingTitle": "Чего здесь не хватает?",
   "missingBody": "Слово, которое должно быть здесь; область, выбранная неверно; перевод, который не попадает.",
   "missingBodyForm": "Слово, которое должно быть здесь; область, выбранная неверно; перевод, который не попадает. Форма открывается в новом окне и не спрашивает ни имени, ни почты.",
-  "missingNote": "Ответы приходят без имени: видно только текст. Сама страница ничего не отправляет.",
   "missingSoon": "Форма пока не подключена.",
   "copyAddr": "Скопировать",
   "copyAddrAria": "Скопировать адрес {c}",
@@ -780,8 +790,7 @@ export const feelingsRU: FeelingsContent = {
   "copied": "Скопировано",
   "copyFail": "Не удалось скопировать — выделите текст вручную",
   "foot1": "Порядок кругов следует эмоционально-фокусированной последовательности Лесли Гринберга: обратиться к телу, назвать чувство словами, отличить реактивное чувство от того, что лежит под ним, и найти потребность, на которую чувство указывает. У каждого чувства есть телесное ощущение, импульс и потребность.",
-  "foot2": "Карта описывает и спрашивает. Она не интерпретирует, не ставит диагнозов и не делает выводов — эта работа принадлежит тому, кто её делает, и человеку, который сидит рядом. Она сделана так, чтобы стоять рядом с работой по Двенадцати шагам, гештальт-практикой осознавания и аналитическим консультированием, не подменяя ни одно из них.",
-  "foot3": "Всё, что здесь выбрано, остаётся в браузере: ничего не отправляется и нигде не сохраняется."
+  "foot2": "Карта описывает и спрашивает. Она не интерпретирует, не ставит диагнозов и не делает выводов — эта работа принадлежит тому, кто её делает, и человеку, который сидит рядом. Она сделана так, чтобы стоять рядом с работой по Двенадцати шагам, гештальт-практикой осознавания и аналитическим консультированием, не подменяя ни одно из них."
 };
 
 /**

@@ -25,6 +25,10 @@ import AdminOffers from "./pages/AdminOffers";
 import SessionJoin from "./pages/SessionJoin";
 import SessionCancel from "./pages/SessionCancel";
 import Feelings from "./pages/Feelings";
+import FeelingsLegacyRedirect from "./pages/FeelingsLegacyRedirect";
+import TakeIndex from "./pages/TakeIndex";
+import TakeItemSoon from "./pages/TakeItemSoon";
+import TakeBoundary from "./components/TakeBoundary";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +42,12 @@ const LangLayout = ({ children }: { children: React.ReactNode }) => {
   }, [lang]);
 
   return <LanguageProvider>{children}</LanguageProvider>;
+};
+
+/** /take/<slug> with no language prefix defaults to English. */
+const RootTakeRedirect = () => {
+  const { slug } = useParams();
+  return <Navigate to={`/en/take/${slug}`} replace />;
 };
 
 // Redirect legacy ?session=<id> URLs to the dedicated book page
@@ -58,6 +68,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <TakeBoundary />
         <Routes>
           {/* Root "/" serves English directly (default language) */}
           <Route
@@ -127,11 +138,40 @@ const App = () => (
             }
           />
 
+          {/* Free material. Slugs stay English and lowercase in both
+              languages; only the display names are translated. */}
+          <Route
+            path="/:lang/take"
+            element={
+              <LangLayout>
+                <TakeIndex />
+              </LangLayout>
+            }
+          />
+          <Route
+            path="/:lang/take/feelings-map"
+            element={
+              <LangLayout>
+                <Feelings />
+              </LangLayout>
+            }
+          />
+          <Route
+            path="/:lang/take/:slug"
+            element={
+              <LangLayout>
+                <TakeItemSoon />
+              </LangLayout>
+            }
+          />
+
+          {/* The map's old address. Still linked from elsewhere, so it keeps
+              working — it just does not stay here. */}
           <Route
             path="/:lang/feeling"
             element={
               <LangLayout>
-                <Feelings />
+                <FeelingsLegacyRedirect />
               </LangLayout>
             }
           />
@@ -144,6 +184,10 @@ const App = () => (
 
           {/* Root-level feeling defaults to English */}
           <Route path="/feeling" element={<Navigate to="/en/feeling" replace />} />
+
+          {/* Root-level take defaults to English */}
+          <Route path="/take" element={<Navigate to="/en/take" replace />} />
+          <Route path="/take/:slug" element={<RootTakeRedirect />} />
 
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />

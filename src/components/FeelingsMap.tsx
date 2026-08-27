@@ -71,6 +71,27 @@ const FEEDBACK_URL =
   "https://forms.gle/VKEcgvPcjYWW2tGi8";
 
 const RING_IDS = [1, 2, 3, 4, 5, 6] as const;
+const SEGMENTS = [0, 1, 2, 3, 4, 5];
+/** One size for all six segment labels. Sized to the longest of them in the
+ *  tightest place — "Thoughts" in the upper-left segment — because six labels
+ *  at six sizes read as a rendering fault rather than as emphasis. */
+const SEG_FS = "max(11px,3.4cqw)";
+/** Degrees of opening left over each feeling's midpoint in the pull ring. */
+const PULL_GAP = 6;
+
+/* The wheel's geometry, in its own 720-unit box: angles clockwise from twelve
+   o'clock, so nothing here is a pixel offset and all of it scales. */
+const WHEEL_C = 360;
+const SEG_MID = (k: number) => 30 + k * 60;
+const polar = (r: number, deg: number) => {
+  const a = ((deg - 90) * Math.PI) / 180;
+  return [WHEEL_C + r * Math.cos(a), WHEEL_C + r * Math.sin(a)] as const;
+};
+const arcPath = (r: number, from: number, to: number) => {
+  const [x0, y0] = polar(r, from);
+  const [x1, y1] = polar(r, to);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${to - from > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+};
 const WORD_LIMIT = 8;
 
 /* Static hovers and the two keyframes the design uses. Scoped to .fm-root and
@@ -255,9 +276,11 @@ const FeelingsMap = () => {
   const { language } = useLanguage();
   const t: FeelingsContent = language === "ru" ? feelingsRU : feelingsEN;
 
-  const [active, setActive] = useState(3);
+  /* Null until the first touch. The map must not assert anything about the
+     person before they have said anything. */
+  const [active, setActive] = useState<number | null>(null);
   const [marked, setMarked] = useState<Record<string, true>>({});
-  const [famIdx, setFamIdx] = useState(0);
+  const [famIdx, setFamIdx] = useState<number | null>(null);
   const [behindOpen, setBehindOpen] = useState(false);
   const [wordsOpen, setWordsOpen] = useState(false);
   const [defIdx, setDefIdx] = useState<number | null>(null);
@@ -290,7 +313,7 @@ const FeelingsMap = () => {
   const pushedRef = useRef(false);
 
   const families = t.s3.families as FeelingFamily[];
-  const fam = families[famIdx];
+  const fam = famIdx === null ? null : families[famIdx];
 
   const toggleMark = (key: string) =>
     setMarked((prev) => {
@@ -456,15 +479,18 @@ const FeelingsMap = () => {
     }
   };
 
-  /* ---- ring 3 words are graded hottest-first, so the eye reads intensity ---- */
+  /* ---- ring 3 words are graded strongest-first, so the eye reads intensity ---- */
   const isTable = active === 3;
-  const ring = t[`s${active}` as "s1"];
-  const allWords = (isTable ? fam.words : ring.words) ?? [];
+  const ring = active === null ? null : t[`s${active}` as "s1"];
+  /* Ring 3 has nothing to list until one of the six is chosen; the copy in that
+     ring is what asks for the choice. */
+  const allWords = (isTable ? fam?.words : ring?.words) ?? [];
   const collapsible = allWords.length - WORD_LIMIT >= 3;
   const shownWords = wordsOpen || !collapsible ? allWords : allWords.slice(0, WORD_LIMIT);
-  const wordScope = isTable ? `s3|${fam.id}` : `s${active}`;
+  const wordScope = isTable ? `s3|${fam?.id}` : `s${active}`;
 
-  const defList = isTable ? feelingDefs[language === "ru" ? "ru" : "en"][fam.id] ?? [] : [];
+  const defList =
+    isTable && fam ? feelingDefs[language === "ru" ? "ru" : "en"][fam.id] ?? [] : [];
   const shownDefIdx = defIdx === null ? pinIdx : defIdx;
   const def = shownDefIdx === null ? null : defList[shownDefIdx] ?? null;
 
@@ -517,7 +543,8 @@ const FeelingsMap = () => {
 
   /* ---- ring order: 1→2→3→4→5, then 5 loops out to 6 and 6 back to 1 ---- */
   const order = [1, 2, 3, 4, 5];
-  const inward = active === 5 ? 6 : active === 6 ? 1 : order[order.indexOf(active) + 1];
+  const inward =
+    active === null ? null : active === 5 ? 6 : active === 6 ? 1 : order[order.indexOf(active) + 1];
   const nextArrow = active === 5 || active === 6 ? "↗" : "↘";
 
   /* ---- body silhouette glow (ring 2 only) ---- */
@@ -532,9 +559,8 @@ const FeelingsMap = () => {
   const longestWord = Math.max(...centreLabel.split(/\s+/).map((w) => w.length));
   const centreFs = `max(9px, min(4.4cqw, ${(CENTRE_BOX / (longestWord * 0.55)).toFixed(2)}cqw))`;
 
-  const behindPrompt = t.behindAsk.includes("{fam}")
-    ? t.behindAsk.replace("{fam}", fam.t)
-    : t.behindAsk;
+  const behindPrompt =
+    fam && t.behindAsk.includes("{fam}") ? t.behindAsk.replace("{fam}", fam.t) : t.behindAsk;
 
   const clickable: CSSProperties = { cursor: "pointer", userSelect: "none" };
   const arcTransition = { cursor: "pointer", transition: "stroke .5s cubic-bezier(.22,1,.36,1)" } as CSSProperties;
@@ -548,14 +574,23 @@ const FeelingsMap = () => {
     "M202.57 447.27 A180 180 0 0 1 202.57 272.73",
     "M205.71 267.29 A180 180 0 0 1 356.86 180.03",
   ];
+  /* Where each segment's label sits. Size and colour are common to all six. */
   const ARC_LABEL_POS = [
-    { left: "62.5%", top: "28.33%", size: "max(11px,4cqw)" },
-    { left: "75%", top: "50%", size: "max(11px,4cqw)" },
-    { left: "62.5%", top: "71.67%", size: "max(11px,3.8cqw)" },
-    { left: "37.5%", top: "71.67%", size: "max(11px,4cqw)" },
-    { left: "25%", top: "50%", size: "max(11px,3.8cqw)" },
-    { left: "37.5%", top: "28.33%", size: "max(10.5px,2.95cqw)", width: "13%" },
+    { left: "62.5%", top: "28.33%" },
+    { left: "75%", top: "50%" },
+    { left: "62.5%", top: "71.67%" },
+    { left: "37.5%", top: "71.67%" },
+    { left: "25%", top: "50%" },
+    { left: "37.5%", top: "28.33%" },
   ];
+  /* Six arcs with a 6° opening over the middle of each feeling below, so the
+     pull reads as a layer of the wheel rather than a wall around it. Built from
+     the same angles as the segments, in the wheel's own units, so the two stay
+     in register at every size. */
+  const PULL_ARCS = SEGMENTS.map((k) =>
+    arcPath(333, SEG_MID(k) + PULL_GAP / 2, SEG_MID(k + 1) - PULL_GAP / 2),
+  );
+
   /* Concentric rings, outermost first: 6 (the pull), 1 (here and now), 2 (body).
      `top` is where each ring's name sits — at the 12 o'clock point of its own
      band, so the label is on the ring it names. */
@@ -594,7 +629,7 @@ const FeelingsMap = () => {
               display: "flex",
               alignItems: "center",
               gap: 7,
-              padding: "6px 13px 6px 9px",
+              padding: "6px 13px",
               borderRadius: 999,
               ...clickable,
               transition: "all .35s cubic-bezier(.4,0,.2,1)",
@@ -602,9 +637,6 @@ const FeelingsMap = () => {
               border: `1px solid ${on ? SAGE : "#DCD4CA"}`,
             }}
           >
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".04em", minWidth: 12, textAlign: "center", transition: "color .35s ease", color: on ? "rgba(250,248,245,.65)" : "#A39889" }}>
-              {i}
-            </span>
             <span style={{ fontSize: FS_SMALL, fontWeight: 600, whiteSpace: "nowrap", transition: "color .35s ease", color: on ? CREAM : "#5c554e" }}>
               {t[`s${i}` as "s1"].short}
             </span>
@@ -653,15 +685,22 @@ const FeelingsMap = () => {
 
   /* The open ring. Rendered in the second grid column on desktop and
      inside the bottom sheet below md — one definition, two homes. */
-  const panel: ReactNode = (
+  const panel: ReactNode = !ring ? (
     <>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <div id="fm-sheet-title" style={{ fontSize: "clamp(9.5px,2.15cqw,11px)", fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: "#C2603A" }}>
-            {ring.ring}
-          </div>
-          <div style={{ fontSize: "clamp(9.5px,2.15cqw,11px)", letterSpacing: ".12em", color: MUTE, whiteSpace: "nowrap" }}>
-            {t.step.replace("{n}", String(active))}
-          </div>
+      <h2
+        id="fm-sheet-title"
+        style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontWeight: 400, fontSize: "clamp(17px,5.25cqw,27px)", lineHeight: 1.18, margin: 0, color: "#464039" }}
+      >
+        {t.emptyTitle}
+      </h2>
+      <p style={{ margin: "14px 0 0", fontSize: "clamp(12.5px,3cqw,15.5px)", lineHeight: 1.72, color: INK }}>
+        {t.emptyBody}
+      </p>
+    </>
+  ) : (
+    <>
+        <div id="fm-sheet-title" style={{ fontSize: "clamp(9.5px,2.15cqw,11px)", fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: "#C2603A" }}>
+          {ring.ring}
         </div>
 
         <div style={{ margin: "10px 0 0", fontSize: "clamp(10.5px,2.4cqw,12.5px)", lineHeight: 1.5, color: MUTE, fontStyle: "italic" }}>
@@ -681,9 +720,11 @@ const FeelingsMap = () => {
           </div>
         )}
 
-        <div style={{ margin: "22px 0 0", fontSize: "clamp(10.5px,2.4cqw,12.5px)", lineHeight: 1.6, color: MUTE, fontStyle: "italic" }}>
-          {t.suggestive}
-        </div>
+        {allWords.length > 0 && (
+          <div style={{ margin: "22px 0 0", fontSize: "clamp(10.5px,2.4cqw,12.5px)", lineHeight: 1.6, color: MUTE, fontStyle: "italic" }}>
+            {t.suggestive}
+          </div>
+        )}
 
         <div style={{ display: "flex", alignItems: "flex-start", gap: "clamp(12px,3cqw,22px)", margin: "10px 0 0" }}>
           {active === 2 && (
@@ -833,7 +874,7 @@ const FeelingsMap = () => {
         )}
 
         {/* ---- what usually sits behind this family ---- */}
-        {isTable && (
+        {isTable && fam && (
           <div style={{ margin: "22px 0 0", borderRadius: 12, border: "1px solid #E7E1DA", background: "rgba(250,248,245,.7)", overflow: "hidden" }}>
             <div
               role="button"
@@ -950,28 +991,58 @@ const FeelingsMap = () => {
               viewBox="0 0 720 720"
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }}
             >
-              {OUTER_RINGS.map((o) => (
-                <circle
-                  key={o.id}
-                  cx="360"
-                  cy="360"
-                  r={o.r}
-                  fill="none"
-                  strokeWidth={o.w}
-                  stroke={ringVals(o.id).bg}
-                  ref={(el) => {
-                    ringRefs.current[o.id] = el;
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={ringVals(o.id).name}
-                  onClick={(e) => goToRing(o.id, e.currentTarget)}
-                  onKeyDown={onEnterOrSpace(() => goToRing(o.id))}
-                  onMouseEnter={() => setHoverRing(o.id)}
-                  onMouseLeave={() => setHoverRing((h) => (h === o.id ? null : h))}
-                  style={arcTransition}
-                />
-              ))}
+              {OUTER_RINGS.map((o) =>
+                /* The pull is broken into arcs; one group so it stays a single
+                   control, the same as the rings that are still whole. */
+                o.id === 6 ? (
+                  <g
+                    key={o.id}
+                    ref={(el) => {
+                      ringRefs.current[o.id] = el;
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={ringVals(o.id).name}
+                    onClick={(e) => goToRing(o.id, e.currentTarget)}
+                    onKeyDown={onEnterOrSpace(() => goToRing(o.id))}
+                    onMouseEnter={() => setHoverRing(o.id)}
+                    onMouseLeave={() => setHoverRing((h) => (h === o.id ? null : h))}
+                    style={clickable}
+                  >
+                    {PULL_ARCS.map((d, i) => (
+                      <path
+                        key={i}
+                        d={d}
+                        fill="none"
+                        strokeWidth={o.w}
+                        stroke={ringVals(o.id).bg}
+                        style={arcTransition}
+                      />
+                    ))}
+                  </g>
+                ) : (
+                  <circle
+                    key={o.id}
+                    cx="360"
+                    cy="360"
+                    r={o.r}
+                    fill="none"
+                    strokeWidth={o.w}
+                    stroke={ringVals(o.id).bg}
+                    ref={(el) => {
+                      ringRefs.current[o.id] = el;
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={ringVals(o.id).name}
+                    onClick={(e) => goToRing(o.id, e.currentTarget)}
+                    onKeyDown={onEnterOrSpace(() => goToRing(o.id))}
+                    onMouseEnter={() => setHoverRing(o.id)}
+                    onMouseLeave={() => setHoverRing((h) => (h === o.id ? null : h))}
+                    style={arcTransition}
+                  />
+                ),
+              )}
 
               {/* The six segments carry no visible ring name any more, so the
                   group is what tells a screen reader what is being chosen. */}
@@ -1048,13 +1119,12 @@ const FeelingsMap = () => {
                   position: "absolute",
                   left: p.left,
                   top: p.top,
-                  width: p.width,
                   transform: "translate(-50%,-50%)",
                   textAlign: "center",
                   lineHeight: 1.06,
                   ...clickable,
                   fontFamily: "'Cormorant Garamond',Georgia,serif",
-                  fontSize: p.size,
+                  fontSize: SEG_FS,
                   transition: "color .5s ease",
                   color: famVals(k).fg,
                 }}

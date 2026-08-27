@@ -56,6 +56,12 @@ export interface FeelingsContent {
   chooseLabel: string;
   /** Mobile bottom sheet. */
   sheetClose: string;
+  /** Mobile only — the instruction line that sits directly above the wheel.
+   *  Both sentences are lifted verbatim from `intro` / `intro2`, which move
+   *  below the wheel (`intro`) or are dropped (`intro2`) at that breakpoint. */
+  touchHint: string;
+  /** Pinned above the sheet's ring nav so it cannot scroll out of view. */
+  writeDown: string;
   /** Support card: the addresses sit behind this disclosure. */
   showAddresses: string; hideAddresses: string;
   s1: FeelingRing; s2: FeelingRing; s3: FeelingRing;
@@ -343,6 +349,8 @@ export const feelingsEN: FeelingsContent = {
   "previewLabel": "Behind this",
   "chooseLabel": "what you're feeling",
   "sheetClose": "Close",
+  "touchHint": "Touch any ring. Keep a notebook beside you.",
+  "writeDown": "Write this ring down before you go deeper.",
   "showAddresses": "Show addresses",
   "hideAddresses": "Hide addresses",
   "s4": {
@@ -707,6 +715,8 @@ export const feelingsRU: FeelingsContent = {
   "previewLabel": "Что за этим",
   "chooseLabel": "что вы чувствуете",
   "sheetClose": "Закрыть",
+  "touchHint": "Коснитесь любого круга. Держите блокнот рядом.",
+  "writeDown": "Запишите этот круг, прежде чем идти глубже.",
   "showAddresses": "Показать адреса",
   "hideAddresses": "Скрыть адреса",
   "s4": {

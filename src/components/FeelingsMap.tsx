@@ -2,6 +2,7 @@ import {
   Fragment,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -85,6 +86,7 @@ const STYLES = `
    column beside it to scroll past. */
 .fm-main { display: grid; grid-template-columns: minmax(0,1fr); gap: clamp(20px,3vw,52px); align-items: start; margin: clamp(26px,4vw,44px) 0 0; }
 .fm-wheel-col { min-width: 0; width: 100%; max-width: min(100%,480px); margin: 0 auto; }
+.fm-wheel-box { position: relative; width: 100%; aspect-ratio: 1/1; container-type: inline-size; }
 @media (min-width: 900px) {
   .fm-main { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .fm-wheel-col { position: sticky; top: 96px; }
@@ -99,16 +101,25 @@ const STYLES = `
 /* Below md the panel is a bottom sheet, so the wheel gets the viewport to
    itself and is sized off its HEIGHT — width alone left it running past the
    fold on a 375x667 screen. svh, not vh, so the mobile URL bar cannot push it
-   under the fold either. --fm-chrome is the header + ring nav + breathing
-   room that has to share the screen with it. */
+   under the fold either. --fm-chrome is the header + title + instruction line
+   + breathing room that has to share the screen with it: the page must land as
+   title, instruction, whole wheel, with nothing below the fold to reach for. */
 @media (max-width: 767.98px) {
   .fm-root { display: flex; flex-direction: column; }
   .fm-h1 { order: 1; }
-  .fm-main { order: 2; margin-top: 14px; }
-  .fm-intro { order: 3; margin-top: clamp(22px,5vw,34px); }
-  .fm-tail { order: 4; }
-  .fm-wheel-col { --fm-chrome: 250px; max-width: min(100%, calc(100svh - var(--fm-chrome))); }
+  .fm-hint { order: 2; }
+  .fm-main { order: 3; margin-top: 12px; }
+  .fm-intro { order: 4; margin-top: clamp(22px,5vw,34px); }
+  .fm-tail { order: 5; }
+  /* The long intro reads below the wheel here. The notebook aside is already
+     said by the instruction line above the wheel, so it is not shown twice. */
+  .fm-aside { display: none; }
+  /* The labelled wheel and the sheet's own pinned nav are the navigation on
+     mobile; a second pill row under the wheel only cost the wheel its size. */
+  .fm-wheel-nav { display: none !important; }
+  .fm-wheel-col { --fm-chrome: 222px; max-width: min(100%, calc(100svh - var(--fm-chrome))); }
 }
+@media (min-width: 768px) { .fm-hint { display: none; } }
 
 /* 66ch is the reading measure; the container query the panel's own type is
    sized from comes with it. */
@@ -126,25 +137,50 @@ const STYLES = `
 .fm-card p { font-size: 14px; }
 
 /* ---- mobile bottom sheet ---- */
-.fm-scrim { position: fixed; inset: 0; z-index: 60; background: rgba(70,64,57,.34); animation: fm-fade .28s ease both; }
+/* The two detents are two heights, not two positions: the sheet keeps its foot
+   on the bottom of the screen either way, so the pinned prompt and nav are
+   always on it. 60svh leaves the top 40svh to the wheel; 85svh is the reach for
+   a long ring. --fm-off is only the slide-in, and only for one frame. */
+.fm-scrim { position: fixed; inset: 0; z-index: 59; background: rgba(70,64,57,.34); animation: fm-fade .28s ease both; }
 .fm-sheet {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 61;
-  height: 85svh; max-height: 85svh;
+  height: var(--fm-h, 60svh); max-height: 85svh;
   display: flex; flex-direction: column;
   background: #FAF8F5; border-top: 1px solid #E7E1DA;
   border-radius: 20px 20px 0 0; box-shadow: 0 -18px 44px rgba(70,64,57,.18);
-  animation: fm-sheetIn .32s cubic-bezier(.22,1,.36,1) both;
+  transform: translateY(var(--fm-off, 100%));
+  transition: transform .34s cubic-bezier(.22,1,.36,1), height .34s cubic-bezier(.22,1,.36,1);
 }
 .fm-sheet-grip { flex: none; padding: 9px 0 3px; display: flex; justify-content: center; cursor: grab; touch-action: none; }
 .fm-sheet-grip span { width: 42px; height: 4px; border-radius: 999px; background: #DCD4CA; }
 .fm-sheet-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 2px 18px 10px; }
 /* contain, or iOS Safari hands the overscroll to the page underneath. */
 .fm-sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 0 18px 20px; }
+/* Outside the scrolling body, or the one line that has to stay in view for as
+   long as a ring is open is the first thing to scroll away. */
+.fm-sheet-note { flex: none; padding: 9px 18px 10px; border-top: 1px solid #EFEAE3; }
 .fm-sheet-nav { flex: none; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #E7E1DA; background: #F6F2EC; }
 @keyframes fm-fade { from { opacity: 0 } to { opacity: 1 } }
-@keyframes fm-sheetIn { from { transform: translateY(100%) } to { transform: translateY(0) } }
+
+/* ---- the docked wheel ---- */
+/* Nothing is re-rendered here: the same element that holds the wheel is lifted
+   out of flow into the top band. That is what keeps it live — its highlights,
+   its handlers and the ring it has open carry over, so tapping a second ring
+   only changes what the sheet shows.
+   It sits above the scrim, so at the half detent it is lit and takes taps, and
+   below the sheet, so the full detent can cover it as it is meant to. */
+@media (max-width: 767.98px) {
+  .fm-docked .fm-wheel-col {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+    height: 40svh; width: auto; max-width: none; margin: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 8px 0 6px; background: #FAF8F5;
+  }
+  .fm-docked .fm-wheel-box { width: auto; height: 100%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .fm-sheet, .fm-scrim { animation: none !important; }
+  .fm-sheet, .fm-scrim, .fm-wheel-box { animation: none !important; transition: none !important; }
 }
 
 .fm-chip:hover { border-color: #D17147 !important; transform: translateY(-1px); }
@@ -167,6 +203,19 @@ const STYLES = `
 /* The sheet is a mobile-only branch, so the breakpoint has to be readable from
    JS as well as CSS — focus trapping and history are not CSS-expressible. */
 const MOBILE_MQ = "(max-width: 767.98px)";
+
+/* Read at the moment of use rather than subscribed to: the dock and the sheet
+   only ask when they are about to move. */
+const reducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** How far the grip has to travel before a drag counts as a decision. */
+const DRAG_COMMIT = 48;
+/** The two detents, as a share of the small viewport height. Half is the
+ *  complement of the 40svh the docked wheel takes at the top. */
+const HALF_H = 0.6;
+const FULL_H = 0.85;
 
 const useIsMobile = () => {
   const [is, setIs] = useState(
@@ -220,9 +269,23 @@ const FeelingsMap = () => {
 
   const isMobile = useIsMobile();
   const [sheetOpen, setSheetOpen] = useState(false);
+  /* "half" leaves the wheel visible above the sheet; "full" is the reach for a
+     long ring and covers it, which is the person's own choice to make. */
+  const [detent, setDetent] = useState<"half" | "full">("half");
+  /* False for the first frame after mount, so the sheet has an off-screen
+     position to slide out of. */
+  const [entered, setEntered] = useState(false);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const wheelBoxRef = useRef<HTMLDivElement>(null);
+  /* Where the wheel was standing just before it docked or undocked, so the
+     move between the two sizes can be played rather than jumped. */
+  const wheelFromRef = useRef<DOMRect | null>(null);
   /* The element that opened the sheet, so focus can go back to it on close. */
   const openerRef = useRef<HTMLElement | SVGElement | null>(null);
+  /* The wheel's own shapes, so a tap on one of the labels drawn over them can
+     hand focus back to something that can hold it. */
+  const ringRefs = useRef<Record<number, SVGElement | null>>({});
+  const famRefs = useRef<Record<number, SVGElement | null>>({});
   /* True while our own history entry is on the stack. */
   const pushedRef = useRef(false);
 
@@ -242,12 +305,18 @@ const FeelingsMap = () => {
     return Object.keys(marked).filter((k) => k.startsWith(p)).length;
   };
 
+  const markWheel = useCallback(() => {
+    wheelFromRef.current = wheelBoxRef.current?.getBoundingClientRect() ?? null;
+  }, []);
+
   /* Opening pushes a history entry so Android's hardware Back closes the sheet
      instead of leaving the page. The URL is unchanged: map state must never
      reach the address bar, because $current_url is what analytics transmits. */
   const openSheet = (opener?: HTMLElement | SVGElement | null) => {
     if (opener) openerRef.current = opener;
     if (sheetOpen) return; // already open — a ring switch, not a new opening
+    markWheel();
+    setDetent("half");
     setSheetOpen(true);
     if (!pushedRef.current) {
       window.history.pushState({ fmSheet: true }, "", window.location.href);
@@ -259,17 +328,66 @@ const FeelingsMap = () => {
      the popstate handler is the single place that flips the state to closed. */
   const closeSheet = useCallback(() => {
     if (pushedRef.current) window.history.back();
-    else setSheetOpen(false);
-  }, []);
+    else {
+      markWheel();
+      setSheetOpen(false);
+    }
+  }, [markWheel]);
 
   useEffect(() => {
+    /* Also the way Android's hardware Back arrives, which is why the wheel is
+       measured here and not only in closeSheet. */
     const onPop = () => {
+      markWheel();
       pushedRef.current = false;
       setSheetOpen(false);
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
-  }, []);
+  }, [markWheel]);
+
+  /* The wheel changes size and place by changing class, which cannot be
+     transitioned — so it is put back where it was, in one transform, and let
+     go of. Both directions, since closing is the same move reversed. */
+  useLayoutEffect(() => {
+    const node = wheelBoxRef.current;
+    const from = wheelFromRef.current;
+    wheelFromRef.current = null;
+    if (!node || !from || !from.width || reducedMotion()) return;
+    const to = node.getBoundingClientRect();
+    if (!to.width) return;
+    const scale = from.width / to.width;
+    const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+    const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+    node.style.transition = "none";
+    node.style.transform = `translate(${dx}px,${dy}px) scale(${scale})`;
+    const raf = requestAnimationFrame(() => {
+      node.style.transition = "transform .38s cubic-bezier(.22,1,.36,1)";
+      node.style.transform = "";
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [sheetOpen]);
+
+  /* One frame parked off-screen, then the detent, so the transition has two
+     values to move between. Reduced motion skips straight to the detent. */
+  useLayoutEffect(() => {
+    if (!sheetOpen) {
+      setEntered(false);
+      return;
+    }
+    if (reducedMotion()) {
+      setEntered(true);
+      return;
+    }
+    let inner = 0;
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setEntered(true));
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
+  }, [sheetOpen]);
 
   /* Focus trap: move focus in on open, keep Tab inside, Escape closes, and the
      ring that was tapped gets focus back on the way out. */
@@ -451,6 +569,7 @@ const FeelingsMap = () => {
      sheet — switching rings there must not close and reopen it. */
   const ringNav = (where: "wheel" | "sheet"): ReactNode => (
     <div
+      className={where === "wheel" ? "fm-wheel-nav" : undefined}
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -496,25 +615,36 @@ const FeelingsMap = () => {
     </div>
   );
 
-  /* Drag the handle down far enough and the sheet goes. Pointer events, so a
-     mouse works too; no rubber-banding, the sheet either stays or closes. */
+  /* The handle moves between the two detents and out. Up from either goes to
+     full; down goes one step — full back to half, half to closed. Pointer
+     events, so a mouse works too. */
   const onGripDown = (e: React.PointerEvent) => {
-    const startY = e.clientY;
     const node = sheetRef.current;
+    if (!node) return;
+    const startY = e.clientY;
+    const base = node.getBoundingClientRect().height;
+    const vh = window.innerHeight;
+    let dy = 0;
+    node.style.transition = "none";
     const move = (ev: PointerEvent) => {
-      const dy = Math.max(0, ev.clientY - startY);
-      if (node) node.style.transform = `translateY(${dy}px)`;
-      if (dy > 96) {
-        end(ev);
-        closeSheet();
-      }
+      dy = ev.clientY - startY;
+      /* The floor is below the half detent so that dragging down from half
+         still gives way under the finger before it lets go. */
+      const h = Math.min(vh * FULL_H, Math.max(vh * 0.34, base - dy));
+      node.style.height = `${h}px`;
     };
-    const end = (ev: PointerEvent) => {
-      if (node) node.style.transform = "";
+    const end = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", end);
       window.removeEventListener("pointercancel", end);
-      void ev;
+      /* Transition first, then the height it should animate back to. */
+      node.style.transition = "";
+      node.style.height = "";
+      if (dy < -DRAG_COMMIT) setDetent("full");
+      else if (dy > DRAG_COMMIT) {
+        if (detent === "full") setDetent("half");
+        else closeSheet();
+      }
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", end);
@@ -775,7 +905,7 @@ const FeelingsMap = () => {
        autocapture were ever switched back on, the chips — whose text is the
        feeling someone just marked — must never be sent as $el_text. One
        $pageview when the page opens is the whole of what leaves here. */
-    <div className="fm-root ph-no-capture">
+    <div className={`fm-root ph-no-capture${isMobile && sheetOpen ? " fm-docked" : ""}`}>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
       <h1
@@ -794,11 +924,20 @@ const FeelingsMap = () => {
         {t.title}
       </h1>
 
+      {/* Mobile only. What to do and what to have to hand, in the two places
+          the eye goes first — between the title and the wheel. */}
+      <p
+        className="fm-hint"
+        style={{ margin: "11px 0 0", maxWidth: "42ch", fontSize: FS_NOTE, lineHeight: 1.55, color: MUTE, fontStyle: "italic" }}
+      >
+        {t.touchHint}
+      </p>
+
       <div className="fm-intro" style={{ display: "flex", flexWrap: "wrap", gap: 30, margin: "20px 0 0" }}>
         <p style={{ margin: 0, flex: "1 1 400px", maxWidth: "58ch", fontSize: FS_INTRO, lineHeight: 1.75, color: INK }}>
           {t.intro}
         </p>
-        <p style={{ margin: 0, flex: "0 1 240px", maxWidth: "32ch", fontSize: FS_NOTE, lineHeight: 1.7, color: MUTE, fontStyle: "italic" }}>
+        <p className="fm-aside" style={{ margin: 0, flex: "0 1 240px", maxWidth: "32ch", fontSize: FS_NOTE, lineHeight: 1.7, color: MUTE, fontStyle: "italic" }}>
           {t.intro2}
         </p>
       </div>
@@ -806,7 +945,7 @@ const FeelingsMap = () => {
       <div className="fm-main">
         {/* ------------------------------ the wheel ------------------------------ */}
         <div className="fm-wheel-col">
-          <div style={{ position: "relative", width: "100%", aspectRatio: "1/1", containerType: "inline-size" }}>
+          <div className="fm-wheel-box" ref={wheelBoxRef}>
             <svg
               viewBox="0 0 720 720"
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }}
@@ -820,6 +959,9 @@ const FeelingsMap = () => {
                   fill="none"
                   strokeWidth={o.w}
                   stroke={ringVals(o.id).bg}
+                  ref={(el) => {
+                    ringRefs.current[o.id] = el;
+                  }}
                   role="button"
                   tabIndex={0}
                   aria-label={ringVals(o.id).name}
@@ -841,6 +983,9 @@ const FeelingsMap = () => {
                     fill="none"
                     strokeWidth={76}
                     stroke={famVals(k).stroke}
+                    ref={(el) => {
+                      famRefs.current[k] = el;
+                    }}
                     role="button"
                     tabIndex={0}
                     aria-label={families[k].t}
@@ -860,6 +1005,9 @@ const FeelingsMap = () => {
                 fill="none"
                 strokeWidth={42}
                 stroke={ringVals(4).bg}
+                ref={(el) => {
+                  ringRefs.current[4] = el;
+                }}
                 role="button"
                 tabIndex={0}
                 aria-label={ringVals(4).name}
@@ -874,6 +1022,9 @@ const FeelingsMap = () => {
                 cy="360"
                 r={92}
                 fill={r5.bg}
+                ref={(el) => {
+                  ringRefs.current[5] = el;
+                }}
                 role="button"
                 tabIndex={0}
                 aria-label={ringVals(5).name}
@@ -889,7 +1040,7 @@ const FeelingsMap = () => {
             {ARC_LABEL_POS.map((p, k) => (
               <div
                 key={k}
-                onClick={(e) => pickFam(k, e.currentTarget)}
+                onClick={() => pickFam(k, famRefs.current[k])}
                 onMouseEnter={() => setHoverFam(k)}
                 onMouseLeave={() => setHoverFam((h) => (h === k ? null : h))}
                 aria-hidden="true"
@@ -917,7 +1068,7 @@ const FeelingsMap = () => {
             {[...OUTER_RINGS, { id: 4, top: "33.75%", fs: "max(9.5px,2.3cqw)" }].map((o) => (
               <div
                 key={o.id}
-                onClick={(e) => goToRing(o.id, e.currentTarget)}
+                onClick={() => goToRing(o.id, ringRefs.current[o.id])}
                 onMouseEnter={() => setHoverRing(o.id)}
                 onMouseLeave={() => setHoverRing((h) => (h === o.id ? null : h))}
                 aria-hidden="true"
@@ -943,7 +1094,7 @@ const FeelingsMap = () => {
             ))}
 
             <div
-              onClick={(e) => goToRing(5, e.currentTarget)}
+              onClick={() => goToRing(5, ringRefs.current[5])}
               aria-hidden="true"
               onMouseEnter={() => setHoverRing(5)}
               onMouseLeave={() => setHoverRing((h) => (h === 5 ? null : h))}
@@ -987,6 +1138,10 @@ const FeelingsMap = () => {
             aria-labelledby="fm-sheet-title"
             tabIndex={-1}
             ref={sheetRef}
+            style={{
+              "--fm-h": `${(detent === "full" ? FULL_H : HALF_H) * 100}svh`,
+              "--fm-off": entered ? "0px" : "100%",
+            } as CSSProperties}
           >
             <div
               className="fm-sheet-grip"
@@ -1021,6 +1176,11 @@ const FeelingsMap = () => {
             </div>
             <div className="fm-sheet-body" style={{ containerType: "inline-size" }}>
               {panel}
+            </div>
+            <div className="fm-sheet-note">
+              <p style={{ margin: 0, fontSize: FS_TINY, lineHeight: 1.5, color: MUTE, fontStyle: "italic" }}>
+                {t.writeDown}
+              </p>
             </div>
             <div className="fm-sheet-nav">{ringNav("sheet")}</div>
           </div>

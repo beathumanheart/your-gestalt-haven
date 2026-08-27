@@ -136,7 +136,7 @@ export const feelingsEN: FeelingsContent = {
     "short": "The word",
     "theory": "six places to look, and what sits behind each",
     "q": "Which region is it, and which word inside it?",
-    "body": "Pick one of the six first — that is the easy part. The words inside it go from strongest to faintest. Take the one that fits closest, even if it only almost fits.",
+    "body": "Pick one of the six first. The words inside it go from strongest to faintest. Take the one that fits closest, even if it only almost fits.",
     "families": [
       {
         "id": "anger",
@@ -163,7 +163,7 @@ export const feelingsEN: FeelingsContent = {
           "irritation",
           "dislike"
         ],
-        "behind": "Anger is the loudest feeling and rarely the first one. It usually stands in front of something softer: hurt, a line that was crossed, fear of losing something, or shame. Its job is to defend a boundary — so the useful question is not how to stop being angry, but what the anger came out to protect."
+        "behind": "Anger rarely arrives first. It usually stands in front of something softer: hurt, a line that was crossed, fear of losing something, or shame. Its job is to defend a boundary — so the question it opens is not how to stop being angry, but what the anger came out to protect."
       },
       {
         "id": "fear",
@@ -192,7 +192,7 @@ export const feelingsEN: FeelingsContent = {
           "doubt",
           "shyness"
         ],
-        "behind": "Fear is always about something that could be lost — safety, control, a person, or a version of yourself you rely on. Naming what specifically is at stake shrinks it from a fog to a sentence.",
+        "behind": "Fear is about something that could be lost — safety, control, a person, or a version of yourself you rely on. What is at stake can be named specifically.",
         "listLabel": "The ten it is usually about",
         "list": "being judged · making a mistake · what is new · being alone · being responsible · the dark · heights · being disappointed in myself · the future · my own life"
       },
@@ -223,7 +223,7 @@ export const feelingsEN: FeelingsContent = {
           "sluggishness",
           "boredom"
         ],
-        "behind": "Sadness follows a loss: a person, a hope, a version of the future you had already started living in. It asks to be grieved rather than solved, and it is the feeling most often mistaken for something being wrong with you."
+        "behind": "Sadness follows a loss: a person, a hope, a version of the future you had already started living in. It asks to be grieved rather than solved."
       },
       {
         "id": "joy",
@@ -254,7 +254,7 @@ export const feelingsEN: FeelingsContent = {
           "taking it in",
           "interest"
         ],
-        "behind": "Joy marks a need that is being met right now. It belongs on the map for the same reason the painful regions do — it points at something true about what you need, and it is the column people skip past fastest."
+        "behind": "Joy marks a need that is being met right now. It belongs on the map for the same reason the painful regions do — it points at something true about what you need."
       },
       {
         "id": "love",
@@ -288,7 +288,7 @@ export const feelingsEN: FeelingsContent = {
           "mutual help",
           "liking"
         ],
-        "behind": "This region is about contact and belonging — with another person, or with yourself. It is often the hardest column to claim out loud, and the one that says most clearly what the need underneath is going to be."
+        "behind": "This region is about contact and belonging — with another person, or with yourself. What is named here points at the need underneath it."
       },
       {
         "id": "states",
@@ -377,7 +377,7 @@ export const feelingsEN: FeelingsContent = {
     "centre": "The need",
     "theory": "what the feeling is pointing at",
     "q": "What did you need, and not get?",
-    "body": "Every ring above is pointing here. This is the centre of the map and it is worth the most time. Naming a need does not oblige you to go and get it today.",
+    "body": "Every ring above is pointing here. This is the centre of the map. Naming a need does not oblige you to go and get it today.",
     "words": [
       "to be seen",
       "to be safe",
@@ -500,7 +500,7 @@ export const feelingsRU: FeelingsContent = {
     "short": "Слово",
     "theory": "шесть мест, куда посмотреть, и что стоит за каждым",
     "q": "Какая это область и какое слово внутри неё?",
-    "body": "Сначала выберите одно из шести — это простая часть. Слова внутри идут от самых сильных к самым слабым. Берите то, что ближе всего, даже если подходит не совсем.",
+    "body": "Сначала выберите одно из шести. Слова внутри идут от самых сильных к самым слабым. Берите то, что ближе всего, даже если подходит не совсем.",
     "families": [
       {
         "id": "anger",
@@ -527,7 +527,7 @@ export const feelingsRU: FeelingsContent = {
           "раздражение",
           "неприязнь"
         ],
-        "behind": "Гнев — самое громкое чувство и почти никогда не первое. Обычно он стоит перед чем-то более мягким: перед болью, перед нарушенной границей, перед страхом потерять что-то, перед стыдом. Его работа — защищать границу, поэтому полезный вопрос не «как перестать злиться», а «что гнев вышел защищать»."
+        "behind": "Гнев почти никогда не приходит первым. Обычно он стоит перед чем-то более мягким: перед болью, перед нарушенной границей, перед страхом потерять что-то, перед стыдом. Его работа — защищать границу, поэтому вопрос, который он открывает, не «как перестать злиться», а «что гнев вышел защищать»."
       },
       {
         "id": "fear",
@@ -557,7 +557,7 @@ export const feelingsRU: FeelingsContent = {
           "сомнение",
           "застенчивость"
         ],
-        "behind": "Страх всегда о том, что может быть потеряно: о безопасности, о контроле, о человеке, о той версии себя, на которой всё держится. Когда названо, что именно под угрозой, страх перестаёт быть туманом и становится фразой.",
+        "behind": "Страх — о том, что может быть потеряно: о безопасности, о контроле, о человеке, о той версии себя, на которой всё держится. То, что под угрозой, можно назвать точно.",
         "listLabel": "Десять, о которых он чаще всего",
         "list": "страх оценки · страх ошибки · страх нового · страх одиночества · страх ответственности · страх темноты · страх высоты · страх разочарования в себе · страх будущего · страх за свою жизнь"
       },
@@ -588,7 +588,7 @@ export const feelingsRU: FeelingsContent = {
           "лень",
           "скука"
         ],
-        "behind": "Грусть идёт за потерей: человека, надежды, той версии будущего, в которой уже начали жить. Она просит, чтобы её оплакали, а не решили, — и её чаще всего принимают за признак того, что что-то не так."
+        "behind": "Грусть идёт за потерей: человека, надежды, той версии будущего, в которой уже начали жить. Она просит, чтобы её оплакали, а не решили."
       },
       {
         "id": "joy",
@@ -619,7 +619,7 @@ export const feelingsRU: FeelingsContent = {
           "приятие",
           "интерес"
         ],
-        "behind": "Радость отмечает потребность, которая прямо сейчас удовлетворяется. Она на карте по той же причине, что и болезненные области: она тоже указывает на правду о потребностях — и её колонку пролистывают быстрее всех."
+        "behind": "Радость отмечает потребность, которая прямо сейчас удовлетворяется. Она на карте по той же причине, что и болезненные области: она тоже указывает на правду о потребностях."
       },
       {
         "id": "love",
@@ -653,7 +653,7 @@ export const feelingsRU: FeelingsContent = {
           "взаимовыручка",
           "симпатия"
         ],
-        "behind": "Эта область — о контакте и принадлежности: с другим человеком или с самим собой. Её труднее всего признать вслух, и она яснее всего говорит, какой окажется потребность в центре."
+        "behind": "Эта область — о контакте и принадлежности: с другим человеком или с самим собой. То, что названо здесь, указывает на потребность под ним."
       },
       {
         "id": "states",
@@ -743,7 +743,7 @@ export const feelingsRU: FeelingsContent = {
     "centre": "Потребность",
     "theory": "на что указывает чувство",
     "q": "Что было нужно и чего не случилось?",
-    "body": "Все круги выше указывают сюда. Это центр карты, и он стоит больше всего времени. Назвать потребность не значит идти за ней сегодня.",
+    "body": "Все круги выше указывают сюда. Это центр карты. Назвать потребность не значит идти за ней сегодня.",
     "words": [
       "чтобы увидели",
       "быть в безопасности",

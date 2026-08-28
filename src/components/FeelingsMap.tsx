@@ -204,6 +204,23 @@ const STYLES = `
   .fm-sheet, .fm-scrim, .fm-wheel-box { animation: none !important; transition: none !important; }
 }
 
+/* ---- focus, and what iOS Safari does with it ---- */
+/* Safari draws the focus outline around an element's bounding BOX rather than
+   its rendered shape. A band circle's box is the whole wheel, so the outline
+   comes out as a square around everything; a segment path's box is a rectangle
+   whose edges show as stray lines across the map. The wheel is drawn entirely
+   in shapes, so it cannot use outline at all — the keyboard indicator is the
+   shape's own active colouring instead, applied in the component. */
+.fm-wheel-box :focus,
+.fm-wheel-box :focus-visible { outline: none; }
+/* No grey flash on tap, and no callout on a long press over a shape. */
+.fm-wheel-box path,
+.fm-wheel-box circle,
+.fm-wheel-box [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
 .fm-chip:hover { border-color: #D17147 !important; transform: translateY(-1px); }
 .fm-more:hover { background: #E0EBE6; border-color: #437059 !important; }
 .fm-pill:hover { border-color: #437059 !important; }
@@ -254,6 +271,18 @@ const useIsMobile = () => {
 const FOCUSABLE =
   'a[href],button,[role="button"],input,select,textarea,[tabindex]:not([tabindex="-1"])';
 
+/** True only where the browser would itself have drawn a focus ring, which is
+ *  what keeps the indicator off taps and clicks. Safari below 15.4 has no
+ *  :focus-visible and throws on it; there the wheel simply shows no indicator,
+ *  as it did before. */
+const isKeyboardFocus = (el: Element) => {
+  try {
+    return el.matches(":focus-visible");
+  } catch {
+    return false;
+  }
+};
+
 const onEnterOrSpace = (fn: () => void) => (e: KeyboardEvent) => {
   if (e.key === "Enter" || e.key === " ") {
     e.preventDefault();
@@ -288,6 +317,12 @@ const FeelingsMap = () => {
   const [payStatus, setPayStatus] = useState("");
   const [hoverFam, setHoverFam] = useState<number | null>(null);
   const [hoverRing, setHoverRing] = useState<number | null>(null);
+  /* Which shape the keyboard is on. Dropping the outline would leave keyboard
+     users with no indicator at all, so the focused shape is drawn in its own
+     active colours — the same treatment through the same code path, not a
+     second style invented for focus. */
+  const [focusRing, setFocusRing] = useState<number | null>(null);
+  const [focusFam, setFocusFam] = useState<number | null>(null);
   const [addrOpen, setAddrOpen] = useState(false);
 
   const isMobile = useIsMobile();
@@ -496,7 +531,7 @@ const FeelingsMap = () => {
 
   /* ---- the six wheel rings. Only ring 5 shows a tally, in the centre disc ---- */
   const ringVals = (i: number) => {
-    const on = active === i;
+    const on = active === i || focusRing === i;
     const hovered = hoverRing === i;
     return {
       name: t[`s${i}` as "s1"].short,
@@ -507,7 +542,7 @@ const FeelingsMap = () => {
   };
 
   const r5 = (() => {
-    const on = active === 5;
+    const on = active === 5 || focusRing === 5;
     const count = countFor("s5");
     const hovered = hoverRing === 5;
     return {
@@ -520,7 +555,7 @@ const FeelingsMap = () => {
   })();
 
   const famVals = (k: number) => {
-    const sel = active === 3 && k === famIdx;
+    const sel = (active === 3 && k === famIdx) || focusFam === k;
     const count = countFor(`s3|${families[k].id}`);
     const hovered = hoverFam === k;
     const base = families[k].wheel ?? families[k].t;
@@ -1007,6 +1042,10 @@ const FeelingsMap = () => {
                     onKeyDown={onEnterOrSpace(() => goToRing(o.id))}
                     onMouseEnter={() => setHoverRing(o.id)}
                     onMouseLeave={() => setHoverRing((h) => (h === o.id ? null : h))}
+                    onFocus={(e) => {
+                      if (isKeyboardFocus(e.currentTarget)) setFocusRing(o.id);
+                    }}
+                    onBlur={() => setFocusRing((f) => (f === o.id ? null : f))}
                     style={clickable}
                   >
                     {PULL_ARCS.map((d, i) => (
@@ -1039,6 +1078,10 @@ const FeelingsMap = () => {
                     onKeyDown={onEnterOrSpace(() => goToRing(o.id))}
                     onMouseEnter={() => setHoverRing(o.id)}
                     onMouseLeave={() => setHoverRing((h) => (h === o.id ? null : h))}
+                    onFocus={(e) => {
+                      if (isKeyboardFocus(e.currentTarget)) setFocusRing(o.id);
+                    }}
+                    onBlur={() => setFocusRing((f) => (f === o.id ? null : f))}
                     style={arcTransition}
                   />
                 ),
@@ -1064,6 +1107,10 @@ const FeelingsMap = () => {
                     onKeyDown={onEnterOrSpace(() => pickFam(k))}
                     onMouseEnter={() => setHoverFam(k)}
                     onMouseLeave={() => setHoverFam((h) => (h === k ? null : h))}
+                    onFocus={(e) => {
+                      if (isKeyboardFocus(e.currentTarget)) setFocusFam(k);
+                    }}
+                    onBlur={() => setFocusFam((f) => (f === k ? null : f))}
                     style={arcTransition}
                   />
                 ))}
@@ -1086,6 +1133,10 @@ const FeelingsMap = () => {
                 onKeyDown={onEnterOrSpace(() => goToRing(4))}
                 onMouseEnter={() => setHoverRing(4)}
                 onMouseLeave={() => setHoverRing((h) => (h === 4 ? null : h))}
+                onFocus={(e) => {
+                  if (isKeyboardFocus(e.currentTarget)) setFocusRing(4);
+                }}
+                onBlur={() => setFocusRing((f) => (f === 4 ? null : f))}
                 style={arcTransition}
               />
               <circle
@@ -1103,6 +1154,10 @@ const FeelingsMap = () => {
                 onKeyDown={onEnterOrSpace(() => goToRing(5))}
                 onMouseEnter={() => setHoverRing(5)}
                 onMouseLeave={() => setHoverRing((h) => (h === 5 ? null : h))}
+                onFocus={(e) => {
+                  if (isKeyboardFocus(e.currentTarget)) setFocusRing(5);
+                }}
+                onBlur={() => setFocusRing((f) => (f === 5 ? null : f))}
                 style={{ cursor: "pointer", transition: "fill .5s cubic-bezier(.22,1,.36,1)" }}
               />
             </svg>

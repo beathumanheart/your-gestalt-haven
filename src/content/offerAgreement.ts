@@ -82,7 +82,7 @@ export const offerAgreementEN: OfferAgreementContent = {
     {
       heading: "6. Payment and Cancellation",
       bullets: [
-        "Session cost: a sliding scale from €40 to €80 — you choose what fits",
+        "Session cost: a sliding scale from €40 to €100 — you choose what fits",
         "Payment is due after each session, by bank transfer, Wise, Revolut, or cryptocurrency",
         "Cancellations with less than 24 hours notice are charged in full",
         "Missed sessions without notice are charged in full",
@@ -152,7 +152,7 @@ export const offerAgreementRU: OfferAgreementContent = {
     {
       heading: "6. Оплата и отмена",
       bullets: [
-        "Стоимость сессии: по свободной шкале от 40 до 80 € — вы выбираете сумму сами",
+        "Стоимость сессии: по свободной шкале от 40 до 100 € — вы выбираете сумму сами",
         "Оплата производится после каждой сессии: банковским переводом, Wise, Revolut или криптовалютой",
         "При отмене менее чем за 24 часа сессия оплачивается полностью",
         "Пропущенная без предупреждения сессия оплачивается полностью",

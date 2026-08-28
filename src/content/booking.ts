@@ -154,7 +154,7 @@ export const bookingEN: BookingContent = {
   bookSession: "Book session",
   sessionBooked: "Session booked",
   termsHeading: "Before you book",
-  termsFee: "Sessions are on a sliding scale from €40 to €80 — you choose what fits.",
+  termsFee: "Sessions are on a sliding scale from €40 to €100 — you choose what fits.",
   termsCancellation: "Cancel or reschedule free of charge up to 24 hours before your session.",
   termsPayment:
     "Payment is due after each session — by bank transfer, Wise, Revolut, or cryptocurrency.",
@@ -230,7 +230,7 @@ export const bookingRU: BookingContent = {
   bookSession: "Записаться",
   sessionBooked: "Вы записаны",
   termsHeading: "Перед записью",
-  termsFee: "Стоимость сессии — по свободной шкале от 40 до 80 €, вы выбираете сумму сами.",
+  termsFee: "Стоимость сессии — по свободной шкале от 40 до 100 €, вы выбираете сумму сами.",
   termsCancellation: "Отменить или перенести сессию можно бесплатно не позднее чем за 24 часа.",
   termsPayment:
     "Оплата — после каждой сессии: банковским переводом, Wise, Revolut или криптовалютой.",

@@ -313,7 +313,7 @@ const FeelingsMap = () => {
   const [behindOpen, setBehindOpen] = useState(false);
   const [wordsOpen, setWordsOpen] = useState(false);
   const [defIdx, setDefIdx] = useState<number | null>(null);
-  const [pinIdx, setPinIdx] = useState<number | null>(null);
+  const [pinOrder, setPinOrder] = useState<string[]>([]);
   const [payStatus, setPayStatus] = useState("");
   const [hoverFam, setHoverFam] = useState<number | null>(null);
   const [hoverRing, setHoverRing] = useState<number | null>(null);
@@ -350,13 +350,27 @@ const FeelingsMap = () => {
   const families = t.s3.families as FeelingFamily[];
   const fam = famIdx === null ? null : families[famIdx];
 
-  const toggleMark = (key: string) =>
+  /* Marked keys in the order they were marked, oldest first. The detail card
+     below reads the tail of this, so unmarking a word falls back to the one
+     marked before it rather than staying on the word that was just let go. */
+  const toggleMark = (key: string) => {
+    const wasOn = !!marked[key];
     setMarked((prev) => {
       const next = { ...prev };
-      if (next[key]) delete next[key];
+      if (wasOn) delete next[key];
       else next[key] = true;
       return next;
     });
+    setPinOrder((prev) => {
+      const rest = prev.filter((k) => k !== key);
+      return wasOn ? rest : [...rest, key];
+    });
+  };
+
+  const clearMarks = () => {
+    setMarked({});
+    setPinOrder([]);
+  };
 
   const countFor = (prefix: string) => {
     const p = `${language}|${prefix}|`;
@@ -501,7 +515,6 @@ const FeelingsMap = () => {
     setActive(i);
     setWordsOpen(false);
     setDefIdx(null);
-    setPinIdx(null);
     if (isMobile) openSheet(opener);
   };
 
@@ -526,6 +539,19 @@ const FeelingsMap = () => {
 
   const defList =
     isTable && fam ? feelingDefs[language === "ru" ? "ru" : "en"][fam.id] ?? [] : [];
+  /* Hover wins while it lasts; otherwise the card shows what is marked in this
+     ring now — the most recent one still standing, and nothing at all once the
+     ring has no marks left. */
+  const pinIdx = (() => {
+    const prefix = `${language}|${wordScope}|`;
+    for (let i = pinOrder.length - 1; i >= 0; i--) {
+      const key = pinOrder[i];
+      if (!marked[key] || !key.startsWith(prefix)) continue;
+      const idx = allWords.indexOf(key.slice(prefix.length));
+      if (idx >= 0) return idx;
+    }
+    return null;
+  })();
   const shownDefIdx = defIdx === null ? pinIdx : defIdx;
   const def = shownDefIdx === null ? null : defList[shownDefIdx] ?? null;
 
@@ -572,7 +598,6 @@ const FeelingsMap = () => {
     setBehindOpen(false);
     setWordsOpen(false);
     setDefIdx(null);
-    setPinIdx(null);
     if (isMobile) openSheet(opener);
   };
 
@@ -823,14 +848,8 @@ const FeelingsMap = () => {
                   role="button"
                   tabIndex={0}
                   aria-pressed={on}
-                  onClick={() => {
-                    toggleMark(key);
-                    setPinIdx(i);
-                  }}
-                  onKeyDown={onEnterOrSpace(() => {
-                    toggleMark(key);
-                    setPinIdx(i);
-                  })}
+                  onClick={() => toggleMark(key)}
+                  onKeyDown={onEnterOrSpace(() => toggleMark(key))}
                   onMouseEnter={() => setDefIdx(i)}
                   onMouseLeave={() => setDefIdx((d) => (d === i ? null : d))}
                   onFocus={() => setDefIdx(i)}
@@ -965,8 +984,8 @@ const FeelingsMap = () => {
             className="fm-clear"
             role="button"
             tabIndex={0}
-            onClick={() => setMarked({})}
-            onKeyDown={onEnterOrSpace(() => setMarked({}))}
+            onClick={clearMarks}
+            onKeyDown={onEnterOrSpace(clearMarks)}
             style={{ padding: "7px 15px", borderRadius: 999, border: "1px solid #E7E1DA", fontSize: "clamp(11px,2.35cqw,12px)", fontWeight: 600, color: SAGE, ...clickable, whiteSpace: "nowrap", transition: "all .4s cubic-bezier(.4,0,.2,1)" }}
           >
             {t.clear}

@@ -117,26 +117,18 @@ export const feelingsEN: FeelingsContent = {
     "q": "Where in your body is something happening?",
     "body": "Find the place, the temperature, the weight. Stay with it long enough to describe it out loud. The body usually knows before the words arrive.",
     "words": [
-      "chest",
-      "throat",
-      "stomach",
-      "jaw",
-      "shoulders",
-      "head",
-      "hands",
-      "legs",
-      "tight",
-      "loose",
-      "hot",
-      "cool",
-      "heavy",
-      "light",
-      "hollow",
-      "full",
-      "restless",
-      "steady",
-      "tingling",
-      "numb"
+      "chest tightening",
+      "chest opening",
+      "throat gripping",
+      "stomach dropping",
+      "jaw clenching",
+      "shoulders rising",
+      "shoulders letting go",
+      "hands tingling",
+      "face warming",
+      "breath catching",
+      "everything slowing",
+      "nothing I can find"
     ]
   },
   "s3": {
@@ -368,7 +360,7 @@ export const feelingsEN: FeelingsContent = {
     "short": "Beneath",
     "theory": "the first feeling, or the one that came after it",
     "q": "Did something else come before this feeling?",
-    "body": "Anger often arrives after hurt. Hopelessness often arrives after anger. And sometimes the first feeling is exactly what it looks like. Nobody can answer this for you, and you do not have to answer it today.",
+    "body": "Anger often arrives after hurt. Hopelessness often arrives after anger. And sometimes the first feeling is exactly what it looks like.",
     "pairs": "Common pairs: anger over hurt · hopelessness over anger · worry over anger · contempt over shame · busyness over grief",
     "words": [
       "this is the first feeling",
@@ -385,7 +377,7 @@ export const feelingsEN: FeelingsContent = {
     "centre": "The need",
     "theory": "what the feeling is pointing at",
     "q": "What did you need, and not get?",
-    "body": "Every ring above is pointing here. This is the centre of the map. Naming a need does not oblige you to go and get it today.",
+    "body": "Every ring above is pointing here. This is the centre of the map.",
     "words": [
       "to be seen",
       "to be safe",
@@ -412,7 +404,7 @@ export const feelingsEN: FeelingsContent = {
     "short": "The pull",
     "theory": "what the feeling moves you to do",
     "q": "What does it want you to do right now?",
-    "body": "Write the honest impulse, including the one you would never act on. Naming it is not doing it — and the gap between the two is where the choice lives. Before anything else: am I hungry, angry, lonely, tired?",
+    "body": "Write the honest impulse, including the one you would never act on. Naming it is not doing it — and the gap between the two is where the choice lives.",
     "words": [
       "get away",
       "push back",
@@ -489,26 +481,18 @@ export const feelingsRU: FeelingsContent = {
     "q": "Где в теле сейчас что-то происходит?",
     "body": "Место, температура, тяжесть. Побыть с этим достаточно долго, чтобы описать вслух. Тело обычно знает раньше, чем приходят слова.",
     "words": [
-      "грудь",
-      "горло",
-      "живот",
-      "челюсть",
-      "плечи",
-      "голова",
-      "руки",
-      "ноги",
-      "сжато",
-      "свободно",
-      "горячо",
-      "прохладно",
-      "тяжело",
-      "легко",
-      "пусто",
-      "полно",
-      "беспокойно",
-      "ровно",
-      "покалывает",
-      "онемело"
+      "давит в груди",
+      "отпускает в груди",
+      "сжимает горло",
+      "подводит живот",
+      "стискивает челюсти",
+      "поднимаются плечи",
+      "опускаются плечи",
+      "покалывает в ладонях",
+      "горит лицо",
+      "перехватывает дыхание",
+      "всё замедляется",
+      "ничего не нахожу"
     ]
   },
   "s3": {
@@ -742,7 +726,7 @@ export const feelingsRU: FeelingsContent = {
     "short": "Глубже",
     "theory": "первое чувство или то, что пришло после",
     "q": "Было ли что-то до этого чувства?",
-    "body": "Злость часто приходит после боли. Безнадёжность — часто после злости. А иногда первое чувство именно такое, каким кажется. Здесь нет правильного ответа, и отвечать сегодня не обязательно.",
+    "body": "Злость часто приходит после боли. Безнадёжность — часто после злости. А иногда первое чувство именно такое, каким кажется.",
     "pairs": "Частые пары: злость поверх боли · безнадёжность поверх злости · тревога поверх злости · презрение поверх стыда · суета поверх горя",
     "words": [
       "это первое чувство",
@@ -759,7 +743,7 @@ export const feelingsRU: FeelingsContent = {
     "centre": "Потребность",
     "theory": "на что указывает чувство",
     "q": "Что было нужно и чего не случилось?",
-    "body": "Все круги выше указывают сюда. Это центр карты. Назвать потребность не значит идти за ней сегодня.",
+    "body": "Все круги выше указывают сюда. Это центр карты.",
     "words": [
       "чтобы увидели",
       "быть в безопасности",
@@ -786,7 +770,7 @@ export const feelingsRU: FeelingsContent = {
     "short": "Порыв",
     "theory": "к чему чувство подталкивает",
     "q": "Что хочется сделать прямо сейчас?",
-    "body": "Запишите порыв честно — в том числе тот, который никогда не осуществится. Назвать — не значит сделать; в этом зазоре и живёт выбор. И прежде всего остального: голод, злость, одиночество, усталость?",
+    "body": "Запишите порыв честно — в том числе тот, который никогда не осуществится. Назвать — не значит сделать; в этом зазоре и живёт выбор.",
     "words": [
       "уйти",
       "ответить резко",
@@ -2869,25 +2853,17 @@ export const bodyZones = [
 /** Maps each ring-2 word (by index) to the body zone it lights up. */
 export const bodyZoneForWord: string[] = [
   "chest",
+  "chest",
   "throat",
   "belly",
   "head",
   "shoulders",
-  "head",
-  "hands",
-  "legs",
-  "chest",
   "shoulders",
+  "hands",
   "head",
-  "hands",
   "chest",
   "whole",
-  "belly",
-  "chest",
-  "legs",
-  "whole",
-  "hands",
-  "whole"
+  ""
 ];
 
 /** One earth tone per family, tinted when the family is not the one in hand. */

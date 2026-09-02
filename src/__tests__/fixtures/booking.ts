@@ -5,7 +5,7 @@ import type { IcsBooking } from "@edge/ics.ts";
 export const ENQUIRY =
   "I've been struggling since my father died in March and I can't talk to my partner about it.";
 
-export const ORGANIZER = { name: "Human Heart", email: "be@humanheart.life" };
+export const ORGANIZER = { name: "Genia", email: "be@humanheart.life" };
 
 export const BOOKING_ID = "3f2b1c8e-7d4a-4c19-9b6e-2a5f8d0c1e73";
 

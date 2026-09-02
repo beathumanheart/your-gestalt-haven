@@ -23,7 +23,13 @@ const corsHeaders = {
 };
 
 const THERAPIST_EMAIL = "be@humanheart.life";
-const THERAPIST_NAME = "Human Heart";
+/** Every place a human name is shown to someone: the from-name on mail, the
+ *  moderator in the video room, the ORGANIZER on the calendar invite. A person,
+ *  not the practice — the mail is a note from Genia about a session, and a
+ *  brand name in the sender column reads like a newsletter. The practice name
+ *  belongs on the site, not in an inbox. SENDER_NAME still overrides the
+ *  from-name. */
+const THERAPIST_NAME = "Genia";
 
 /** What a client's calendar shows when a session type has no override.
  *  Deliberately less specific than the service name — this string syncs to

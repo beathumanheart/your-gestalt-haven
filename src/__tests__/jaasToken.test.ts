@@ -159,7 +159,7 @@ describe("token payload carries no personal data", () => {
     const moderatorPayload = buildJaasPayload({
       appId: APP_ID,
       roomName: roomNameForBooking(BOOKING_ID),
-      displayName: "Human Heart",
+      displayName: "Genia",
       userId: `practitioner:${BOOKING_ID}`,
       isModerator: true,
       window: computeJwtWindow(START, END),

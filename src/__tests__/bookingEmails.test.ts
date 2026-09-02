@@ -27,7 +27,7 @@ import {
 const FIXED_NOW = new Date("2026-08-12T14:30:00Z");
 
 const CLIENT_RECIPIENTS = [{ email: "sam.rivera@example.com", name: "Sam Rivera" }];
-const PRACTITIONER_RECIPIENTS = [{ email: "be@humanheart.life", name: "Human Heart" }];
+const PRACTITIONER_RECIPIENTS = [{ email: "be@humanheart.life", name: "Genia" }];
 
 function confirmation(overrides = {}) {
   return buildConfirmationEmails({

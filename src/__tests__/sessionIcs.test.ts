@@ -67,7 +67,7 @@ describe("client .ics", () => {
         " m9ZpX2vTb",
         "LOCATION:https://humanheart.life/s/k3Qm9ZpX2vTb",
         "URL:https://humanheart.life/s/k3Qm9ZpX2vTb",
-        "ORGANIZER;CN=Human Heart:mailto:be@humanheart.life",
+        "ORGANIZER;CN=Genia:mailto:be@humanheart.life",
         "ATTENDEE;CN=Sam Rivera;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED:mailto:sam.ri",
         " vera@example.com",
         "STATUS:CONFIRMED",

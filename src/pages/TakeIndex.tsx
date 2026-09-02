@@ -68,8 +68,8 @@ const TakeIndex = () => {
   return (
     <>
       <PageMeta
-        titleEn="Take with you — free material | Human Heart Beat"
-        titleRu="С собой — бесплатные материалы | Human Heart Beat"
+        titleEn="Take with you — free material | Human Heart"
+        titleRu="С собой — бесплатные материалы | Human Heart"
         descriptionEn="Free material, here if it is useful to you. No session, no account, nothing to sign up for."
         descriptionRu="Бесплатные материалы. Что-то может пригодиться, что-то нет. Ни сессии, ни регистрации не нужно."
         canonicalPath={`/${language}/take`}

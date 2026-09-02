@@ -23,7 +23,7 @@ const corsHeaders = {
 };
 
 const THERAPIST_EMAIL = "be@humanheart.life";
-const THERAPIST_NAME = "Human Heart Beat";
+const THERAPIST_NAME = "Human Heart";
 
 /** What a client's calendar shows when a session type has no override.
  *  Deliberately less specific than the service name — this string syncs to

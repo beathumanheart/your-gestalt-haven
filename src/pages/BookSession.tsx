@@ -54,11 +54,11 @@ const BookSession = () => {
     }).format(value);
 
   const metaTitleEn = session
-    ? `${session.name} — Book with Genia | Human Heart Beat`
-    : "Book a session — Human Heart Beat";
+    ? `${session.name} — Book with Genia | Human Heart`
+    : "Book a session — Human Heart";
   const metaTitleRu = session
-    ? `${(session.name_ru || session.name)} — Записаться к Жене | Human Heart Beat`
-    : "Записаться на сессию — Human Heart Beat";
+    ? `${(session.name_ru || session.name)} — Записаться к Жене | Human Heart`
+    : "Записаться на сессию — Human Heart";
   const metaDescEn = session?.description
     ? session.description.slice(0, 155).trimEnd() + (session.description.length > 155 ? "…" : "")
     : "Book a therapy session with Genia.";

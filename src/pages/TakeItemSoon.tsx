@@ -21,8 +21,8 @@ const TakeItemSoon = () => {
   return (
     <>
       <PageMeta
-        titleEn={`${takeEN.items.find((i) => i.slug === item.slug)?.title} | Human Heart Beat`}
-        titleRu={`${takeRU.items.find((i) => i.slug === item.slug)?.title} | Human Heart Beat`}
+        titleEn={`${takeEN.items.find((i) => i.slug === item.slug)?.title} | Human Heart`}
+        titleRu={`${takeRU.items.find((i) => i.slug === item.slug)?.title} | Human Heart`}
         descriptionEn={takeEN.items.find((i) => i.slug === item.slug)?.description}
         descriptionRu={takeRU.items.find((i) => i.slug === item.slug)?.description}
         noIndex

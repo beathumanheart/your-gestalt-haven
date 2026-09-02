@@ -123,7 +123,7 @@ export const staticServiceNode = () => ({
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   "@id": SERVICE_ID,
-  name: "Human Heart Beat — Gestalt Counselling",
+  name: "Human Heart — Gestalt Counselling",
   description:
     "A warm, compassionate space for individual Gestalt counselling. Working with grief, relationships, and life's existential questions.",
   url: `${SITE_URL}/en`,

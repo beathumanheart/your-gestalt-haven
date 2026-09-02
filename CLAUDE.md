@@ -24,7 +24,7 @@ npm run test:all      # unit + E2E
 
 **Stack**: React 18 + TypeScript + Vite + Supabase (PostgreSQL BaaS) + Tailwind CSS + shadcn/ui + React Query + React Router v6.
 
-This is a therapy practice site ("Human Heart Beat" / Gestalt therapy) with a public marketing site, bilingual (EN/RU) support, a client booking system, and an admin dashboard.
+This is a therapy practice site ("Human Heart" / Gestalt therapy) with a public marketing site, bilingual (EN/RU) support, a client booking system, and an admin dashboard.
 
 ### Routing (`src/App.tsx`)
 - `/` → English homepage

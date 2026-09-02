@@ -25,8 +25,8 @@ const SessionLinkLayout = ({ icon, title, children }: SessionLinkLayoutProps) =>
         <html lang={language} />
         <title>
           {language === "ru"
-            ? "Ваша сессия | Human Heart Beat"
-            : "Your Session | Human Heart Beat"}
+            ? "Ваша сессия | Human Heart"
+            : "Your Session | Human Heart"}
         </title>
         {/* Belt and braces. robots.txt disallows /s/ and /c/ outright, which is
             the directive that survives a crawler not running JS; this tag only

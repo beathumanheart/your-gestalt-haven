@@ -69,7 +69,7 @@ const Header = ({ hideSwitcher = false }: { hideSwitcher?: boolean } = {}) => {
                 strokeLinejoin="round"
               />
             </svg>
-            <span className="hidden sm:inline">Human Heart Beat</span>
+            <span className="hidden sm:inline">Human Heart</span>
           </button>
 
           <div className="col-start-2 hidden md:flex items-center gap-8">

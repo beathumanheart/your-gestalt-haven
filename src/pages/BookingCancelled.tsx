@@ -37,8 +37,8 @@ const BookingCancelled = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <PageMeta
-        titleEn="Booking Cancelled | Human Heart Beat"
-        titleRu="Запись отменена | Human Heart Beat"
+        titleEn="Booking Cancelled | Human Heart"
+        titleRu="Запись отменена | Human Heart"
         noIndex
       />
       <div className="max-w-md w-full text-center space-y-6">

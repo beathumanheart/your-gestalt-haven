@@ -32,9 +32,6 @@ export interface ServicesContent {
   title2: string;
   subtitle: string;
   /** One prose line under the subtitle, wrapping a link to /take/feelings-map. */
-  takePre: string;
-  takeLink: string;
-  takePost: string;
 
   /** 4 cards, rendered in order with icons [Heart, Users, Flame, Clock]. */
   topics: TopicCard[];
@@ -59,9 +56,6 @@ export const servicesEN: ServicesContent = {
   title2: "Work On",
   subtitle:
     "None of these will describe you exactly — your story is your own. These are simply the doors people most often come through.",
-  takePre: "If you would rather begin on your own, there is ",
-  takeLink: "a map of feelings",
-  takePost: " here — free, with nothing to sign up for.",
 
   topics: [
     {
@@ -149,9 +143,6 @@ export const servicesRU: ServicesContent = {
   title2: "поработать", // DRAFT RU
   subtitle:
     "Ничто из этого не опишет вас в точности — ваша история только ваша. Это просто двери, через которые люди чаще всего входят.", // DRAFT RU
-  takePre: "Если хочется начать самостоятельно, есть ", // DRAFT RU
-  takeLink: "карта чувств", // DRAFT RU
-  takePost: " — бесплатно и без регистрации.", // DRAFT RU
 
   topics: [
     {

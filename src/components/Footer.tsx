@@ -26,7 +26,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <Link to={langPath("/")} className="font-display text-2xl text-foreground hover:text-primary transition-colors mb-2 block">
-              Human Heart Beat
+              Human Heart
             </Link>
             <p className="font-body text-sm text-muted-foreground">
               {language === "ru" ? "Терапия с Женей" : "Therapy with Genia"}
@@ -74,7 +74,7 @@ const Footer = () => {
               {c.footerEmail}
             </a>
             <p className="font-body text-xs text-muted-foreground mt-2">
-              © {new Date().getFullYear()} Human Heart Beat. {c.footerRights}
+              © {new Date().getFullYear()} Human Heart. {c.footerRights}
             </p>
           </div>
         </div>

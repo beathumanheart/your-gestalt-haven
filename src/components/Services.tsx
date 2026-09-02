@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Heart, Users, Flame, Clock, Video, CreditCard } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { servicesEN, servicesRU } from "@/content/services";
@@ -7,7 +6,7 @@ import { servicesEN, servicesRU } from "@/content/services";
 const TOPIC_ICONS = [Heart, Users, Flame, Clock];
 
 const Services = () => {
-  const { language, langPath } = useLanguage();
+  const { language } = useLanguage();
   const c = language === "ru" ? servicesRU : servicesEN;
 
   const [rate, setRate] = useState(50);
@@ -24,13 +23,6 @@ const Services = () => {
           </h2>
           <p className="font-body text-muted-foreground max-w-xl mx-auto leading-relaxed">
             {c.subtitle}
-          </p>
-          <p className="font-body text-muted-foreground max-w-xl mx-auto leading-relaxed mt-3">
-            {c.takePre}
-            <Link to={langPath("/take/feelings-map")} className="text-primary underline underline-offset-2 hover:text-foreground transition-colors">
-              {c.takeLink}
-            </Link>
-            {c.takePost}
           </p>
         </div>
 

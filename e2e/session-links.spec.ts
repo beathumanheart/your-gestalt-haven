@@ -35,7 +35,9 @@ test.describe("/s/<slug> join link", () => {
     await expect(page.getByRole("heading", { name: /not quite yet/i })).toBeVisible({
       timeout: 10_000,
     });
-    await expect(page.getByText(/404/)).toHaveCount(0);
+    // Exact match, not /404/: the countdown to the stubbed 2099 start renders a
+    // five-figure hour count, and a substring regex matches the digits inside it.
+    await expect(page.getByText("404", { exact: true })).toHaveCount(0);
     await expect(page.getByText(/page not found/i)).toHaveCount(0);
   });
 

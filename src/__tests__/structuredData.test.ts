@@ -46,10 +46,34 @@ describe("credentials are only claimed when formally awarded", () => {
   });
 
   it("does not encode in-progress training as completed study", () => {
-    // alumniOf asserts completion just as hasCredential does.
+    // alumniOf asserts completion just as hasCredential does. Asserted by
+    // absence of the institution rather than by pinning the whole list: the
+    // list legitimately grows when an awarding body becomes identifiable,
+    // and an exact-match here would fail for that too and teach nothing.
     const json = JSON.stringify(person);
     expect(json).not.toMatch(/International Institute of Gestalt|mig\.institute/i);
-    expect(alumniNames).toEqual(["KU Leuven", "University of Tartu"]);
+  });
+
+  it("lists every awarding institution in alumniOf, and only those", () => {
+    // One entry per awarded qualification: the three in hasCredential.
+    expect(person.alumniOf).toHaveLength(person.hasCredential.length);
+
+    // Each is identified by a resolvable url, whether or not it has a name —
+    // that is what makes an unnamed node a claim rather than a blank.
+    for (const org of person.alumniOf) {
+      expect(org.url).toMatch(/^https:\/\//);
+    }
+
+    // Every institution named in a credential's recognizedBy appears here.
+    const alumniUrls = person.alumniOf.map((a) => a.url).sort();
+    const awardingUrls = person.hasCredential
+      .map((c) => (c as { recognizedBy?: { url: string } }).recognizedBy?.url)
+      .sort();
+    expect(alumniUrls).toEqual(awardingUrls);
+  });
+
+  it("names the two universities and leaves the CPD provider unnamed", () => {
+    expect(alumniNames.filter(Boolean)).toEqual(["KU Leuven", "University of Tartu"]);
   });
 
   it("keeps jobTitle exactly as chosen", () => {

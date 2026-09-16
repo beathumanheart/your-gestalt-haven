@@ -31,17 +31,17 @@ export type IdentityLang = "en" | "ru";
  *
  * EN says "Gestalt Counsellor" because the two nearest-sounding Belgian
  * professional titles are protected in law and reserved to practitioners on
- * the federal register. An English page read in Belgium must not imply
- * either. (Those titles are not spelled out here on purpose: the guard in
- * src/__tests__/bannedTerminology.test.ts bans them as substrings across the
- * whole repo, comments included, so writing them would fail the build.)
- *
- * RU says «гештальт-терапевт» because that is the ordinary, unregulated
- * descriptor in Russian-language practice, where «консультант» would
- * understate the work.
+ * the federal register; an English page read in Belgium must not imply
+ * either. RU says «гештальт-терапевт» because that is the ordinary,
+ * unregulated descriptor in Russian-language practice, where «консультант»
+ * would understate the work.
  *
  * Do not harmonise them. A future translation pass that "fixes" one to match
  * the other reintroduces a regulatory claim on the EN side.
+ *
+ * The two titles are named, and the full reasoning set out, in
+ * docs/terminology.md — the one file where the terminology guard permits the
+ * words themselves. Read it before changing either value.
  */
 const JOB_TITLE: Record<IdentityLang, string> = {
   en: "Gestalt Counsellor",

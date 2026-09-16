@@ -1,7 +1,15 @@
 import { Helmet } from "react-helmet-async";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  HOME_TEXT,
+  OG_IMAGE_ALT,
+  OG_LOCALE,
+  SITE_URL,
+  swapLang,
+} from "@/config/pageMetadata";
 
-export const SITE_URL = "https://humanheart.life";
+// Re-exported because several components import it from here.
+export { SITE_URL };
 
 interface PageMetaProps {
   titleEn?: string;
@@ -16,22 +24,12 @@ interface PageMetaProps {
   noIndex?: boolean;
 }
 
-const defaults = {
-  titleEn: "Genia | Counselling & Accompaniment",
-  titleRu: "Genia | Психолог-консультант",
-  descriptionEn:
-    "A warm, compassionate space for therapy. I offer short-term and long-term Gestalt counselling for grief, relationships, and life's existential questions.",
-  descriptionRu:
-    "Тёплое пространство для терапии. Краткосрочное и долгосрочное гештальт-консультирование — горе, отношения, экзистенциальные вопросы.",
-};
-
-/** Given "/en/book/foo", returns "/ru/book/foo" and vice-versa. */
-const swapLang = (path: string, from: "en" | "ru"): string => {
-  const to = from === "en" ? "ru" : "en";
-  if (path.startsWith(`/${from}/`)) return `/${to}/${path.slice(from.length + 2)}`;
-  if (path === `/${from}`) return `/${to}`;
-  return path;
-};
+/**
+ * Every string this component can render also has to be written into the
+ * static files the build generates, so they all live in one module — see
+ * the note at the top of src/config/pageMetadata.ts.
+ */
+const defaults = HOME_TEXT;
 
 const PageMeta = ({
   titleEn = defaults.titleEn,
@@ -47,9 +45,9 @@ const PageMeta = ({
   const title       = isRu ? titleRu : titleEn;
   const description = isRu ? descriptionRu : descriptionEn;
   const ogImage     = `${SITE_URL}/og-image-${language}.png`;
-  const ogImageAlt  = isRu ? "Женя — психолог-консультант" : "Genia — Gestalt counsellor";
-  const locale      = isRu ? "ru_RU" : "en_US";
-  const altLocale   = isRu ? "en_US" : "ru_RU";
+  const ogImageAlt  = OG_IMAGE_ALT[language];
+  const locale      = OG_LOCALE[language];
+  const altLocale   = OG_LOCALE[isRu ? "en" : "ru"];
 
   const canonicalUrl = canonicalPath ? `${SITE_URL}${canonicalPath}` : undefined;
   const lang = language as "en" | "ru";

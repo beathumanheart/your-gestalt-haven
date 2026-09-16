@@ -2,6 +2,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
+import { FEELINGS_MAP_TEXT } from "@/config/pageMetadata";
 import FeelingsMap from "@/components/FeelingsMap";
 
 const Feelings = () => {
@@ -9,13 +10,7 @@ const Feelings = () => {
 
   return (
     <>
-      <PageMeta
-        titleEn="What is going on with me — a map of feelings | Human Heart"
-        titleRu="Что со мной происходит — карта чувств | Human Heart"
-        descriptionEn="A free interactive map of feelings in six rings: land in the present, find the felt sense, name the feeling, tell it from the one underneath, and reach the need it points at."
-        descriptionRu="Бесплатная интерактивная карта чувств из шести колец: заземлиться в настоящем, найти телесное ощущение, назвать чувство, отличить его от того, что под ним, и дойти до потребности."
-        canonicalPath={`/${language}/take/feelings-map`}
-      />
+      <PageMeta {...FEELINGS_MAP_TEXT} canonicalPath={`/${language}/take/feelings-map`} />
       <Header />
       {/* pt clears the fixed header */}
       <main className="min-h-screen bg-background pt-24 md:pt-28">

@@ -4,10 +4,13 @@
     <meta charset="utf-8">
     <title>Human Heart</title>
     <script type="text/javascript">
-      // GitHub Pages SPA fallback
-      // This file is served for any path that doesn't match a real file.
-      // The build workflow (static.yml) copies dist/index.html to dist/404.html,
-      // which is the actual fallback used in production.
+      // GitHub Pages SPA fallback.
+      // Most public routes are real files now — the staticSite build plugin
+      // writes one per indexable route, so they answer 200 and never reach
+      // here. This is for what is left: /admin, short session links, hidden
+      // offers, and genuinely wrong URLs.
+      // deploy-production.yml copies dist/index.html to dist/404.html, which
+      // is the actual fallback used in production.
       // This repo-root file is only a safety net for development.
       sessionStorage.setItem('spa-redirect', window.location.href);
       window.location.replace('/');

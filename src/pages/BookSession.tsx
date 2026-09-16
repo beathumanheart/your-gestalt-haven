@@ -8,6 +8,7 @@ import BookingWidget from "@/components/booking/BookingWidget";
 import { supabase } from "@/integrations/supabase/client";
 import type { SessionType } from "@/components/booking/SessionTypeSelector";
 import PageMeta from "@/components/PageMeta";
+import { bookingRouteText } from "@/config/pageMetadata";
 import { ServiceJsonLd } from "@/components/JsonLd";
 
 const BookSession = () => {
@@ -53,27 +54,14 @@ const BookSession = () => {
       maximumFractionDigits: 0,
     }).format(value);
 
-  const metaTitleEn = session
-    ? `${session.name} — Book with Genia | Human Heart`
-    : "Book a session — Human Heart";
-  const metaTitleRu = session
-    ? `${(session.name_ru || session.name)} — Записаться к Жене | Human Heart`
-    : "Записаться на сессию — Human Heart";
-  const metaDescEn = session?.description
-    ? session.description.slice(0, 155).trimEnd() + (session.description.length > 155 ? "…" : "")
-    : "Book a therapy session with Genia.";
-  const metaDescRu = (session?.description_ru || session?.description)
-    ? (session?.description_ru || session?.description || "").slice(0, 155).trimEnd() +
-      ((session?.description_ru || session?.description || "").length > 155 ? "…" : "")
-    : "Запись на терапевтическую сессию с Genia.";
+  // Same builder the build step uses to write this page's static file, so the
+  // head a crawler is served and the head React renders cannot disagree.
+  const meta = bookingRouteText(session);
 
   return (
     <main className="min-h-screen bg-background">
       <PageMeta
-        titleEn={metaTitleEn}
-        titleRu={metaTitleRu}
-        descriptionEn={metaDescEn}
-        descriptionRu={metaDescRu}
+        {...meta}
         canonicalPath={session ? `/${language}/book/${session.slug ?? sessionId}` : undefined}
       />
       {session && (

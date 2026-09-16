@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
+import { TAKE_TEXT } from "@/config/pageMetadata";
 import { takeEN, takeRU, type TakeItem } from "@/content/take";
 
 /* The map page needs width for the wheel. This one is a list of four cards and
@@ -67,13 +68,7 @@ const TakeIndex = () => {
 
   return (
     <>
-      <PageMeta
-        titleEn="Take with you — free material | Human Heart"
-        titleRu="С собой — бесплатные материалы | Human Heart"
-        descriptionEn="Free material, here if it is useful to you. No session, no account, nothing to sign up for."
-        descriptionRu="Бесплатные материалы. Что-то может пригодиться, что-то нет. Ни сессии, ни регистрации не нужно."
-        canonicalPath={`/${language}/take`}
-      />
+      <PageMeta {...TAKE_TEXT} canonicalPath={`/${language}/take`} />
       {/* Fraunces is the card face and is used nowhere else on the site, so it
           loads here rather than in the global font import. */}
       <Helmet>

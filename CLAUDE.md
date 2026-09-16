@@ -40,6 +40,46 @@ const t = language === "ru" ? contentRU : contentEN;
 ```
 Language context is provided via `src/contexts/LanguageContext.tsx` (`useLanguage()` hook), persisted in localStorage and driven by route param.
 
+### Static page generation (SEO)
+The app is client-rendered and deployed to GitHub Pages, which has no rewrite
+rules. The deploy copies `index.html` to `404.html` so the SPA fallback renders
+the right page — but the response status is still 404, and crawlers believe the
+status, not the rendered pixels. For a long time every URL in the sitemap was
+served as a 404, so only `/` was ever indexed.
+
+`scripts/static-site/plugin.ts` (a Vite plugin, run on `vite build`) therefore
+writes a real HTML file for every indexable route, in both languages, plus
+`sitemap.xml`. Each file carries that route's own title, description, OG tags,
+canonical and hreflang set. It is **not** prerendering — the body is still an
+empty `#root` that boots the SPA — it is a fetchable document with an honest
+head, which is the part that was missing.
+
+- Route titles/descriptions live in `src/config/pageMetadata.ts` and nowhere
+  else. `<PageMeta>` renders them at runtime and the build writes them into the
+  files; if the two ever disagree, the indexed head stops matching the page.
+  Add a route by adding it there.
+- `scripts/static-site/render.ts` is pure (string in, string out) and throws if
+  a tag it must replace is missing from `index.html`, so renaming a meta tag
+  fails the build instead of silently shipping the homepage's head everywhere.
+- Every path is checked against `FORBIDDEN_PATH_SEGMENTS` before anything is
+  written: `/s/` and `/c/` slugs are capability tokens for video rooms, so
+  writing a file at one would publish the room. See
+  `src/__tests__/shortLinkIndexing.test.ts`.
+- Routes with no generated file (`/admin`, `/s/`, `/c/`, hidden offers,
+  `/booking-cancelled`) still fall through to the SPA via `404.html`, which is
+  intended — they are all noindex or private.
+- Each route is written twice, as `en/take/index.html` and `en/take.html`,
+  because the sitemap lists the extensionless URL and static hosts disagree
+  about how to serve it. That makes `/en/take.html` a third reachable URL for
+  the same document; all three share one canonical. Tracked debt, resolved by
+  one curl after a deploy — see issue #48.
+- The site-wide JSON-LD is emitted per language: `scripts/static-site/jsonLd.ts`
+  injects the English nodes into `index.html`, and `setJsonLd` in `render.ts`
+  rewrites them in Russian for the `/ru` files. The EN output stays
+  byte-identical to `index.html`. `jobTitle` differs between languages **by
+  intent, not translation** — see the comment on `JOB_TITLE` in
+  `src/config/identity.ts` before touching it.
+
 ### Supabase Integration
 - Client initialized in `src/integrations/supabase/client.ts`
 - Auto-generated TypeScript types in `src/integrations/supabase/types.ts` — regenerate with `supabase gen types` after schema changes

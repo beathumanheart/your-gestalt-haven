@@ -40,9 +40,9 @@
          Both nodes are built from src/config/identity.ts and injected by the
          siteJsonLd plugin in vite.config.ts — edit the module, not this file.
 
-         Known limitation: one static file serves both /en and /ru, so this
-         prose is English on Russian pages too. Fixing that needs per-language
-         HTML emitted at build time. -->
+         The nodes here are the English ones, which is what "/" serves. The
+         staticSite plugin rewrites them in Russian for the /ru pages it
+         generates — see setJsonLd in scripts/static-site/render.ts. -->
     <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "Person",
@@ -129,7 +129,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <script type="module" crossorigin src="/assets/index-BEh9CcN0.js"></script>
+    <script type="module" crossorigin src="/assets/index-CTeC7HSJ.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-DKjOS3u1.css">
   </head>
 

@@ -9,7 +9,16 @@ import { test, expect } from "@playwright/test";
  * The build now writes a real file at each indexable path. These tests use the
  * `request` fixture rather than `page` on purpose: it does not run JavaScript,
  * so it sees what a crawler sees before deciding whether to render anything —
- * the served status and the served head, not the head React installs later.
+ * the served head, not the head React installs later.
+ *
+ * ⚠️ Status codes prove nothing here. `vite preview` answers 200 for every
+ * path, real file or not, so an `expect(status).toBe(200)` would pass even if
+ * the build wrote no files at all — which is the whole bug these tests exist
+ * to catch. The discriminator is the served *head*: a path with no file of
+ * its own falls back to index.html and carries the English homepage's title,
+ * so asserting each route's own title is what distinguishes a real file from
+ * the fallback. The status itself is only checkable against the real host,
+ * and is recorded in issue #48.
  */
 
 const INDEXABLE = [
@@ -29,14 +38,14 @@ const INDEXABLE = [
   { path: "/ru/offer-agreement", title: "Договор оферты | Human Heart" },
 ];
 
+/** The head every un-generated path falls back to, i.e. index.html's. */
+const FALLBACK_TITLE = "Genia | Counselling &amp; Accompaniment";
+
 test.describe("indexable routes are served, not faked", () => {
   for (const { path, title } of INDEXABLE) {
-    test(`${path} answers 200 with its own head`, async ({ request }) => {
-      const response = await request.get(path);
+    test(`${path} is served from its own file`, async ({ request }) => {
+      const html = await (await request.get(path)).text();
 
-      expect(response.status()).toBe(200);
-
-      const html = await response.text();
       expect(html).toContain(`<title>${title}</title>`);
       expect(html).toContain(
         `<link rel="canonical" href="https://humanheart.life${path}" />`,
@@ -45,22 +54,29 @@ test.describe("indexable routes are served, not faked", () => {
     });
   }
 
-  test("the trailing-slash form is served too, with the same canonical", async ({ request }) => {
-    // Hosts that redirect /en/take to /en/take/ must land on a page that still
-    // claims /en/take, or the redirect and the canonical disagree.
-    const response = await request.get("/en/take/");
+  test("a path with no file of its own falls back to the homepage head", async ({ request }) => {
+    // The negative control the assertions above depend on. If this ever
+    // returned a route's own head, the fallback would be indistinguishable
+    // from a generated file and every test here would be vacuous.
+    const html = await (await request.get("/en/not-a-generated-route")).text();
 
-    expect(response.status()).toBe(200);
-    expect(await response.text()).toContain(
-      '<link rel="canonical" href="https://humanheart.life/en/take" />',
-    );
+    expect(html).toContain(`<title>${FALLBACK_TITLE}</title>`);
+    expect(html).not.toContain("Take with you");
+  });
+
+  test("a Russian route does not serve the English fallback head", async ({ request }) => {
+    // The exact failure before this work: /ru/take existed only as a fallback,
+    // so it was served with the English homepage's title and description.
+    const html = await (await request.get("/ru/take")).text();
+
+    expect(html).not.toContain(FALLBACK_TITLE);
+    expect(html).toContain('<html lang="ru">');
+    expect(html).toContain('<meta property="og:locale" content="ru_RU" />');
   });
 
   test("a booking page carries the session's own title, from the database", async ({ request }) => {
-    const response = await request.get("/en/book/individual-therapy");
+    const html = await (await request.get("/en/book/individual-therapy")).text();
 
-    expect(response.status()).toBe(200);
-    const html = await response.text();
     expect(html).toContain("Book with Genia | Human Heart");
     expect(html).toContain(
       '<link rel="canonical" href="https://humanheart.life/en/book/individual-therapy" />',
@@ -76,13 +92,16 @@ test.describe("the SPA still routes on the real paths", () => {
     await expect(page).toHaveTitle("Что со мной происходит — карта чувств | Human Heart");
   });
 
-  test("the trailing-slash path routes to the same page", async ({ page }) => {
-    // React Router ignores a trailing slash when matching; if it ever stops,
-    // readers arriving from a host that redirects would land on the 404 view.
-    await page.goto("/en/take/");
+  test("the app never links to a trailing-slash URL", async ({ page }) => {
+    // Only /en.html is written, so /en/ has no file and would 404 on the real
+    // host. langPath("/") must therefore produce /en, not /en/ — the footer
+    // wordmark and every "back to home" link go through it.
+    await page.goto("/en/take");
 
-    await expect(page.getByText("404", { exact: true })).toHaveCount(0);
-    await expect(page).toHaveTitle("Take with you — free material | Human Heart");
+    const homeHrefs = await page
+      .locator('a[href$="/en/"], a[href$="/ru/"]')
+      .count();
+    expect(homeHrefs).toBe(0);
   });
 
   test("a route with no generated file still falls back to the SPA", async ({ page }) => {

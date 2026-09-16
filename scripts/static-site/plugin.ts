@@ -136,29 +136,24 @@ export const staticSite = (): Plugin => {
           const canonicalPath = `/${lang}${route.path}`;
           const html = renderRoutePage(template, { canonicalPath, lang, text: route.text });
 
-          // Written in both shapes, because the sitemap lists the extensionless
-          // URL (/en/take) and static hosts disagree about how to serve it:
+          // One file per route, at `<path>.html`.
           //
-          //   en/take/index.html  — every host serves this at /en/take/, and
-          //                         redirects /en/take to it with a 301.
-          //   en/take.html        — hosts with an extensionless HTML fallback,
-          //                         GitHub Pages among them, serve this at
-          //                         /en/take directly, with no redirect hop.
+          // This host resolves an extensionless request to the sibling .html
+          // file and serves it directly, with no redirect: /404 returns 200
+          // from 404.html, which has no directory of its own. The directory
+          // form would work too, but only via a 301 — /en/book, a directory
+          // with no .html sibling, redirects to /en/book/ — and that would
+          // make every URL in the sitemap a redirect to its own canonical.
           //
-          // Both carry the same canonical, so whichever one answers, the URL
-          // Google keeps is the one in the sitemap. This is tracked debt with
-          // a one-curl resolution — see issue #48 — not a permanent design:
-          // the .html form is a third reachable URL for the same document.
-          const targets = [
-            path.join(outDir, canonicalPath, "index.html"),
-            path.join(outDir, `${canonicalPath}.html`),
-          ];
+          // So the sitemap URL is served directly, and the only other shape
+          // reachable for the same document is the literal /en/take.html,
+          // which the canonical consolidates. Measured on the deploy of #49;
+          // see issue #48 for the full evidence.
+          const target = path.join(outDir, `${canonicalPath}.html`);
 
-          for (const target of targets) {
-            fs.mkdirSync(path.dirname(target), { recursive: true });
-            fs.writeFileSync(target, html, "utf8");
-            fileCount += 1;
-          }
+          fs.mkdirSync(path.dirname(target), { recursive: true });
+          fs.writeFileSync(target, html, "utf8");
+          fileCount += 1;
         }
       }
 

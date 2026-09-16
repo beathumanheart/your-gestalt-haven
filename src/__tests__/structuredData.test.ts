@@ -29,7 +29,9 @@ describe("no hardcoded prices in structured data", () => {
 describe("credentials are only claimed when formally awarded", () => {
   const person = staticPersonNode();
   const credentialNames = person.hasCredential.map((c) => c.name);
-  const alumniNames = person.alumniOf.map((a) => a.name);
+  // Not every institution carries a name — the CPD provider is identified
+  // by url alone — so this is narrowed rather than assumed.
+  const alumniNames = person.alumniOf.map((a) => ("name" in a ? a.name : undefined));
 
   it("encodes the three awarded qualifications", () => {
     expect(credentialNames).toEqual([

@@ -17,6 +17,18 @@ below, with what to use instead. Do not add your term to the exemption, and
 do not widen the exemption to a directory. Reword, and if the reasoning needs
 recording, record it here.
 
+## Blind spot: text inside images
+
+The guard reads files as text, so a term drawn into an image is invisible to
+it. That is not hypothetical — both social preview cards
+(`public/og-image-en.png`, `public/og-image-ru.png`) state a protected title
+in their artwork while every line of source around them says "Gestalt
+Counsellor" / «гештальт-терапевт». See #55.
+
+OCR in a unit test is not worth it. Instead: **when an image contains words,
+read the words.** Any new card, banner, or screenshot with text on it needs a
+human look before it ships, because nothing downstream will catch it.
+
 ## `psychotherapeut`, `klinisch psycholoog` — and so `psychotherap*`, `psychologist`
 
 Both are professional titles protected under Belgian law and reserved to

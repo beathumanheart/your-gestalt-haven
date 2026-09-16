@@ -9,6 +9,7 @@ import {
 } from "@/content/offerAgreement";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
+import { OFFER_AGREEMENT_TEXT } from "@/config/pageMetadata";
 import OfferAgreementBody from "@/components/OfferAgreementBody";
 
 const OfferAgreement = () => {
@@ -18,13 +19,7 @@ const OfferAgreement = () => {
 
   return (
     <>
-      <PageMeta
-        titleEn="Offer Agreement | Human Heart"
-        titleRu="Договор оферты | Human Heart"
-        descriptionEn="Terms and conditions for therapy sessions at Human Heart — Gestalt counselling with Genia."
-        descriptionRu="Условия оказания терапевтических услуг на Human Heart — гештальт-консультирование с Женей."
-        canonicalPath={`/${language}/offer-agreement`}
-      />
+      <PageMeta {...OFFER_AGREEMENT_TEXT} canonicalPath={`/${language}/offer-agreement`} />
       <main className="min-h-screen bg-background py-20 px-6">
         <div className="container-narrow max-w-3xl">
           <Link

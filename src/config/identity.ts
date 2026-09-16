@@ -21,6 +21,70 @@ export const SITE_URL = "https://humanheart.life";
 export const PERSON_ID = `${SITE_URL}/#genia`;
 export const SERVICE_ID = `${SITE_URL}/#service`;
 
+/** The languages the identity nodes are emitted in. */
+export type IdentityLang = "en" | "ru";
+
+/**
+ * The practitioner's job title, per language.
+ *
+ * ⚠️ The EN and RU titles are deliberately NOT translations of each other.
+ *
+ * EN says "Gestalt Counsellor" because the two nearest-sounding Belgian
+ * professional titles are protected in law and reserved to practitioners on
+ * the federal register. An English page read in Belgium must not imply
+ * either. (Those titles are not spelled out here on purpose: the guard in
+ * src/__tests__/bannedTerminology.test.ts bans them as substrings across the
+ * whole repo, comments included, so writing them would fail the build.)
+ *
+ * RU says «гештальт-терапевт» because that is the ordinary, unregulated
+ * descriptor in Russian-language practice, where «консультант» would
+ * understate the work.
+ *
+ * Do not harmonise them. A future translation pass that "fixes" one to match
+ * the other reintroduces a regulatory claim on the EN side.
+ */
+const JOB_TITLE: Record<IdentityLang, string> = {
+  en: "Gestalt Counsellor",
+  ru: "гештальт-терапевт",
+};
+
+/**
+ * Subject-matter tags, per language.
+ *
+ * The RU side is built from the vocabulary already reviewed and shipping in
+ * the RU metadata and the offer agreement («горе», «отношения»,
+ * «экзистенциальные вопросы», «гештальт-терапия») rather than translated
+ * afresh here — the draft RU in src/content/services.ts is explicitly not a
+ * source for anything user-visible yet.
+ */
+const KNOWS_ABOUT: Record<IdentityLang, readonly string[]> = {
+  en: ["Gestalt therapy", "grief counselling", "existential therapy", "relationship therapy"],
+  ru: ["гештальт-терапия", "работа с горем", "экзистенциальная терапия", "терапия отношений"],
+};
+
+/** The practice's own prose, per language. Mirrors JOB_TITLE's terminology. */
+const SERVICE_NAME: Record<IdentityLang, string> = {
+  // "Human Heart" is the brand and stays; only the descriptor after it is
+  // language-specific, for the same reason JOB_TITLE is.
+  en: "Human Heart — Gestalt Counselling",
+  ru: "Human Heart — гештальт-терапия",
+};
+
+const SERVICE_DESCRIPTION: Record<IdentityLang, string> = {
+  en:
+    "A warm, compassionate space for individual Gestalt counselling. " +
+    "Working with grief, relationships, and life's existential questions.",
+  ru:
+    "Тёплое пространство для индивидуальной гештальт-терапии. " +
+    "Работа с горем, отношениями и экзистенциальными вопросами.",
+};
+
+/** Matches the phrasing the per-session nodes in JsonLd.tsx already emit. */
+const AREA_SERVED: Record<IdentityLang, string> = {
+  en: "Worldwide (online)",
+  ru: "Весь мир (онлайн)",
+};
+
 /**
  * Institutions that *awarded a completed* qualification. URLs verified
  * to resolve.
@@ -76,23 +140,30 @@ export const CREDENTIALS = [
 ] as const;
 
 /**
- * The site-wide Person node, injected into index.html at build time.
+ * The site-wide Person node, written into every generated page's head.
  *
- * The prose here is English. One static HTML file serves both /en and
- * /ru, so it cannot be per-language without build-time prerendering —
- * see the note in index.html. `jobTitle` is "Gestalt Counsellor" by
- * deliberate choice; it is not a loose synonym for "therapist" and
- * should not be broadened.
+ * `@id` is the same string in both languages on purpose: it is the stable
+ * identity of one person, and emitting two ids would assert two people.
+ * Only the prose varies — see JOB_TITLE for the one divergence that is a
+ * legal matter rather than a translation.
+ *
+ * `url` and `image` stay on the English homepage in both languages, because
+ * they name the person's primary page, not the page the node appears on.
+ *
+ * Institution and qualification names are left in their original language.
+ * They are proper nouns awarded by a named body; src/content/credentials.ts
+ * carries reviewed RU labels for the visible page, but which of those are
+ * exonyms and which are translations is a separate decision from this one.
  */
-export const staticPersonNode = () => ({
+export const staticPersonNode = (lang: IdentityLang = "en") => ({
   "@context": "https://schema.org",
   "@type": "Person",
   "@id": PERSON_ID,
   name: "Genia",
-  jobTitle: "Gestalt Counsellor",
+  jobTitle: JOB_TITLE[lang],
   url: `${SITE_URL}/en`,
   image: `${SITE_URL}/og-image-en.png`,
-  knowsAbout: ["Gestalt therapy", "grief counselling", "existential therapy", "relationship therapy"],
+  knowsAbout: KNOWS_ABOUT[lang],
   knowsLanguage: ["en", "ru"],
   sameAs: SAME_AS,
   alumniOf: ALUMNI_OF,
@@ -119,14 +190,13 @@ export const staticPersonNode = () => ({
  * practitioner is expressed as Person.worksFor instead, and the kind of
  * work is already stated in `name` and `description`.
  */
-export const staticServiceNode = () => ({
+export const staticServiceNode = (lang: IdentityLang = "en") => ({
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   "@id": SERVICE_ID,
-  name: "Human Heart — Gestalt Counselling",
-  description:
-    "A warm, compassionate space for individual Gestalt counselling. Working with grief, relationships, and life's existential questions.",
+  name: SERVICE_NAME[lang],
+  description: SERVICE_DESCRIPTION[lang],
   url: `${SITE_URL}/en`,
-  areaServed: "Worldwide (online)",
+  areaServed: AREA_SERVED[lang],
   knowsLanguage: ["en", "ru"],
 });

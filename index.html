@@ -40,9 +40,9 @@
          Both nodes are built from src/config/identity.ts and injected by the
          siteJsonLd plugin in vite.config.ts — edit the module, not this file.
 
-         Known limitation: one static file serves both /en and /ru, so this
-         prose is English on Russian pages too. Fixing that needs per-language
-         HTML emitted at build time. -->
+         The nodes here are the English ones, which is what "/" serves. The
+         staticSite plugin rewrites them in Russian for the /ru pages it
+         generates — see setJsonLd in scripts/static-site/render.ts. -->
     <script type="application/ld+json">"__JSONLD_PERSON__"</script>
     <script type="application/ld+json">"__JSONLD_SERVICE__"</script>
 

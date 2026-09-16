@@ -19,9 +19,16 @@ const Hero = () => {
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
+        {/* The LCP element: a full-viewport background behind the fold-level
+            copy. It is what the largest-contentful-paint measurement actually
+            lands on, so it is fetched at high priority and never lazily. */}
         <img
           src={heroImage}
           alt="Warm, inviting therapy space with soft natural light"
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />

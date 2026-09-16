@@ -1,4 +1,5 @@
-import portraitImage from "@/assets/portrait.jpeg";
+import portraitWebp from "@/assets/portrait-640.webp";
+import portraitJpg from "@/assets/portrait-640.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { aboutEN, aboutRU } from "@/content/about";
 
@@ -33,11 +34,27 @@ const About = () => {
               <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-sage-light p-3 shadow-elevated">
                 <div className="w-full h-full rounded-full bg-terracotta-light p-2 animate-float">
                   <div className="w-full h-full rounded-full bg-cream shadow-card overflow-hidden">
-                    <img 
-                      src={portraitImage} 
-                      alt={language === "ru" ? "Женя, психолог-консультант" : "Genia, Gestalt counsellor"}
-                      className="w-full h-full object-cover"
-                    />
+                    {/* Pre-cropped to the circle this renders in, rather than
+                        shipping the full 1440x1920 frame for object-cover to
+                        crop: a naive downscale softens the face, which is the
+                        part someone is actually reading. The master lives in
+                        design-assets/ and is not built.
+
+                        Below the fold — the hero image is the LCP element — so
+                        this loads lazily instead of competing for bandwidth
+                        during the initial render. */}
+                    <picture>
+                      <source srcSet={portraitWebp} type="image/webp" />
+                      <img
+                        src={portraitJpg}
+                        alt={language === "ru" ? "Женя, психолог-консультант" : "Genia, Gestalt counsellor"}
+                        width={640}
+                        height={640}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    </picture>
                   </div>
                 </div>
               </div>

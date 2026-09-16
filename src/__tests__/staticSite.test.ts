@@ -169,6 +169,59 @@ describe("site-wide JSON-LD", () => {
     expect(personOf(ru).alumniOf).toEqual(personOf(en).alumniOf);
   });
 
+  it("identifies every institution by url, not by name", () => {
+    // The point of the url/sameAs pair: a crawler can resolve them, and
+    // cannot resolve a name. A node with neither identifies nothing.
+    const person = parseNodes(render("en")).find((n) => n["@type"] === "Person");
+    const institutions = [
+      ...person.alumniOf,
+      ...person.hasCredential.map((c: Record<string, unknown>) => c.recognizedBy),
+    ];
+
+    expect(institutions.length).toBeGreaterThan(0);
+    for (const org of institutions) {
+      expect(org).toBeTruthy();
+      expect(org.url).toMatch(/^https:\/\//);
+    }
+  });
+
+  it("points sameAs at the right KU Leuven, not the pre-1968 one", () => {
+    // Q644789 is the institution that split in 1968 and Q2901923 the umbrella
+    // association. Picking either would assert the degree came from a
+    // different legal body.
+    const json = JSON.stringify(parseNodes(render("en")));
+
+    expect(json).toContain("wikidata.org/wiki/Q833670");
+    expect(json).not.toContain("Q644789");
+    expect(json).not.toContain("Q2901923");
+  });
+
+  it("names institutions identically in both languages", () => {
+    // An institution's name is its own official name, so it is not a
+    // translation and must not drift per language. Exonyms would break this.
+    const namesOf = (lang: MetaLang) => {
+      const person = parseNodes(render(lang)).find((n) => n["@type"] === "Person");
+      return person.alumniOf.map((o: Record<string, unknown>) => o.name ?? null);
+    };
+
+    expect(namesOf("ru")).toEqual(namesOf("en"));
+    expect(namesOf("en")).toContain("KU Leuven");
+    expect(namesOf("en")).toContain("University of Tartu");
+  });
+
+  it("leaves the Saint Petersburg institute unnamed rather than guessing", () => {
+    // Its own tagline is not its name, and the legal form on the diploma is
+    // not to hand. A url with no name asserts less than a wrong name.
+    const person = parseNodes(render("en")).find((n) => n["@type"] === "Person");
+    const spb = person.alumniOf.find((o: Record<string, unknown>) =>
+      String(o.url).includes("education-psy.ru"),
+    );
+
+    expect(spb).toBeTruthy();
+    expect(spb.name).toBeUndefined();
+    expect(spb["@type"]).toBe("EducationalOrganization");
+  });
+
   it("throws rather than guess when a JSON-LD block has no known @id", () => {
     // Replace the injected Service node with one carrying no known @id —
     // what reaches render.ts if someone hand-adds a node to index.html.

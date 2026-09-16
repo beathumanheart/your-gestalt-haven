@@ -31,17 +31,17 @@ export type IdentityLang = "en" | "ru";
  *
  * EN says "Gestalt Counsellor" because the two nearest-sounding Belgian
  * professional titles are protected in law and reserved to practitioners on
- * the federal register. An English page read in Belgium must not imply
- * either. (Those titles are not spelled out here on purpose: the guard in
- * src/__tests__/bannedTerminology.test.ts bans them as substrings across the
- * whole repo, comments included, so writing them would fail the build.)
- *
- * RU says «гештальт-терапевт» because that is the ordinary, unregulated
- * descriptor in Russian-language practice, where «консультант» would
- * understate the work.
+ * the federal register; an English page read in Belgium must not imply
+ * either. RU says «гештальт-терапевт» because that is the ordinary,
+ * unregulated descriptor in Russian-language practice, where «консультант»
+ * would understate the work.
  *
  * Do not harmonise them. A future translation pass that "fixes" one to match
  * the other reintroduces a regulatory claim on the EN side.
+ *
+ * The two titles are named, and the full reasoning set out, in
+ * docs/terminology.md — the one file where the terminology guard permits the
+ * words themselves. Read it before changing either value.
  */
 const JOB_TITLE: Record<IdentityLang, string> = {
   en: "Gestalt Counsellor",
@@ -86,17 +86,80 @@ const AREA_SERVED: Record<IdentityLang, string> = {
 };
 
 /**
- * Institutions that *awarded a completed* qualification. URLs verified
- * to resolve.
+ * ── Institutions ─────────────────────────────────────────────────────────
  *
- * The International Institute of Gestalt is deliberately absent: that
- * training is ongoing, and `alumniOf` asserts completed study just as
+ * Defined once each and referenced from both `alumniOf` and the
+ * `recognizedBy` of the credential they awarded, so an institution cannot
+ * be described one way in one place and another way in the other.
+ *
+ * An institution's `name` is its own official name. That is not a
+ * translation decision, so it does not vary by page language: "KU Leuven"
+ * and "University of Tartu" appear on the Russian pages exactly as on the
+ * English ones, and by the same rule a Russian institution keeps its
+ * Russian name on the English page. Exonyms are avoided — «Лёвенский
+ * католический университет» describes the institution rather than naming
+ * it.
+ *
+ * Identity is carried by `url` and `sameAs` instead of by the name, which
+ * is both language-neutral and checkable by a third party. That is the
+ * point: a crawler can resolve these, and cannot resolve a translation.
+ */
+
+const KU_LEUVEN = {
+  "@type": "CollegeOrUniversity",
+  name: "KU Leuven",
+  url: "https://www.kuleuven.be/",
+  // Q833670 is the Dutch-language university as it exists since the 1968
+  // split, which is the body that awarded the degree. Q644789 is the
+  // pre-1968 institution and Q2901923 the umbrella association; neither is
+  // this one, and both are easy to pick by mistake.
+  sameAs: "https://www.wikidata.org/wiki/Q833670",
+} as const;
+
+const UNIVERSITY_OF_TARTU = {
+  "@type": "CollegeOrUniversity",
+  name: "University of Tartu",
+  url: "https://ut.ee/",
+  sameAs: "https://www.wikidata.org/wiki/Q204181",
+} as const;
+
+/**
+ * The Saint Petersburg institute that awarded the counselling diploma.
+ *
+ * `name` is deliberately absent, and a node carrying a url and no name
+ * asserts less than a node carrying a wrong one. The site's own tagline is
+ * not the institution's name, and the legal form printed on the diploma is
+ * not to hand; Genia will supply the official name if it is wanted.
+ *
+ * `@type` is the general EducationalOrganization rather than
+ * CollegeOrUniversity: this is a continuing-professional-development
+ * provider, not a university.
+ *
+ * No `sameAs` — there is no Wikidata or Wikipedia entry to point at.
+ */
+const SPB_COUNSELLING_INSTITUTE = {
+  "@type": "EducationalOrganization",
+  url: "https://education-psy.ru/",
+} as const;
+
+/**
+ * Institutions that *awarded a completed* qualification.
+ *
+ * All three diplomas and degrees here are finished, so all three
+ * institutions belong. The Saint Petersburg one was previously absent only
+ * because no institution was identified at all — the page names the city —
+ * and a url now identifies it without naming it.
+ *
+ * The International Institute of Gestalt is still deliberately absent:
+ * that training is ongoing, and `alumniOf` asserts completed study just as
  * surely as `hasCredential` would. It stays prose on the page, where
- * "(ongoing)" can qualify it.
+ * "(ongoing)" can qualify it. Its url lives in src/content/credentials.ts,
+ * next to that qualifier.
  */
 export const ALUMNI_OF = [
-  { "@type": "CollegeOrUniversity", name: "KU Leuven", url: "https://www.kuleuven.be/" },
-  { "@type": "CollegeOrUniversity", name: "University of Tartu", url: "https://ut.ee/" },
+  KU_LEUVEN,
+  UNIVERSITY_OF_TARTU,
+  SPB_COUNSELLING_INSTITUTE,
 ] as const;
 
 /**
@@ -120,22 +183,22 @@ export const CREDENTIALS = [
     "@type": "EducationalOccupationalCredential",
     credentialCategory: "diploma",
     name: "Diploma in Psychological Counselling",
-    // The page names the city, not an institution, so none is asserted.
     educationalLevel: "Diploma",
+    recognizedBy: SPB_COUNSELLING_INSTITUTE,
   },
   {
     "@type": "EducationalOccupationalCredential",
     credentialCategory: "degree",
     name: "MSc in Bioethics",
     educationalLevel: "Master's degree",
-    recognizedBy: { "@type": "CollegeOrUniversity", name: "KU Leuven", url: "https://www.kuleuven.be/" },
+    recognizedBy: KU_LEUVEN,
   },
   {
     "@type": "EducationalOccupationalCredential",
     credentialCategory: "degree",
     name: "MA in Philosophy",
     educationalLevel: "Master's degree",
-    recognizedBy: { "@type": "CollegeOrUniversity", name: "University of Tartu", url: "https://ut.ee/" },
+    recognizedBy: UNIVERSITY_OF_TARTU,
   },
 ] as const;
 
@@ -150,10 +213,9 @@ export const CREDENTIALS = [
  * `url` and `image` stay on the English homepage in both languages, because
  * they name the person's primary page, not the page the node appears on.
  *
- * Institution and qualification names are left in their original language.
- * They are proper nouns awarded by a named body; src/content/credentials.ts
- * carries reviewed RU labels for the visible page, but which of those are
- * exonyms and which are translations is a separate decision from this one.
+ * Institution and qualification names do not vary by language — an
+ * institution's name is its own official name, and identity is carried by
+ * `url` and `sameAs`. See the institutions block above.
  */
 export const staticPersonNode = (lang: IdentityLang = "en") => ({
   "@context": "https://schema.org",

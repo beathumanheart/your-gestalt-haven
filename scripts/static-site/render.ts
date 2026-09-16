@@ -193,7 +193,7 @@ export const renderRoutePage = (template: string, spec: PageSpec): string => {
   const isRu = lang === "ru";
   const title = isRu ? text.titleRu : text.titleEn;
   const description = isRu ? text.descriptionRu : text.descriptionEn;
-  const ogImage = `${SITE_URL}/og-image-${lang}.png`;
+  const ogImage = `${SITE_URL}/og-image-${lang}.jpg`;
   const otherLang: MetaLang = isRu ? "en" : "ru";
 
   let html = replaceOnce(

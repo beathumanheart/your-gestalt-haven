@@ -67,7 +67,7 @@ describe("renderRoutePage", () => {
       text: STATIC_ROUTES[0],
     });
 
-    expect(html).toContain('content="https://humanheart.life/og-image-ru.png"');
+    expect(html).toContain('content="https://humanheart.life/og-image-ru.jpg"');
     expect(html).toContain('<meta property="og:locale" content="ru_RU" />');
     expect(html).toContain('<meta property="og:locale:alternate" content="en_US" />');
     expect(html).toContain("Психолог-консультант");

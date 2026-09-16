@@ -30,11 +30,15 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     navigate(`/${newLang}${pathWithoutLang || ""}`);
   };
 
-  // For root English, links can omit prefix; for Russian, always prefix
-  const langPath = (path: string) => {
-    if (language === "en") return `/en${path}`;
-    return `/${language}${path}`;
-  };
+  /**
+   * Prefixes a route with the current language.
+   *
+   * The root case drops the slash: langPath("/") must be "/en", not "/en/".
+   * The build writes one file per route, at /en.html, which the host serves
+   * at /en — there is no /en/ any more, so a link to it would leave the
+   * reader on a URL that 404s if they reload or share it.
+   */
+  const langPath = (path: string) => `/${language}${path === "/" ? "" : path}`;
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, langPath }}>

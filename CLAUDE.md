@@ -68,11 +68,12 @@ head, which is the part that was missing.
 - Routes with no generated file (`/admin`, `/s/`, `/c/`, hidden offers,
   `/booking-cancelled`) still fall through to the SPA via `404.html`, which is
   intended — they are all noindex or private.
-- Each route is written twice, as `en/take/index.html` and `en/take.html`,
-  because the sitemap lists the extensionless URL and static hosts disagree
-  about how to serve it. That makes `/en/take.html` a third reachable URL for
-  the same document; all three share one canonical. Tracked debt, resolved by
-  one curl after a deploy — see issue #48.
+- One file per route, written as `en/take.html`. GitHub Pages resolves the
+  extensionless `/en/take` to it and serves it directly, so the sitemap URL is
+  never a redirect. The directory form (`en/take/index.html`) was dropped
+  because it is only reachable via a 301 from the canonical URL — measured on
+  the #49 deploy, see issue #48. Consequence: there is no `/en/take/`, so
+  `langPath()` must never emit a trailing slash.
 - The site-wide JSON-LD is emitted per language: `scripts/static-site/jsonLd.ts`
   injects the English nodes into `index.html`, and `setJsonLd` in `render.ts`
   rewrites them in Russian for the `/ru` files. The EN output stays

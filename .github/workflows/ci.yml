@@ -30,6 +30,13 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Nothing else type-checks: vite build uses esbuild, which strips types
+      # without reading them, and eslint does not use the type information
+      # either. A type error reached main and sat there until someone happened
+      # to run tsc by hand.
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Unit tests (vitest)
         run: npm run test
         env:

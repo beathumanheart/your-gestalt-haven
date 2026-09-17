@@ -46,13 +46,29 @@ export const takeConfig: Partial<PostHogConfig> = {
   advanced_disable_flags: true,
 };
 
-/** The marketing site's existing configuration, unchanged. */
+/**
+ * The marketing site's configuration.
+ *
+ * Unlike takeConfig, this does not write out every flag, so PostHog's
+ * project-level remote config governs whatever is left unset — that is what
+ * pulls in dead-clicks-autocapture.js here. Anything that must not depend on
+ * a setting in the PostHog UI has to be stated below.
+ */
 export const siteConfig: Partial<PostHogConfig> = {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com",
   autocapture: true,
   capture_performance: true,
   capture_pageleave: true,
   cross_subdomain_cookie: false,
+  /* The site runs no surveys, and leaving this unset had posthog-js fetch
+     surveys.js on every page load — 102 KB measured, for a feature nothing
+     uses. */
+  disable_surveys: true,
+  /* Only takes effect if session replay is running at all, which is a project
+     setting rather than a code one: no recorder.js is fetched today, on the
+     production key. If replay is ever switched on in the PostHog UI it starts
+     without a deploy, and this flag is then the only thing masking the
+     enquiry textarea on the booking form. */
   session_recording: {
     maskAllInputs: true,
   },

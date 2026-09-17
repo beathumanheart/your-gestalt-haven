@@ -30,7 +30,8 @@ const Hero = () => {
           // Lowercase, via spread: React 18.3 does not map the camelCase
           // `fetchPriority` prop and warns in the console on every render,
           // even though it still reaches the DOM. @types/react does type the
-          // camelCase form, so the spread is what satisfies both.
+          // camelCase form, so the spread is what satisfies both — a case of
+          // tsc and the browser disagreeing, see docs/writing-guards.md.
           {...{ fetchpriority: "high" }}
           decoding="async"
           className="w-full h-full object-cover"

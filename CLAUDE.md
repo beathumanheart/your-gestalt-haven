@@ -81,6 +81,15 @@ head, which is the part that was missing.
   intent, not translation** — see the comment on `JOB_TITLE` in
   `src/config/identity.ts` before touching it.
 
+### Guards and tests
+Several tests exist to stop a specific mistake recurring rather than to check
+a feature — sitemap tokens, draft copy, image weight, terminology, bundle
+splitting. Four of them were once wrong in the same way: they asserted on an
+artifact's presence rather than on behaviour, so they passed when the guarded
+thing stopped existing. **Read `docs/writing-guards.md` before adding or
+editing one.** The short version: make a guard fail before trusting it, and
+"not found" is not a pass.
+
 ### Supabase Integration
 - Client initialized in `src/integrations/supabase/client.ts`
 - Auto-generated TypeScript types in `src/integrations/supabase/types.ts` — regenerate with `supabase gen types` after schema changes

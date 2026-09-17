@@ -1,0 +1,16 @@
+import{u as l,j as e,P as d,T as c,b as p,H as x,a as g,L as m}from"./index-BQG3J3kn.js";import{t as h,a as f}from"./take-DZtfFvMu.js";const u=`
+.tk-root { max-width: 980px; margin: 0 auto; padding: clamp(26px,4vw,60px) clamp(18px,4vw,40px) 80px; }
+.tk-intro { max-width: 60ch; }
+.tk-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; align-items: stretch; margin: clamp(28px,4vw,40px) 0 0; }
+/* Fixed two-up, not auto-fit: four cards must never spread into one row. */
+@media (min-width: 700px) { .tk-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+.tk-card { display: flex; flex-direction: column; height: 100%; padding: 24px 28px; border-radius: 16px; background: #FAF8F5; border: 1px solid #E7E1DA; text-decoration: none; color: inherit; }
+.tk-card-title { font-family: Fraunces,'Cormorant Garamond',Georgia,serif; font-weight: 400; font-size: 19px; line-height: 1.16; margin: 10px 0 0; color: #464039; }
+@media (min-width: 700px) { .tk-card-title { font-size: 22px; } }
+/* Only a live card is a link, so only a live card reacts to the pointer. The
+   status badge is what mutes the others — not a dimmed card. */
+a.tk-card { transition: border-color .3s ease, transform .3s ease, box-shadow .3s ease; }
+a.tk-card:hover { border-color: #437059; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(70,64,57,.09); }
+div.tk-card { cursor: default; }
+@media (prefers-reduced-motion: reduce) { a.tk-card { transition: none; } a.tk-card:hover { transform: none; } }
+`,k={live:{bg:"#E0EBE6",fg:"#3c5c4c"},prep:{bg:"#F3EFE8",fg:"#8A8075"},later:{bg:"#F3EFE8",fg:"#8A8075"}},y=()=>{const{language:r,langPath:i}=l(),a=r==="ru"?h:f,o=t=>{const s=k[t.status],n=e.jsxs(e.Fragment,{children:[e.jsxs("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"},children:[e.jsx("span",{style:{fontSize:11,fontWeight:600,letterSpacing:".13em",textTransform:"uppercase",color:"#C2603A"},children:t.kind}),e.jsx("span",{style:{padding:"3px 10px",borderRadius:999,fontSize:11,fontWeight:600,letterSpacing:".04em",background:s.bg,color:s.fg},children:a.statuses[t.status]})]}),e.jsx("h2",{className:"tk-card-title",children:t.title}),e.jsx("p",{style:{margin:"9px 0 0",fontSize:14.5,lineHeight:1.7,color:"#5c554e"},children:t.description})]});return t.status==="live"?e.jsx(m,{className:"tk-card",to:i(`/take/${t.slug}`),children:n},t.slug):e.jsx("div",{className:"tk-card",children:n},t.slug)};return e.jsxs(e.Fragment,{children:[e.jsx(d,{...c,canonicalPath:`/${r}/take`}),e.jsx(p,{children:e.jsx("link",{rel:"stylesheet",href:"https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap"})}),e.jsx(x,{}),e.jsx("main",{className:"min-h-screen bg-background pt-24 md:pt-28",children:e.jsxs("div",{className:"tk-root",children:[e.jsx("style",{dangerouslySetInnerHTML:{__html:u}}),e.jsx("h1",{style:{fontFamily:"'Cormorant Garamond',Georgia,serif",fontWeight:300,fontSize:"clamp(30px,6vw,52px)",lineHeight:1.06,margin:0,color:"#464039"},children:a.title}),e.jsx("p",{className:"tk-intro",style:{margin:"18px 0 0",fontSize:16,lineHeight:1.75,color:"#5c554e"},children:a.intro}),e.jsx("div",{className:"tk-grid",children:a.items.map(o)})]})}),e.jsx(g,{})]})};export{y as default};

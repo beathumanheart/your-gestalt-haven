@@ -1,1 +1,0 @@
-import{c as n,j as e,b as t,S as r,N as o}from"./index-KACjVpS_.js";const i=()=>{const{lang:a}=n(),s=`/${a==="ru"?"ru":"en"}/take/feelings-map`;return e.jsxs(e.Fragment,{children:[e.jsxs(t,{children:[e.jsx("link",{rel:"canonical",href:`${r}${s}`}),e.jsx("meta",{name:"robots",content:"noindex,follow"})]}),e.jsx(o,{to:s,replace:!0})]})};export{i as default};

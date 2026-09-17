@@ -64,11 +64,21 @@ export const siteConfig: Partial<PostHogConfig> = {
      surveys.js on every page load — 102 KB measured, for a feature nothing
      uses. */
   disable_surveys: true,
-  /* Only takes effect if session replay is running at all, which is a project
-     setting rather than a code one: no recorder.js is fetched today, on the
-     production key. If replay is ever switched on in the PostHog UI it starts
-     without a deploy, and this flag is then the only thing masking the
-     enquiry textarea on the booking form. */
+  /* Session replay is off in the PostHog project today, but a project setting
+     is not a protection: switching it on in the UI would start recording with
+     no deploy and no review. Pinned here so the decision lives in code.
+
+     What it protects is the booking form's enquiry textarea, where someone
+     writes why they are seeking therapy. That is health data — special
+     category under GDPR Article 9 — and it is not ours to record. This is a
+     privacy measure, not a performance one; do not relax it to debug a
+     funnel.
+
+     maskAllInputs stays as a second layer for the case where replay is
+     deliberately enabled later: it masks input, textarea and select values.
+     The textarea also carries ph-no-capture at the element, because a global
+     flag is one config edit away from being wrong. */
+  disable_session_recording: true,
   session_recording: {
     maskAllInputs: true,
   },

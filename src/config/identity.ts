@@ -224,7 +224,7 @@ export const staticPersonNode = (lang: IdentityLang = "en") => ({
   name: "Genia",
   jobTitle: JOB_TITLE[lang],
   url: `${SITE_URL}/en`,
-  image: `${SITE_URL}/og-image-en.png`,
+  image: `${SITE_URL}/og-image-en.jpg`,
   knowsAbout: KNOWS_ABOUT[lang],
   knowsLanguage: ["en", "ru"],
   sameAs: SAME_AS,

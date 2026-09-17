@@ -44,7 +44,7 @@ const PageMeta = ({
 
   const title       = isRu ? titleRu : titleEn;
   const description = isRu ? descriptionRu : descriptionEn;
-  const ogImage     = `${SITE_URL}/og-image-${language}.png`;
+  const ogImage     = `${SITE_URL}/og-image-${language}.jpg`;
   const ogImageAlt  = OG_IMAGE_ALT[language];
   const locale      = OG_LOCALE[language];
   const altLocale   = OG_LOCALE[isRu ? "en" : "ru"];

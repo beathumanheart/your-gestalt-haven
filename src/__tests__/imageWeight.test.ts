@@ -19,6 +19,14 @@
  *
  * Masters and source material live in design-assets/, which is deliberately
  * not scanned: nothing there is imported, so nothing there ships.
+ *
+ * There is no allowlist. There was one — the two social cards at ~315 KB
+ * apiece — and it is gone because they were re-encoded rather than excused:
+ * they carry a photograph, so PNG was the wrong format and JPEG took them to
+ * 58 KB with no visible loss. If an exemption is ever genuinely needed, the
+ * shape to copy is QUARANTINE in draftContent.test.ts: an exact path with a
+ * ceiling that may shrink, fails if it grows, and fails once the file is back
+ * under the limit so the entry cannot outlive its reason.
  */
 
 import { describe, expect, it } from "vitest";
@@ -39,21 +47,6 @@ const IMAGE = /\.(png|jpe?g|webp|gif|avif|svg|heic)$/i;
 
 const SCANNED = ["public", "src/assets", "dist/assets"];
 
-/**
- * Images allowed to exceed the limit, with the size each may not exceed.
- *
- * Like the draft-copy quarantine, an entry is a ceiling and a debt, not a
- * blessing: it may shrink freely, it fails if it grows, and it fails once the
- * file is back under the limit so the entry cannot outlive its reason.
- */
-const ALLOWLIST: Record<string, number> = {
-  // Social preview cards, 1200x630. Both must be redrawn anyway — the text on
-  // them states a protected professional title (see docs/terminology.md), and
-  // the redraw should bring them under the limit. Tracked in #55.
-  "public/og-image-en.png": 321_285,
-  "public/og-image-ru.png": 323_318,
-};
-
 const walk = (dir: string, acc: string[] = []): string[] => {
   if (!existsSync(dir)) return acc;
   for (const entry of readdirSync(dir)) {
@@ -72,18 +65,18 @@ const images = SCANNED.flatMap((d) => walk(join(ROOT, d))).map((full) => ({
 const kb = (bytes: number) => `${Math.round(bytes / KB)} KB`;
 
 describe("shipped images stay within budget", () => {
-  it("finds no image over the limit outside the allowlist", () => {
+  it("finds no image over the limit", () => {
     const offenders = images
-      .filter(({ rel, bytes }) => bytes > LIMIT && !(rel in ALLOWLIST))
+      .filter(({ bytes }) => bytes > LIMIT)
       .map(({ rel, bytes }) => `${rel}: ${kb(bytes)} (limit ${kb(LIMIT)})`);
 
     expect(
       offenders,
       `These images ship on every deploy:\n${offenders.join("\n")}\n\n` +
-        `Resize or re-encode to the size they actually render at. If the file ` +
-        `is source material rather than something a page loads, move it to ` +
-        `design-assets/ — nothing there is imported, so nothing there ships. ` +
-        `Add to ALLOWLIST only with a reason and an issue.`,
+        `Resize or re-encode to the size it actually renders at — a ` +
+        `photograph saved as PNG is usually the whole story. If the file is ` +
+        `source material rather than something a page loads, move it to ` +
+        `design-assets/: nothing there is imported, so nothing there ships.`,
     ).toEqual([]);
   });
 
@@ -91,37 +84,5 @@ describe("shipped images stay within budget", () => {
     // A typo'd directory name would silently make every assertion here pass.
     expect(images.length).toBeGreaterThan(3);
     expect(images.map((i) => i.rel)).toContain("public/favicon.svg");
-  });
-});
-
-describe("the allowlist", () => {
-  const entries = Object.entries(ALLOWLIST);
-
-  it("points only at files that exist", () => {
-    for (const [rel] of entries) {
-      expect(existsSync(join(ROOT, rel)), `${rel} is allowlisted but missing`).toBe(true);
-    }
-  });
-
-  it("never grows", () => {
-    for (const [rel, ceiling] of entries) {
-      const actual = images.find((i) => i.rel === rel)?.bytes ?? 0;
-      expect(
-        actual,
-        `${rel} is ${kb(actual)}, above its ${kb(ceiling)} ceiling. An ` +
-          `allowlisted image may shrink, never grow.`,
-      ).toBeLessThanOrEqual(ceiling);
-    }
-  });
-
-  it("releases a file once it is back under the limit", () => {
-    for (const [rel] of entries) {
-      const actual = images.find((i) => i.rel === rel)?.bytes ?? 0;
-      expect(
-        actual,
-        `${rel} is now ${kb(actual)}, under the ${kb(LIMIT)} limit — remove it ` +
-          `from ALLOWLIST so the exemption does not outlive its reason.`,
-      ).toBeGreaterThan(LIMIT);
-    }
   });
 });

@@ -29,6 +29,22 @@ OCR in a unit test is not worth it. Instead: **when an image contains words,
 read the words.** Any new card, banner, or screenshot with text on it needs a
 human look before it ships, because nothing downstream will catch it.
 
+### The same blind spot, off-site
+
+Everything above stops at the edge of this repository, and most of what a
+prospective client reads is outside it. No guard here can see:
+
+- social and directory **bios** — Instagram, Threads, Telegram, YouTube,
+  Substack, therapist listings
+- **channel and page descriptions**, pinned posts, link-in-bio pages
+- **thumbnails, carousels, story templates, slides** — text in images again,
+  now also beyond the repo
+- ad copy, newsletter headers, email signatures, business cards
+
+These are the same claim in the same places a search engine and a client will
+read it, and several outlive any edit here. When the title changes, they have
+to be changed by hand, one by one. Treat this list as the checklist.
+
 ## `psychotherapeut`, `klinisch psycholoog` — and so `psychotherap*`, `psychologist`
 
 Both are professional titles protected under Belgian law and reserved to

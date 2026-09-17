@@ -27,7 +27,11 @@ const Hero = () => {
           alt="Warm, inviting therapy space with soft natural light"
           width={1920}
           height={1080}
-          fetchPriority="high"
+          // Lowercase, via spread: React 18.3 does not map the camelCase
+          // `fetchPriority` prop and warns in the console on every render,
+          // even though it still reaches the DOM. @types/react does type the
+          // camelCase form, so the spread is what satisfies both.
+          {...{ fetchpriority: "high" }}
           decoding="async"
           className="w-full h-full object-cover"
         />

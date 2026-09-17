@@ -112,3 +112,79 @@ test.describe("the SPA still routes on the real paths", () => {
     await expect(page.getByText("404", { exact: true })).toHaveCount(0);
   });
 });
+
+/**
+ * Prerendering: the body must carry the page's content, not just its head.
+ *
+ * #49 made every route a real file with a correct <head>, and left the body an
+ * empty #root — so Google had nothing to rank and crawlers that do not run
+ * JavaScript saw nothing. These assertions are on the *served bytes*, with no
+ * JavaScript executed, which is the only place the distinction shows.
+ *
+ * They also catch a build that skipped prerendering: PRERENDER=0 exists for a
+ * quick local build and would otherwise ship empty pages silently.
+ */
+test.describe("prerendered bodies", () => {
+  const withoutJs = async (request: import("@playwright/test").APIRequestContext, path: string) =>
+    (await request.get(path)).text();
+
+  /** Strip tags so an assertion cannot be satisfied by markup alone. */
+  const visibleText = (html: string) => {
+    const body = html.match(/<div id="root">([\s\S]*?)<\/div>\s*<!-- prerendered -->/);
+    if (!body) return "";
+    return body[1]
+      .replace(/<script[\s\S]*?<\/script>/g, " ")
+      .replace(/<style[\s\S]*?<\/style>/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  test("the homepage serves its copy without running JavaScript", async ({ request }) => {
+    const text = visibleText(await withoutJs(request, "/en"));
+
+    // Substantial, and specifically the page's own words rather than boilerplate.
+    expect(text.length, "the homepage body is empty or not prerendered").toBeGreaterThan(2000);
+    expect(text).toContain("Gestalt");
+  });
+
+  test("the Russian homepage serves Russian copy, not the English fallback", async ({ request }) => {
+    const text = visibleText(await withoutJs(request, "/ru"));
+
+    expect(text.length).toBeGreaterThan(2000);
+    // Counted, not matched as a run: no Russian word is 20 letters long, so a
+    // {20,} pattern never matches however Russian the page is.
+    const cyrillic = (text.match(/[А-Яа-яЁё]/g) ?? []).length;
+    expect(cyrillic, "the Russian homepage body is not in Russian").toBeGreaterThan(1500);
+    expect(text).not.toContain("A Space for You");
+  });
+
+  test("a booking page serves the session's name and description from the database", async ({
+    request,
+  }) => {
+    const text = visibleText(await withoutJs(request, "/en/book/individual-therapy"));
+
+    expect(text).toContain("Individual Therapy");
+    // And it is not the loading state: skeletons carry no words.
+    expect(text.length, "looks like a prerendered skeleton rather than content").toBeGreaterThan(400);
+  });
+
+  test("no route ships a loading skeleton", async ({ request }) => {
+    // A page prerendered too early says nothing while looking like it renders.
+    for (const path of ["/en", "/ru", "/en/take", "/en/book/individual-therapy"]) {
+      const html = await withoutJs(request, path);
+      const skeletons = (html.match(/animate-pulse(?!-soft)/g) ?? []).length;
+      expect(skeletons, `${path} was prerendered mid-load`).toBe(0);
+    }
+  });
+
+  test("every indexable route is prerendered, not just the ones checked above", async ({
+    request,
+  }) => {
+    for (const { path } of INDEXABLE) {
+      const html = await withoutJs(request, path);
+      expect(html, `${path} has no prerendered body`).toContain("<!-- prerendered -->");
+      expect(visibleText(html).length, `${path} prerendered an empty body`).toBeGreaterThan(200);
+    }
+  });
+});

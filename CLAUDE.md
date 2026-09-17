@@ -68,6 +68,15 @@ head, which is the part that was missing.
 - Routes with no generated file (`/admin`, `/s/`, `/c/`, hidden offers,
   `/booking-cancelled`) still fall through to the SPA via `404.html`, which is
   intended — they are all noindex or private.
+- Route bodies are **prerendered** at build time: `scripts/static-site/prerender.ts`
+  loads each generated page in headless Chromium and writes the rendered
+  `#root` back into the file, so the HTML response carries the page's content.
+  On by default; `PRERENDER=0` opts out loudly for a quick local build and must
+  never be used for a deploy (the e2e suite fails if a build skipped it). A
+  route that times out or renders empty **fails the build** rather than
+  shipping one blank page invisibly. Both deploy workflows and the CI build job
+  install Chromium for this. Read the header comment in that file before
+  changing `createRoot` to `hydrateRoot` — it records what was measured.
 - One file per route, written as `en/take.html`. GitHub Pages resolves the
   extensionless `/en/take` to it and serves it directly, so the sitemap URL is
   never a redirect. The directory form (`en/take/index.html`) was dropped

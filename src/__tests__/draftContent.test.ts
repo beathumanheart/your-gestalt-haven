@@ -8,9 +8,14 @@
  *
  * The marker was doing no work. This makes it fail the build instead.
  *
- * Known drafts are quarantined rather than grandfathered silently: the
- * quarantine is an exact path with a ceiling, it can only shrink, and it
- * fails once the file is clean so the entry cannot outlive its purpose.
+ * Those drafts were quarantined rather than grandfathered silently — an exact
+ * path with a ceiling that could only shrink, and that failed once the file
+ * was clean. It did exactly that when the reviewed copy landed (#52), which
+ * is how the entry came to be removed rather than forgotten. There is no
+ * quarantine now, and a marker anywhere in src/content fails the build.
+ *
+ * If one is ever needed again, that is the shape to rebuild: a ceiling, not a
+ * blessing. An entry that cannot expire is just a hole.
  */
 
 import { describe, expect, it } from "vitest";
@@ -30,20 +35,6 @@ const CONTENT_DIR = "src/content";
  */
 const MARKER = /DRAFT/g;
 
-/**
- * Files known to contain draft copy, with the number of markers each may
- * carry. The number is a **ceiling, not a target**: it may shrink freely as
- * strings are replaced, and it exists so that adding more drafts to an
- * already-quarantined file fails like any other new draft would.
- *
- * An entry must be deleted once its file is clean — a test below enforces
- * that, so the quarantine cannot quietly become permanent.
- */
-const QUARANTINE: Record<string, number> = {
-  // Genia is writing the final Russian as her own sentences. Tracked in #52.
-  "src/content/services.ts": 27,
-};
-
 const countMarkers = (text: string) => (text.match(MARKER) ?? []).length;
 
 const contentFiles = readdirSync(join(ROOT, CONTENT_DIR))
@@ -57,15 +48,15 @@ const markerCounts = new Map(
 describe("draft copy never ships", () => {
   it("finds no draft markers outside the quarantine", () => {
     const offenders = [...markerCounts]
-      .filter(([rel, count]) => count > 0 && !(rel in QUARANTINE))
+      .filter(([, count]) => count > 0)
       .map(([rel, count]) => `${rel}: ${count} marker(s)`);
 
     expect(
       offenders,
       `Draft copy must be replaced before merging, not marked and shipped:\n${offenders.join(
         "\n",
-      )}\n\nIf it genuinely cannot be replaced yet, add the file to QUARANTINE ` +
-        `with an issue number — deliberately, not as a reflex.`,
+      )}\n\nReplace the copy. If it genuinely cannot be replaced yet, see the ` +
+        `note at the top of this file — deliberately, not as a reflex.`,
     ).toEqual([]);
   });
 
@@ -74,35 +65,5 @@ describe("draft copy never ships", () => {
     // above passes vacuously.
     expect(contentFiles.length).toBeGreaterThan(5);
     expect(contentFiles).toContain("src/content/services.ts");
-  });
-});
-
-describe("the quarantine", () => {
-  it("points only at files that exist", () => {
-    for (const rel of Object.keys(QUARANTINE)) {
-      expect(existsSync(join(ROOT, rel)), `${rel} is quarantined but missing`).toBe(true);
-    }
-  });
-
-  it("never grows — a quarantined file may lose markers, not gain them", () => {
-    for (const [rel, ceiling] of Object.entries(QUARANTINE)) {
-      const count = markerCounts.get(rel) ?? 0;
-      expect(
-        count,
-        `${rel} has ${count} draft markers but is allowed ${ceiling}. ` +
-          `Adding draft copy to an already-quarantined file is still adding draft copy.`,
-      ).toBeLessThanOrEqual(ceiling);
-    }
-  });
-
-  it("releases a file once it is clean, instead of outliving its purpose", () => {
-    for (const rel of Object.keys(QUARANTINE)) {
-      const count = markerCounts.get(rel) ?? 0;
-      expect(
-        count,
-        `${rel} no longer contains draft markers — the copy landed. ` +
-          `Remove it from QUARANTINE (and drop the stale warning in its file header).`,
-      ).toBeGreaterThan(0);
-    }
   });
 });

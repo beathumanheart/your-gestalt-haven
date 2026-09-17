@@ -5,9 +5,12 @@
  * Edit this file to update all text on the Services section.
  * Both EN and RU translations are side by side for easy editing.
  *
- * ⚠️ RU strings below are DRAFT adaptations (marked "// DRAFT RU").
- *    Per the design handoff, Genia writes the final Russian as its own
- *    sentences — replace before merging.
+ * The RU strings began as adaptations and were marked provisional until
+ * Genia reviewed them; they are approved as they stand (#52). Provisional
+ * copy must not be committed here again: the guard in
+ * src/__tests__/draftContent.test.ts fails the build on the marker it used
+ * to carry, anywhere in src/content. The marker itself is spelled out only
+ * in that file, which is the one place exempt from its own check.
  * ============================================================
  */
 
@@ -139,14 +142,14 @@ export const servicesEN: ServicesContent = {
 };
 
 export const servicesRU: ServicesContent = {
-  title1: "С чем мы можем", // DRAFT RU
-  title2: "поработать", // DRAFT RU
+  title1: "С чем мы можем",
+  title2: "поработать",
   subtitle:
-    "Ничто из этого не опишет вас в точности — ваша история только ваша. Это просто двери, через которые люди чаще всего входят.", // DRAFT RU
+    "Ничто из этого не опишет вас в точности — ваша история только ваша. Это просто двери, через которые люди чаще всего входят.",
 
   topics: [
     {
-      title: "Горе и утрата", // DRAFT RU
+      title: "Горе и утрата",
       subtopics: [
         "Смерть близкого человека",
         "Предвосхищающее горе и долгая болезнь",
@@ -154,10 +157,10 @@ export const servicesRU: ServicesContent = {
         "Потеря дома или страны",
         "Конец отношений",
         "Горе, которое никто вокруг не признаёт",
-      ], // DRAFT RU
+      ],
     },
     {
-      title: "Отношения", // DRAFT RU
+      title: "Отношения",
       subtopics: [
         "Партнёрство и близость",
         "Повторяющиеся сценарии в выборе партнёра",
@@ -165,10 +168,10 @@ export const servicesRU: ServicesContent = {
         "Дружба, отдаление и охлаждение",
         "Конфликты и границы на работе",
         "Одиночество внутри отношений",
-      ], // DRAFT RU
+      ],
     },
     {
-      title: "Тревога и ощущение тупика", // DRAFT RU
+      title: "Тревога и ощущение тупика",
       subtopics: [
         "Постоянное фоновое беспокойство",
         "Тревога без явной причины",
@@ -176,10 +179,10 @@ export const servicesRU: ServicesContent = {
         "Прокрастинация и самокритика",
         "Стыд и перфекционизм",
         "Злость, которой некуда деться",
-      ], // DRAFT RU
+      ],
     },
     {
-      title: "Переходы и смысл", // DRAFT RU
+      title: "Переходы и смысл",
       subtopics: [
         "Эмиграция и жизнь между странами",
         "Смена работы или её потеря",
@@ -187,40 +190,40 @@ export const servicesRU: ServicesContent = {
         "Старение, время и конечность",
         "Идентичность, ценности и принадлежность",
         "«Это правда моя жизнь?»",
-      ], // DRAFT RU
+      ],
     },
   ],
 
   shortTerm: {
-    term: "Краткосрочно", // DRAFT RU
-    line: "До 10 сессий — когда есть что-то одно, чему нужно внимание, и понятное завершение.", // DRAFT RU
+    term: "Краткосрочно",
+    line: "До 10 сессий — когда есть что-то одно, чему нужно внимание, и понятное завершение.",
   },
   longTerm: {
-    term: "Долгосрочно", // DRAFT RU
-    line: "От полугода и дальше — когда дело не в чём-то одном, а в том, как складывается ваша жизнь целиком.", // DRAFT RU
+    term: "Долгосрочно",
+    line: "От полугода и дальше — когда дело не в чём-то одном, а в том, как складывается ваша жизнь целиком.",
   },
 
-  pillOnline: "Онлайн, где бы вы ни были", // DRAFT RU
-  pillDuration: "50 минут, обычно раз в неделю", // DRAFT RU
-  pillPayment: "Оплата в течение 24 часов", // DRAFT RU
-  paymentMethods: "Банковский перевод, Wise, Revolut или крипта.", // DRAFT RU
+  pillOnline: "Онлайн, где бы вы ни были",
+  pillDuration: "50 минут, обычно раз в неделю",
+  pillPayment: "Оплата в течение 24 часов",
+  paymentMethods: "Банковский перевод, Wise, Revolut или крипта.",
 
-  pricingLabel: "Солидарная оплата", // DRAFT RU
+  pricingLabel: "Солидарная оплата",
   pricingIntro:
-    "Это работает, потому что мы доверяем друг другу — те, кто может платить больше, делают это возможным для тех, кто не может. Выберите сумму, честную для вашей жизни сейчас.", // DRAFT RU
-  perUnit: "за 50 минут", // DRAFT RU
+    "Это работает, потому что мы доверяем друг другу — те, кто может платить больше, делают это возможным для тех, кто не может. Выберите сумму, честную для вашей жизни сейчас.",
+  perUnit: "за 50 минут",
   bands: [
     {
       label: "Когда с ресурсами трудно",
       note: "Выбирайте здесь, если учитесь, между работами, несёте долги или медицинские расходы, или финансово поддерживаете других. Объяснений не нужно.",
-    }, // DRAFT RU
+    },
     {
       label: "Честная цена",
       note: "Выбирайте здесь, если доход покрывает ваши потребности и остаётся немного сверху.",
-    }, // DRAFT RU
+    },
     {
       label: "Помогая кому-то ещё получить помощь",
       note: "Выбирайте здесь, если у вас есть собственность или сбережения, вы путешествуете для удовольствия или можете опереться на семью. Ваша ставка тихо оплачивает чью-то ещё.",
-    }, // DRAFT RU
+    },
   ],
 };

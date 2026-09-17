@@ -24,6 +24,10 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # See ci.yml: the build strips types rather than checking them.
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Unit tests
         run: npm run test
 

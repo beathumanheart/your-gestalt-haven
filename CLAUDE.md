@@ -88,8 +88,11 @@ head, which is the part that was missing.
   react-helmet-async are not. The per-session `Service` node carrying the
   `AggregateOffer` comes from `<ServiceJsonLd>` via Helmet, so it is absent
   from the served HTML: Google sees it after rendering, a non-JS crawler never
-  does — issue #68. The two site-wide nodes are static in `index.html` and
-  unaffected.
+  does — issue #68. The *visible* pricing is inside `#root` and therefore is
+  prerendered, so crawlers read the scale as body text; it is only the
+  machine-readable offer that is runtime-only. The two site-wide nodes are
+  static in `index.html` and unaffected. When fixing #68, do not delete
+  `<ServiceJsonLd>` — see the warning on it.
 - One file per route, written as `en/take.html`. GitHub Pages resolves the
   extensionless `/en/take` to it and serves it directly, so the sitemap URL is
   never a redirect. The directory form (`en/take/index.html`) was dropped

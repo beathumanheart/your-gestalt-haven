@@ -237,13 +237,28 @@ const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmi
 
         <div>
           <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.notesLabel} <span className="text-muted-foreground font-normal">({t.optional})</span></label>
+          {/* Masked twice, at the element, on purpose.
+              This is where someone writes why they are seeking therapy, so
+              what they type is health data — special category under GDPR
+              Article 9 — and it is not ours to collect through analytics.
+
+              The two attributes cover different mechanisms and neither
+              substitutes for the other:
+                data-ph-no-capture  keeps autocapture from sending the value
+                ph-no-capture       keeps session replay from recording it
+
+              The name and email fields carry only the first, which is right
+              for them and would not be enough here. The config flags in
+              src/config/analytics.ts are the other layer; these survive a
+              change to those. Do not remove either to debug a funnel. */}
           <textarea
             value={booking.notes || ""}
             onChange={(e) => onChange({ notes: e.target.value })}
             placeholder={t.notesPlaceholder}
             maxLength={1000}
             rows={3}
-            className="flex w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm sm:text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-none"
+            data-ph-no-capture
+            className="ph-no-capture flex w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm sm:text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-body resize-none"
           />
         </div>
 

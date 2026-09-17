@@ -78,6 +78,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # The build prerenders every route in a headless browser, so this job
+      # needs one. The deploy workflows already install it for their e2e step,
+      # which runs before their build; this job has no e2e step.
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
       - name: Build
         run: npm run build
         env:

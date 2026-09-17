@@ -34,6 +34,7 @@ import {
   renderSitemap,
   type SitemapRoute,
 } from "./render";
+import { prerenderRoutes, type PrerenderTarget } from "./prerender";
 
 interface GeneratedRoute extends SitemapRoute {
   text: RouteText;
@@ -130,6 +131,7 @@ export const staticSite = (): Plugin => {
       );
 
       let fileCount = 0;
+      const targets: PrerenderTarget[] = [];
 
       for (const route of routes) {
         for (const lang of LANGS) {
@@ -154,6 +156,7 @@ export const staticSite = (): Plugin => {
           fs.mkdirSync(path.dirname(target), { recursive: true });
           fs.writeFileSync(target, html, "utf8");
           fileCount += 1;
+          targets.push({ file: target, urlPath: canonicalPath });
         }
       }
 
@@ -164,6 +167,46 @@ export const staticSite = (): Plugin => {
         `[static-site] ${fileCount} page files for ${routes.length} routes ` +
           `(${routes.length * LANGS.length} URLs), plus sitemap.xml`,
       );
+
+      await prerender(outDir, targets);
     },
   };
+};
+
+/**
+ * Fills in the body of every generated page.
+ *
+ * On by default, so the deploy cannot skip it by forgetting a flag — the
+ * failure mode of an opt-in would be publishing empty pages silently, which
+ * is the thing being fixed. PRERENDER=0 opts out explicitly and says so in
+ * the log; use it for a quick local build, never in a deploy. The e2e suite
+ * asserts a prerendered body is present, so a deploy that skipped it fails.
+ *
+ * Playwright is a devDependency and already installed in both deploy
+ * workflows for the e2e step. It is imported here rather than at the top of
+ * the file so that PRERENDER=0 does not require a browser at all.
+ */
+const prerender = async (outDir: string, targets: PrerenderTarget[]) => {
+  if (process.env.PRERENDER === "0") {
+    console.warn(
+      "[prerender] Skipped (PRERENDER=0). Pages ship with an empty #root, " +
+        "which is what this step exists to prevent — do not deploy this build.",
+    );
+    return;
+  }
+
+  const started = Date.now();
+  const { chromium } = await import("playwright");
+  const browser = await chromium.launch();
+
+  try {
+    const results = await prerenderRoutes(browser, outDir, targets);
+    const total = results.reduce((sum, r) => sum + r.bytes, 0);
+    console.log(
+      `[prerender] ${results.length} routes in ${((Date.now() - started) / 1000).toFixed(1)}s, ` +
+        `${Math.round(total / 1024)} KB of rendered body`,
+    );
+  } finally {
+    await browser.close();
+  }
 };

@@ -41,6 +41,30 @@
  * at all), and the human benefit is real but smaller and for a different
  * reason than prerendering is usually credited with.
  *
+ * ── This couples database content to the deploy cycle ───────────────────
+ *
+ * Whatever a route renders at build time is what the HTML says until the next
+ * build. Everything on these pages that comes from `session_types` is
+ * therefore a snapshot: session names, descriptions, durations, and — once
+ * the rows publish a scale — the solidarity prices on the homepage.
+ *
+ * Change a price in the database and nothing rebuilds. A human sees the new
+ * figure, because React re-renders over this markup with live data. A crawler
+ * sees the old one, until something triggers a deploy. Prices are the sharpest
+ * case, being a commitment to a person about money, but the same holds for a
+ * renamed or re-described session.
+ *
+ * **Redeploy after changing pricing or session copy.** Tracked in issue #67:
+ * either a scheduled rebuild or a build hook on the relevant tables.
+ *
+ * A related gap, with a different fix: only `#root` is captured, so the head
+ * tags that react-helmet-async injects at runtime are not prerendered. The
+ * per-session Service node — the one carrying the AggregateOffer from
+ * pricingToOffer — is written by `<ServiceJsonLd>` through Helmet, so it is
+ * absent from the served HTML entirely. Google sees it after rendering; a
+ * crawler that does not execute JavaScript never sees it. The two site-wide
+ * nodes are unaffected, being static in index.html. Tracked in issue #68.
+ *
  * ── Failure is fatal, on purpose ────────────────────────────────────────
  *
  * If one route times out or throws, the build fails. Writing an empty #root

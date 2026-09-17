@@ -104,3 +104,56 @@ export const pricingToOffer = (
       return undefined;
   }
 };
+
+/**
+ * The solidarity scale the site advertises, derived from the rows that
+ * publish one.
+ *
+ * The homepage slider used to hardcode €40–€100 while the database published
+ * nothing, so a reader saw a scale that no structured data could confirm and
+ * nothing kept the two in step. Both now come from here: the slider draws
+ * these bounds, and `pricingToOffer` turns the same row into the
+ * AggregateOffer, so a price cannot be changed in one place only.
+ *
+ * Returns undefined when no row publishes a range — including when
+ * `show_price` is false, because `sessionPricing` already resolves that. A
+ * missing scale means the slider does not render, which is the honest outcome:
+ * there is no published price to show.
+ *
+ * Bounds are the widest across offerings, since one scale is drawn for the
+ * whole practice. Mixed currencies publish nothing rather than a scale in an
+ * unstated unit.
+ */
+export const publishedScale = (
+  rows: readonly PricedSession[],
+): { min: number; max: number; currency: string } | undefined => {
+  const ranges = rows
+    .map(sessionPricing)
+    .filter((p): p is Extract<SessionPricing, { kind: "range" }> => p.kind === "range");
+
+  if (ranges.length === 0) return undefined;
+
+  const { currency } = ranges[0];
+  if (ranges.some((r) => r.currency !== currency)) return undefined;
+
+  return {
+    min: Math.min(...ranges.map((r) => r.min)),
+    max: Math.max(...ranges.map((r) => r.max)),
+    currency,
+  };
+};
+
+/**
+ * Which of the three pricing bands a chosen rate falls in.
+ *
+ * Thirds of the published range rather than fixed figures, so the bands move
+ * with the scale instead of being a third place a price is written down. On a
+ * 40–100 scale this gives the same boundaries the hardcoded version had (60
+ * and 80), which is what keeps the copy in src/content/services.ts accurate.
+ */
+export const scaleBand = (rate: number, min: number, max: number): 0 | 1 | 2 => {
+  const third = (max - min) / 3;
+  if (rate < min + third) return 0;
+  if (rate <= min + 2 * third) return 1;
+  return 2;
+};

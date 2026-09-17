@@ -182,10 +182,11 @@ const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmi
 
       <form id={formId} onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.yourName}</label>
+          <label htmlFor={`${formId}-name`} className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.yourName}</label>
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
+              id={`${formId}-name`}
               value={booking.clientName || ""}
               onChange={(e) => onChange({ clientName: e.target.value })}
               placeholder={t.namePlaceholder}
@@ -198,11 +199,12 @@ const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmi
         </div>
 
         <div>
-          <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.yourEmail}</label>
+          <label htmlFor={`${formId}-email`} className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.yourEmail}</label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               type="email"
+              id={`${formId}-email`}
               value={booking.clientEmail || ""}
               onChange={(e) => onChange({ clientEmail: e.target.value })}
               placeholder={t.emailPlaceholder}
@@ -216,7 +218,7 @@ const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmi
 
         {booking.showSecondEmail && (
           <div>
-            <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">
+            <label htmlFor={`${formId}-email-confirm`} className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">
               {t.yourEmail2} <span className="text-muted-foreground font-normal">({t.optional})</span>
             </label>
             <p className="font-body text-xs text-muted-foreground mb-1.5">{t.email2Hint}</p>
@@ -224,6 +226,7 @@ const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmi
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="email"
+                id={`${formId}-email-confirm`}
                 value={booking.clientEmail2 || ""}
                 onChange={(e) => onChange({ clientEmail2: e.target.value })}
                 placeholder={t.emailPlaceholder}
@@ -236,7 +239,7 @@ const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmi
         )}
 
         <div>
-          <label className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.notesLabel} <span className="text-muted-foreground font-normal">({t.optional})</span></label>
+          <label htmlFor={`${formId}-notes`} className="font-body text-sm sm:text-base text-foreground mb-1.5 block font-medium">{t.notesLabel} <span className="text-muted-foreground font-normal">({t.optional})</span></label>
           {/* Masked twice, at the element, on purpose.
               This is where someone writes why they are seeking therapy, so
               what they type is health data — special category under GDPR
@@ -252,6 +255,7 @@ const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmi
               src/config/analytics.ts are the other layer; these survive a
               change to those. Do not remove either to debug a funnel. */}
           <textarea
+            id={`${formId}-notes`}
             value={booking.notes || ""}
             onChange={(e) => onChange({ notes: e.target.value })}
             placeholder={t.notesPlaceholder}

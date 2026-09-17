@@ -16,7 +16,25 @@ interface ServiceJsonLdProps {
   session?: PricedSession & { duration_minutes?: number | null };
 }
 
-/** JSON-LD for a bookable session-type page */
+/**
+ * JSON-LD for a bookable session-type page.
+ *
+ * Written through Helmet, so it lands in <head> after mount — which means it
+ * is *not* in the prerendered HTML (only #root is captured) and a crawler
+ * that does not execute JavaScript never sees it. That gap is issue #68.
+ *
+ * ⚠️ When #68 is implemented, do not delete this component. Emitting the node
+ * at build time and removing this would trade crawler freshness for human
+ * staleness: after #67 the build-time node is frozen until the next deploy,
+ * and this is what keeps the figure live for everyone who renders the page.
+ *
+ * The shape to build instead: emit the node at build time with a stable
+ * marker, and have this component *replace* the marked node on mount rather
+ * than append to it. Crawlers get the snapshot, humans and rendering crawlers
+ * get live data, and there is never a duplicate — two AggregateOffers for one
+ * Service with different prices is a contradiction a search engine cannot
+ * resolve, which is worse than one stale offer.
+ */
 export const ServiceJsonLd = ({ nameEn, nameRu, descriptionEn, descriptionRu, urlPath, session }: ServiceJsonLdProps) => {
   const { language } = useLanguage();
   const isRu = language === "ru";

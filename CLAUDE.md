@@ -77,6 +77,19 @@ head, which is the part that was missing.
   shipping one blank page invisibly. Both deploy workflows and the CI build job
   install Chromium for this. Read the header comment in that file before
   changing `createRoot` to `hydrateRoot` — it records what was measured.
+- **Prerendering couples database content to the deploy cycle.** Whatever a
+  route renders at build time is what the HTML says until the next build, so
+  session names, descriptions, durations and the published pricing scale are
+  all snapshots. Change a price and a human sees the new figure (React
+  re-renders over the markup with live data) while a crawler sees the old one
+  until something triggers a deploy — so **redeploy after changing pricing or
+  session copy**. A scheduled rebuild or a build hook is the fix — issue #67.
+- Only `#root` is prerendered, so head tags injected at runtime by
+  react-helmet-async are not. The per-session `Service` node carrying the
+  `AggregateOffer` comes from `<ServiceJsonLd>` via Helmet, so it is absent
+  from the served HTML: Google sees it after rendering, a non-JS crawler never
+  does — issue #68. The two site-wide nodes are static in `index.html` and
+  unaffected.
 - One file per route, written as `en/take.html`. GitHub Pages resolves the
   extensionless `/en/take` to it and serves it directly, so the sitemap URL is
   never a redirect. The directory form (`en/take/index.html`) was dropped

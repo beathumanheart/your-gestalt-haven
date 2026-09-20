@@ -34,13 +34,31 @@ import {
   renderSitemap,
   type SitemapRoute,
 } from "./render";
+import { buildServiceNode } from "../../src/config/serviceNode";
 import { prerenderRoutes, type PrerenderTarget } from "./prerender";
 
 interface GeneratedRoute extends SitemapRoute {
   text: RouteText;
+  /** Present for booking routes: the row their Service node is built from. */
+  session?: SessionRow;
 }
 
-type SessionRow = BookingMetaSource & { slug: string | null };
+/**
+ * The pricing columns come along because the page's Service node carries the
+ * offer derived from them. They are read, never interpreted, here —
+ * `sessionPricing` decides what a row publishes, so `show_price: false` keeps
+ * a withheld price out of the markup by construction.
+ */
+type SessionRow = BookingMetaSource & {
+  slug: string | null;
+  show_price?: boolean | null;
+  pricing_type?: string | null;
+  price?: number | null;
+  min_price?: number | null;
+  max_price?: number | null;
+  currency?: string | null;
+  duration_minutes?: number | null;
+};
 
 /**
  * Session types come from the database, so the booking pages that get a file
@@ -69,7 +87,10 @@ const fetchSessionRows = async (env: Record<string, string>): Promise<SessionRow
 
   const { data, error } = await createClient(url, key)
     .from("session_types")
-    .select("slug, name, name_ru, description, description_ru")
+    .select(
+      "slug, name, name_ru, description, description_ru, " +
+        "show_price, pricing_type, price, min_price, max_price, currency, duration_minutes",
+    )
     .eq("is_active", true);
 
   if (error) {
@@ -95,6 +116,7 @@ const collectRoutes = (sessions: SessionRow[]): GeneratedRoute[] => [
     priority: BOOKING_PRIORITY,
     changefreq: BOOKING_CHANGEFREQ,
     text: bookingRouteText(session),
+    session,
   })),
 ];
 
@@ -136,7 +158,26 @@ export const staticSite = (): Plugin => {
       for (const route of routes) {
         for (const lang of LANGS) {
           const canonicalPath = `/${lang}${route.path}`;
-          const html = renderRoutePage(template, { canonicalPath, lang, text: route.text });
+          const html = renderRoutePage(template, {
+            canonicalPath,
+            lang,
+            text: route.text,
+            // Booking routes only: the session's own Service node, so the
+            // offer is in the served HTML rather than injected after mount.
+            serviceNode: route.session
+              ? buildServiceNode(
+                  {
+                    nameEn: route.session.name,
+                    nameRu: route.session.name_ru || route.session.name,
+                    descriptionEn: route.session.description || "",
+                    descriptionRu: route.session.description_ru || route.session.description || "",
+                    urlPath: canonicalPath,
+                    session: route.session,
+                  },
+                  lang,
+                )
+              : undefined,
+          });
 
           // One file per route, at `<path>.html`.
           //

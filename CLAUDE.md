@@ -84,15 +84,16 @@ head, which is the part that was missing.
   re-renders over the markup with live data) while a crawler sees the old one
   until something triggers a deploy — so **redeploy after changing pricing or
   session copy**. A scheduled rebuild or a build hook is the fix — issue #67.
-- Only `#root` is prerendered, so head tags injected at runtime by
-  react-helmet-async are not. The per-session `Service` node carrying the
-  `AggregateOffer` comes from `<ServiceJsonLd>` via Helmet, so it is absent
-  from the served HTML: Google sees it after rendering, a non-JS crawler never
-  does — issue #68. The *visible* pricing is inside `#root` and therefore is
-  prerendered, so crawlers read the scale as body text; it is only the
-  machine-readable offer that is runtime-only. The two site-wide nodes are
-  static in `index.html` and unaffected. When fixing #68, do not delete
-  `<ServiceJsonLd>` — see the warning on it.
+- Only `#root` is prerendered, so head tags injected at runtime are not. The
+  per-session `Service` node is therefore emitted **twice, from one builder**
+  (`src/config/serviceNode.ts`): the build writes it into booking pages so a
+  non-JS crawler can read the offer, and `<ServiceJsonLd>` **replaces** that
+  node on mount so readers get live data rather than a snapshot. It replaces
+  rather than appends because two `AggregateOffer`s for one `Service` with
+  different prices is a contradiction a search engine cannot resolve. Do not
+  reinstate Helmet here (it appends and cannot take over the build's tag), and
+  do not delete the component (that would freeze the figure at deploy time for
+  everyone). The two site-wide nodes are static in `index.html`.
 - One file per route, written as `en/take.html`. GitHub Pages resolves the
   extensionless `/en/take` to it and serves it directly, so the sitemap URL is
   never a redirect. The directory form (`en/take/index.html`) was dropped

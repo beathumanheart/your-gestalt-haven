@@ -32,6 +32,7 @@ import {
   staticPersonNode,
   staticServiceNode,
 } from "../../src/config/identity";
+import { renderServiceNodeTag } from "../../src/config/serviceNode";
 import { formatJsonLd } from "./jsonLd";
 
 export interface PageSpec {
@@ -39,6 +40,14 @@ export interface PageSpec {
   canonicalPath: string;
   lang: MetaLang;
   text: RouteText;
+  /**
+   * The per-session Service node, for booking routes only.
+   *
+   * Written into the page so a crawler that does not execute JavaScript can
+   * read the offer. <ServiceJsonLd> replaces it on mount — see
+   * src/config/serviceNode.ts for why both emitters exist.
+   */
+  serviceNode?: Record<string, unknown>;
 }
 
 export interface SitemapRoute {
@@ -231,13 +240,16 @@ export const renderRoutePage = (template: string, spec: PageSpec): string => {
     .map((tag) => `    ${tag}`)
     .join("\n");
 
+  // Booking routes carry a third node, describing the session itself.
+  const serviceTag = spec.serviceNode ? `\n    ${renderServiceNodeTag(spec.serviceNode)}` : "";
+
   // Matches the whitespace before </head> too, so the inserted block is not
   // pushed out by the indentation already on that line.
   return replaceOnce(
     html,
     "</head>",
     /\n\s*<\/head>/,
-    () => `\n${links}\n  </head>`,
+    () => `\n${links}${serviceTag}\n  </head>`,
   );
 };
 

@@ -1,4 +1,4 @@
-import{u as l,j as e,P as d,T as c,b as p,H as x,a as g,L as m}from"./index-eYFZdZw_.js";import{t as h,a as f}from"./take-DZtfFvMu.js";const u=`
+import{u as l,j as e,P as d,T as c,b as p,H as x,a as g,L as m}from"./index-BpU37CcA.js";import{t as h,a as f}from"./take-DZtfFvMu.js";const u=`
 .tk-root { max-width: 980px; margin: 0 auto; padding: clamp(26px,4vw,60px) clamp(18px,4vw,40px) 80px; }
 .tk-intro { max-width: 60ch; }
 .tk-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; align-items: stretch; margin: clamp(28px,4vw,40px) 0 0; }

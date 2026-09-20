@@ -1,9 +1,11 @@
-import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { SITE_URL } from "@/components/PageMeta";
-import { sessionPricing, pricingToOffer, type PricedSession } from "@/lib/pricing";
-
-const CANONICAL_ID = `${SITE_URL}/#genia`;
+import type { PricedSession } from "@/lib/pricing";
+import {
+  SERVICE_NODE_ATTR,
+  SERVICE_NODE_SELECTOR,
+  buildServiceNode,
+} from "@/config/serviceNode";
 
 interface ServiceJsonLdProps {
   nameEn: string;
@@ -17,51 +19,66 @@ interface ServiceJsonLdProps {
 }
 
 /**
- * JSON-LD for a bookable session-type page.
+ * Keeps the page's Service node current.
  *
- * Written through Helmet, so it lands in <head> after mount — which means it
- * is *not* in the prerendered HTML (only #root is captured) and a crawler
- * that does not execute JavaScript never sees it. That gap is issue #68.
+ * The build writes this node into the page already (render.ts), so a crawler
+ * that does not execute JavaScript can read it. That copy is a snapshot: it
+ * says whatever the database said at the last deploy, and after #67 it can be
+ * a day stale. This component replaces it on mount with live data, so a reader
+ * and a rendering crawler see the real figure.
  *
- * ⚠️ When #68 is implemented, do not delete this component. Emitting the node
- * at build time and removing this would trade crawler freshness for human
- * staleness: after #67 the build-time node is frozen until the next deploy,
- * and this is what keeps the figure live for everyone who renders the page.
+ * ⚠️ It **replaces**, never appends, and that is the whole point. Two
+ * AggregateOffers for one Service with different prices is a contradiction a
+ * search engine cannot resolve — worse than one stale offer. Do not reinstate
+ * Helmet here: Helmet appends its own tag and cannot take over the build's.
  *
- * The shape to build instead: emit the node at build time with a stable
- * marker, and have this component *replace* the marked node on mount rather
- * than append to it. Crawlers get the snapshot, humans and rendering crawlers
- * get live data, and there is never a duplicate — two AggregateOffers for one
- * Service with different prices is a contradiction a search engine cannot
- * resolve, which is worse than one stale offer.
+ * Nor should this component be deleted when build-time emission exists.
+ * Removing it would trade crawler freshness for human staleness, freezing the
+ * figure at deploy time for everyone.
  */
-export const ServiceJsonLd = ({ nameEn, nameRu, descriptionEn, descriptionRu, urlPath, session }: ServiceJsonLdProps) => {
+export const ServiceJsonLd = ({
+  nameEn,
+  nameRu,
+  descriptionEn,
+  descriptionRu,
+  urlPath,
+  session,
+}: ServiceJsonLdProps) => {
   const { language } = useLanguage();
-  const isRu = language === "ru";
-
-  // Same derivation the visible price uses, so markup cannot contradict
-  // the page — including honouring show_price.
-  const offers = session ? pricingToOffer(sessionPricing(session), session.duration_minutes) : undefined;
-
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: isRu ? nameRu : nameEn,
-    description: isRu ? descriptionRu : descriptionEn,
-    url: `${SITE_URL}${urlPath}`,
-    // No `inLanguage`: it is not in Service's domain (it belongs to
-    // CreativeWork and friends), so it was silently an unknown field
-    // here. The page language is already carried by <html lang> and the
-    // hreflang alternates in PageMeta.
-    provider: { "@id": CANONICAL_ID },
-    areaServed: isRu ? "Весь мир (онлайн)" : "Worldwide (online)",
-    serviceType: isRu ? "Консультирование" : "Counselling",
-    ...(offers ? { offers } : {}),
-  };
-
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(data)}</script>
-    </Helmet>
+  const node = JSON.stringify(
+    buildServiceNode(
+      { nameEn, nameRu, descriptionEn, descriptionRu, urlPath, session },
+      language === "ru" ? "ru" : "en",
+    ),
   );
+
+  useEffect(() => {
+    // Adopt the build's node if it is there, otherwise create one — a
+    // client-side navigation into this page has no build-time node, because
+    // only the entry document carried one.
+    let script = document.head.querySelector<HTMLScriptElement>(SERVICE_NODE_SELECTOR);
+    const created = !script;
+
+    if (!script) {
+      script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.setAttribute(SERVICE_NODE_ATTR, "runtime");
+      document.head.appendChild(script);
+    } else {
+      script.setAttribute(SERVICE_NODE_ATTR, "runtime");
+    }
+
+    script.textContent = node;
+
+    return () => {
+      // Leaving the page takes the node with it: a Service node describing a
+      // session is wrong on the homepage, and worse on a different session.
+      // Removing the build's node too is correct — by then the document is no
+      // longer the one it was written for.
+      script?.remove();
+      void created;
+    };
+  }, [node]);
+
+  return null;
 };

@@ -188,3 +188,83 @@ test.describe("prerendered bodies", () => {
     }
   });
 });
+
+/**
+ * The offer must be in the served bytes, and exist exactly once after mount.
+ *
+ * Before this, <ServiceJsonLd> injected the Service node through Helmet after
+ * the app started, so it was absent from the HTML entirely: Google saw it
+ * after rendering, a crawler that does not run JavaScript never did.
+ */
+test.describe("the per-session offer", () => {
+  const nodes = (html: string) =>
+    [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
+      .map((m) => {
+        try {
+          return JSON.parse(m[1]);
+        } catch {
+          return {};
+        }
+      });
+
+  test("is in the HTML a non-JS crawler receives", async ({ request }) => {
+    const html = await (await request.get("/en/book/individual-therapy")).text();
+    const service = nodes(html).find((n) => n["@type"] === "Service");
+
+    expect(service, "no Service node in the served HTML").toBeTruthy();
+    expect(service.offers).toMatchObject({
+      "@type": "AggregateOffer",
+      lowPrice: "40",
+      highPrice: "100",
+      priceCurrency: "EUR",
+    });
+    expect(service.name).toBe("Individual Therapy");
+  });
+
+  test("is absent where no price is published", async ({ request }) => {
+    // bioethical-consultation is deliberately unpriced; the node exists, the
+    // offer does not, because show_price decides both.
+    const html = await (await request.get("/en/book/bioethical-consultation")).text();
+    const service = nodes(html).find((n) => n["@type"] === "Service");
+
+    expect(service).toBeTruthy();
+    expect(service).not.toHaveProperty("offers");
+  });
+
+  test("is not on pages that describe no session", async ({ request }) => {
+    const html = await (await request.get("/en")).text();
+    expect(nodes(html).some((n) => n["@type"] === "Service")).toBe(false);
+    expect(html).not.toContain("data-service-node");
+  });
+
+  test("exists exactly once after the app mounts", async ({ page }) => {
+    // The whole point of replacing rather than appending: two AggregateOffers
+    // for one Service with different prices is worse than one stale offer.
+    await page.goto("/en/book/individual-therapy", { waitUntil: "load" });
+    await page.waitForTimeout(1500);
+
+    const found = await page.evaluate(() => {
+      const all = [...document.querySelectorAll('script[type="application/ld+json"]')];
+      const services = all
+        .map((s) => {
+          try {
+            return JSON.parse(s.textContent ?? "{}");
+          } catch {
+            return {};
+          }
+        })
+        .filter((d) => d["@type"] === "Service");
+      return {
+        services: services.length,
+        marked: all.filter((s) => s.hasAttribute("data-service-node")).length,
+        attr: all.find((s) => s.hasAttribute("data-service-node"))?.getAttribute("data-service-node"),
+      };
+    });
+
+    expect(found.services, "duplicate Service nodes after mount").toBe(1);
+    expect(found.marked).toBe(1);
+    // "runtime" proves the component adopted the build's node rather than
+    // leaving it and adding its own.
+    expect(found.attr).toBe("runtime");
+  });
+});

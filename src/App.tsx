@@ -31,6 +31,7 @@ import Index from "./pages/Index";
 const Feelings = lazy(() => import("./pages/Feelings"));
 const TakeIndex = lazy(() => import("./pages/TakeIndex"));
 const TakeItemSoon = lazy(() => import("./pages/TakeItemSoon"));
+const TakeAutomaticYes = lazy(() => import("./pages/TakeAutomaticYes"));
 const FeelingsLegacyRedirect = lazy(() => import("./pages/FeelingsLegacyRedirect"));
 
 // Booking. Reached by a deliberate click; a visitor who never books never
@@ -181,6 +182,16 @@ const App = () => (
               element={
                 <LangLayout>
                   <Feelings />
+                </LangLayout>
+              }
+            />
+            {/* Before /:lang/take/:slug, which would otherwise match this
+                slug and render the "not written yet" placeholder. */}
+            <Route
+              path="/:lang/take/automatic-yes"
+              element={
+                <LangLayout>
+                  <TakeAutomaticYes />
                 </LangLayout>
               }
             />

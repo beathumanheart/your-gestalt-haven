@@ -12,6 +12,7 @@ import {
   STATIC_ROUTES,
   bookingRouteText,
   type MetaLang,
+  type StaticRoute,
 } from "@/config/pageMetadata";
 
 /**
@@ -238,33 +239,86 @@ describe("site-wide JSON-LD", () => {
 
 describe("renderSitemap", () => {
   const xml = renderSitemap(STATIC_ROUTES, "2026-01-01");
+  /** Routes are not all bilingual: an English-only one lists one URL. */
+  const langsOf = (route: StaticRoute) => route.langs ?? LANGS;
 
-  it("emits one url per language for every route", () => {
+  it("emits one url per language the route exists in", () => {
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    expect(locs).toHaveLength(STATIC_ROUTES.length * LANGS.length);
+    const expected = STATIC_ROUTES.reduce((sum, route) => sum + langsOf(route).length, 0);
+    expect(locs).toHaveLength(expected);
   });
 
-  it("gives every url the full alternate set, self-reference included", () => {
-    const urls = xml.split("<url>").slice(1);
-    for (const url of urls) {
-      expect(url).toContain('hreflang="en"');
-      expect(url).toContain('hreflang="ru"');
-      expect(url).toContain('hreflang="x-default"');
-    }
+  it("gives a bilingual url the full alternate set, self-reference included", () => {
+    const bilingual = STATIC_ROUTES.find((r) => langsOf(r).length === 2)!;
+    const block = xml
+      .split("<url>")
+      .find((u) => u.includes(`<loc>https://humanheart.life/en${bilingual.path}</loc>`))!;
+
+    expect(block).toContain('hreflang="en"');
+    expect(block).toContain('hreflang="ru"');
+    expect(block).toContain('hreflang="x-default"');
+  });
+
+  it("gives a single-language url no alternate in a language it does not exist in", () => {
+    // Pointing hreflang at a URL that 404s is worse than saying nothing.
+    const only = STATIC_ROUTES.find((r) => langsOf(r).length === 1);
+    expect(only, "no single-language route to check — this test would be vacuous").toBeTruthy();
+
+    const block = xml
+      .split("<url>")
+      .find((u) => u.includes(`<loc>https://humanheart.life/en${only!.path}</loc>`))!;
+
+    expect(block).toContain('hreflang="en"');
+    expect(block).not.toContain('hreflang="ru"');
+    // x-default belongs on the only page there is.
+    expect(block).toContain(`hreflang="x-default" href="https://humanheart.life/en${only!.path}"`);
+    // And the other language gets no <url> at all.
+    expect(xml).not.toContain(`<loc>https://humanheart.life/ru${only!.path}</loc>`);
   });
 
   it("lists the same path the page canonicalises to", () => {
     // A sitemap URL that does not match the page's own canonical is how a
     // crawler ends up indexing neither.
     for (const route of STATIC_ROUTES) {
-      for (const lang of LANGS) {
+      for (const lang of langsOf(route)) {
         const canonicalPath = `/${lang}${route.path}`;
         expect(xml).toContain(`<loc>https://humanheart.life${canonicalPath}</loc>`);
         expect(
-          renderRoutePage(template, { canonicalPath, lang: lang as MetaLang, text: route }),
+          renderRoutePage(template, {
+            canonicalPath,
+            lang,
+            text: route,
+            langs: route.langs,
+          }),
         ).toContain(`<link rel="canonical" href="https://humanheart.life${canonicalPath}" />`);
       }
     }
+  });
+});
+
+describe("a single-language route's head", () => {
+  const only = STATIC_ROUTES.find((r) => (r.langs ?? LANGS).length === 1)!;
+  const html = renderRoutePage(template, {
+    canonicalPath: `/en${only.path}`,
+    lang: "en",
+    text: only,
+    langs: only.langs,
+  });
+
+  it("claims no alternate in a language the page does not exist in", () => {
+    expect(html).not.toContain('hreflang="ru"');
+    expect(html).not.toContain("/ru" + only.path);
+  });
+
+  it("points x-default at itself", () => {
+    expect(html).toContain(
+      `<link rel="alternate" hreflang="x-default" href="https://humanheart.life/en${only.path}" />`,
+    );
+  });
+
+  it("advertises no alternate locale", () => {
+    expect(html).not.toContain("og:locale:alternate");
+    expect(html).toContain('<meta property="og:locale" content="en_US" />');
   });
 });
 

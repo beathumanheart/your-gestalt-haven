@@ -18,6 +18,7 @@
  */
 
 import {
+  LANGS,
   FORBIDDEN_PATH_SEGMENTS,
   OG_IMAGE_ALT,
   OG_LOCALE,
@@ -40,6 +41,8 @@ export interface PageSpec {
   canonicalPath: string;
   lang: MetaLang;
   text: RouteText;
+  /** Languages this route exists in. Absent means both. */
+  langs?: readonly MetaLang[];
   /**
    * The per-session Service node, for booking routes only.
    *
@@ -55,6 +58,8 @@ export interface SitemapRoute {
   path: string;
   priority: string;
   changefreq: string;
+  /** Languages this route exists in. Absent means both. */
+  langs?: readonly MetaLang[];
 }
 
 const escapeHtml = (value: string) =>
@@ -169,6 +174,21 @@ const setJsonLd = (html: string, lang: MetaLang): string => {
 };
 
 /**
+ * Drops a meta tag entirely, for a claim that does not apply to this page.
+ *
+ * Throws through replaceOnce when the tag is not there, like setMeta: a head
+ * that quietly lost a tag is how the generated pages would start disagreeing
+ * with index.html without anything failing.
+ */
+const removeMeta = (html: string, attr: "name" | "property", key: string): string =>
+  replaceOnce(
+    html,
+    `<meta ${attr}="${key}">`,
+    new RegExp(`\\n\\s*<meta\\s+${attr}="${key}"\\s+content="[^"]*"\\s*/?>`),
+    () => "",
+  );
+
+/**
  * The canonical and hreflang set for one page.
  *
  * Mirrors what PageMeta emits at runtime, x-default included: it points at
@@ -176,8 +196,24 @@ const setJsonLd = (html: string, lang: MetaLang): string => {
  * correct in the app and still never reached an indexer, because they are
  * written by React and the document they belonged to was a 404.
  */
-const alternateLinks = (canonicalPath: string, lang: MetaLang): string[] => {
+const alternateLinks = (
+  canonicalPath: string,
+  lang: MetaLang,
+  langs: readonly MetaLang[],
+): string[] => {
   const selfUrl = `${SITE_URL}${canonicalPath}`;
+
+  // A route that exists in one language claims no alternate in the other:
+  // pointing hreflang at a URL that 404s is worse than saying nothing, and
+  // x-default then belongs on the only page there is.
+  if (langs.length === 1) {
+    return [
+      `<link rel="canonical" href="${selfUrl}" />`,
+      `<link rel="alternate" hreflang="${lang}" href="${selfUrl}" />`,
+      `<link rel="alternate" hreflang="x-default" href="${selfUrl}" />`,
+    ];
+  }
+
   const altUrl = `${SITE_URL}${swapLang(canonicalPath, lang)}`;
   const otherLang: MetaLang = lang === "en" ? "ru" : "en";
 
@@ -227,7 +263,11 @@ export const renderRoutePage = (template: string, spec: PageSpec): string => {
   html = setMeta(html, "property", "og:image", ogImage);
   html = setMeta(html, "property", "og:image:alt", OG_IMAGE_ALT[lang]);
   html = setMeta(html, "property", "og:locale", OG_LOCALE[lang]);
-  html = setMeta(html, "property", "og:locale:alternate", OG_LOCALE[otherLang]);
+  // No alternate locale to advertise when the page exists in one language.
+  html =
+    (spec.langs ?? LANGS).length === 1
+      ? removeMeta(html, "property", "og:locale:alternate")
+      : setMeta(html, "property", "og:locale:alternate", OG_LOCALE[otherLang]);
 
   html = setMeta(html, "name", "twitter:title", title);
   html = setMeta(html, "name", "twitter:description", description);
@@ -236,7 +276,8 @@ export const renderRoutePage = (template: string, spec: PageSpec): string => {
 
   html = setJsonLd(html, lang);
 
-  const links = alternateLinks(canonicalPath, lang)
+  const langs = spec.langs ?? LANGS;
+  const links = alternateLinks(canonicalPath, lang, langs)
     .map((tag) => `    ${tag}`)
     .join("\n");
 
@@ -260,33 +301,44 @@ export const renderRoutePage = (template: string, spec: PageSpec): string => {
  * self-reference, which the spec requires.
  */
 const urlEntry = (
-  { path: urlPath, priority, changefreq }: SitemapRoute,
+  { path: urlPath, priority, changefreq, langs }: SitemapRoute,
   lastmod: string,
 ): string => {
-  const enUrl = `${SITE_URL}/en${urlPath}`;
-  const ruUrl = `${SITE_URL}/ru${urlPath}`;
+  const url = (lang: MetaLang) => `${SITE_URL}/${lang}${urlPath}`;
+  const present = langs ?? LANGS;
 
-  return `
-  <url>
-    <loc>${enUrl}</loc>
+  // A route in one language lists one URL, whose alternates are itself: there
+  // is no other page to point at, and x-default belongs on the only one.
+  const alternates = (
+    present.length === 1
+      ? [[present[0], url(present[0])] as const, ["x-default", url(present[0])] as const]
+      : [
+          ["en", url("en")] as const,
+          ["ru", url("ru")] as const,
+          ["x-default", url("en")] as const,
+        ]
+  )
+    // The quoted value is padded, never the value itself: hreflang="en       "
+    // is not a language tag. Width 11 lines them up with "x-default".
+    .map(
+      ([hreflang, href]) =>
+        `    <xhtml:link rel="alternate" hreflang=${`"${hreflang}"`.padEnd(11)} href="${href}" />`,
+    )
+    .join("\n");
+
+  return present
+    .map((lang) =>
+      `  <url>
+    <loc>${url(lang)}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
-    <xhtml:link rel="alternate" hreflang="en"        href="${enUrl}" />
-    <xhtml:link rel="alternate" hreflang="ru"        href="${ruUrl}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${enUrl}" />
-  </url>
-  <url>
-    <loc>${ruUrl}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
-    <xhtml:link rel="alternate" hreflang="en"        href="${enUrl}" />
-    <xhtml:link rel="alternate" hreflang="ru"        href="${ruUrl}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${enUrl}" />
-  </url>`.trimStart();
+${alternates}
+  </url>`,
+    )
+    .join("\n")
+    .trimStart();
 };
-
 export const assertNoForbiddenPaths = (paths: string[]): void => {
   const offenders = paths.filter((candidate) =>
     candidate

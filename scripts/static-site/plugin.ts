@@ -105,10 +105,13 @@ const fetchSessionRows = async (env: Record<string, string>): Promise<SessionRow
 };
 
 const collectRoutes = (sessions: SessionRow[]): GeneratedRoute[] => [
-  ...STATIC_ROUTES.map(({ path: routePath, priority, changefreq, ...text }) => ({
+  // `langs` is pulled out with the rest of the route's own fields so it does
+  // not end up inside `text`, which is only the head's words.
+  ...STATIC_ROUTES.map(({ path: routePath, priority, changefreq, langs, ...text }) => ({
     path: routePath,
     priority,
     changefreq,
+    langs,
     text,
   })),
   ...sessions.map((session) => ({
@@ -149,19 +152,22 @@ export const staticSite = (): Plugin => {
       const routes = collectRoutes(await fetchSessionRows(env));
 
       assertNoForbiddenPaths(
-        routes.flatMap((route) => LANGS.map((lang) => `/${lang}${route.path}`)),
+        routes.flatMap((route) => (route.langs ?? LANGS).map((lang) => `/${lang}${route.path}`)),
       );
 
       let fileCount = 0;
       const targets: PrerenderTarget[] = [];
 
       for (const route of routes) {
-        for (const lang of LANGS) {
+        // Not every route is bilingual: one listed for a single language gets
+        // one file, and no file at a path that would 404.
+        for (const lang of route.langs ?? LANGS) {
           const canonicalPath = `/${lang}${route.path}`;
           const html = renderRoutePage(template, {
             canonicalPath,
             lang,
             text: route.text,
+            langs: route.langs,
             // Booking routes only: the session's own Service node, so the
             // offer is in the served HTML rather than injected after mount.
             serviceNode: route.session
@@ -204,9 +210,10 @@ export const staticSite = (): Plugin => {
       const lastmod = new Date().toISOString().slice(0, 10);
       fs.writeFileSync(path.join(outDir, "sitemap.xml"), renderSitemap(routes, lastmod), "utf8");
 
+      const urlCount = routes.reduce((sum, route) => sum + (route.langs ?? LANGS).length, 0);
       console.log(
         `[static-site] ${fileCount} page files for ${routes.length} routes ` +
-          `(${routes.length * LANGS.length} URLs), plus sitemap.xml`,
+          `(${urlCount} URLs), plus sitemap.xml`,
       );
 
       await prerender(outDir, targets);

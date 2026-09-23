@@ -74,7 +74,9 @@ describe("analytics never sees the answers", () => {
 });
 
 describe("nothing is kept unless the reader asks", () => {
-  const firstBox = () => screen.getAllByRole("textbox")[0];
+  // A worksheet field, not just the first textbox — with sign-up on, that is
+  // the card's email input, which is not an answer and is not kept.
+  const firstBox = () => document.querySelector("textarea") as HTMLTextAreaElement;
   const keepSwitch = () => screen.getByRole("switch", { name: new RegExp(automaticYesEN.keepLabel, "i") });
 
   it("writes nothing while the switch is off", () => {
@@ -140,12 +142,22 @@ describe("the Russian address", () => {
   });
 });
 
-describe("the sign-up is off in milestone 1", () => {
-  it("renders neither the card nor the letter block", () => {
+describe("the sign-up", () => {
+  it("renders the card and the letter block now that it is on", () => {
+    // Milestone 1 shipped with SIGNUP_ENABLED false and this asserted the
+    // opposite. Milestone 2 turns it on, so the assertion turns with it.
     renderSheet();
-    // Off means not rendered: a form that cannot submit is worse than none,
-    // and its small print links to a privacy notice that is not published yet.
-    expect(screen.queryByText(automaticYesEN.signup.title)).toBeNull();
-    expect(screen.queryByText(automaticYesEN.letter.title)).toBeNull();
+    expect(screen.getByText(automaticYesEN.signup.title)).toBeTruthy();
+    expect(screen.getByText(automaticYesEN.letter.title)).toBeTruthy();
+  });
+
+  it("does not pre-tick the letter", () => {
+    renderSheet();
+    const letterBox = screen.getAllByRole("checkbox").find(
+      (box) => box.getAttribute("name") === "letter",
+    ) as HTMLInputElement;
+
+    expect(letterBox, "no letter checkbox").toBeTruthy();
+    expect(letterBox.checked, "the letter must be opted into, never out of").toBe(false);
   });
 });

@@ -1,45 +1,92 @@
+import { useState } from "react";
 import type { AutomaticYesContent } from "@/content/automaticYes";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useSignup } from "./useSignup";
 
 /**
  * The PDF sign-up, with the letter as a separate unticked box.
  *
- * Milestone 1 never renders this — `SIGNUP_ENABLED` is false — because the
- * Brevo list and template do not exist yet and the small print links to a
- * privacy notice that is not published. Milestone 2 wires the submit to the
- * `take-signup` function; until then this is deliberately inert markup, kept
- * here so the page's shape is not rebuilt later.
+ * The PDF is sent either way; ticking the letter adds Brevo's double opt-in,
+ * so an address only reaches the list after the reader confirms from their
+ * inbox. Nothing here is pre-ticked.
  */
 
-const SignupCard = ({ c }: { c: AutomaticYesContent }) => (
-  <form className="signup" noValidate aria-labelledby="signup-top-t">
-    <h2 id="signup-top-t">{c.signup.title}</h2>
-    <p>{c.signup.text}</p>
+const SignupCard = ({ c }: { c: AutomaticYesContent }) => {
+  const { langPath } = useLanguage();
+  const { state, message, submit } = useSignup(c, "automatic-yes");
+  const [email, setEmail] = useState("");
+  const [letter, setLetter] = useState(false);
+  const [company, setCompany] = useState("");
 
-    <div className="fld">
-      <label className="lbl" htmlFor="st-email">
-        {c.signup.label}
+  const sending = state === "sending";
+  const done = state === "done";
+
+  return (
+    <form
+      className="signup"
+      noValidate
+      aria-labelledby="signup-top-t"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (sending || done) return;
+        void submit({ email, pdf: true, letter, company });
+      }}
+    >
+      <h2 id="signup-top-t">{c.signup.title}</h2>
+      <p>{c.signup.text}</p>
+
+      <div className="fld">
+        <label className="lbl" htmlFor="st-email">
+          {c.signup.label}
+        </label>
+        <input
+          type="email"
+          id="st-email"
+          name="email"
+          autoComplete="email"
+          placeholder={c.signup.placeholder}
+          required
+          disabled={sending || done}
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+      </div>
+
+      <label className="consent">
+        <input
+          type="checkbox"
+          name="letter"
+          checked={letter}
+          disabled={sending || done}
+          onChange={(event) => setLetter(event.target.checked)}
+        />
+        <span>{c.signup.consent}</span>
       </label>
-      <input type="email" id="st-email" name="email" autoComplete="email" placeholder={c.signup.placeholder} required />
-    </div>
 
-    {/* Unticked, and separate from the PDF: the PDF goes either way. */}
-    <label className="consent">
-      <input type="checkbox" name="letter" value="yes" />
-      <span>{c.signup.consent}</span>
-    </label>
+      {/* Off-screen: a person never sees it, so anything in it is a bot. */}
+      <input
+        type="text"
+        name="company"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="sr-only"
+        value={company}
+        onChange={(event) => setCompany(event.target.value)}
+      />
 
-    {/* Off-screen honeypot; a real reader never fills it. */}
-    <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="sr-only" />
+      <button className="btn full" type="submit" disabled={sending || done}>
+        {sending ? c.signup.sending : c.signup.button}
+      </button>
 
-    <button className="btn full" type="submit">
-      {c.signup.button}
-    </button>
-
-    <div className="small">
-      {c.signup.small} <a href="/en/privacy">{c.signup.privacy}</a>
-    </div>
-    <div className="msg" role="status" aria-live="polite" />
-  </form>
-);
+      <div className="small">
+        {c.signup.small} <a href={langPath("/privacy")}>{c.signup.privacy}</a>
+      </div>
+      <div className="msg" role="status" aria-live="polite">
+        {message}
+      </div>
+    </form>
+  );
+};
 
 export default SignupCard;

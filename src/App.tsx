@@ -32,6 +32,7 @@ const Feelings = lazy(() => import("./pages/Feelings"));
 const TakeIndex = lazy(() => import("./pages/TakeIndex"));
 const TakeItemSoon = lazy(() => import("./pages/TakeItemSoon"));
 const TakeAutomaticYes = lazy(() => import("./pages/TakeAutomaticYes"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const FeelingsLegacyRedirect = lazy(() => import("./pages/FeelingsLegacyRedirect"));
 
 // Booking. Reached by a deliberate click; a visitor who never books never
@@ -155,6 +156,14 @@ const App = () => (
               element={
                 <LangLayout>
                   <BookingCancelled />
+                </LangLayout>
+              }
+            />
+            <Route
+              path="/:lang/privacy"
+              element={
+                <LangLayout>
+                  <Privacy />
                 </LangLayout>
               }
             />

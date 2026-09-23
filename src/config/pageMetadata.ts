@@ -117,6 +117,16 @@ export const AUTOMATIC_YES_TEXT: RouteText = {
     "A free worksheet on people-pleasing through Ferenczi, Winnicott and Gestalt: catch one yes, trace where it began, and try one small experiment.",
 };
 
+export const PRIVACY_TEXT: RouteText = {
+  titleEn: "Privacy | Human Heart",
+  descriptionEn:
+    "What happens to the information you give this site, and what it collects while you read — booking details, emails, worksheets and analytics.",
+  // English-only route, like the worksheet that links to it.
+  titleRu: "Privacy | Human Heart",
+  descriptionRu:
+    "What happens to the information you give this site, and what it collects while you read — booking details, emails, worksheets and analytics.",
+};
+
 /**
  * Routes whose text is known at build time.
  *
@@ -135,6 +145,7 @@ export const STATIC_ROUTES: readonly StaticRoute[] = [
   { path: "", priority: "1.0", changefreq: "monthly", ...HOME_TEXT },
   { path: "/take", priority: "0.7", changefreq: "monthly", ...TAKE_TEXT },
   { path: "/take/feelings-map", priority: "0.7", changefreq: "monthly", ...FEELINGS_MAP_TEXT },
+  { path: "/privacy", priority: "0.3", changefreq: "yearly", langs: ["en"], ...PRIVACY_TEXT },
   {
     path: "/take/automatic-yes",
     priority: "0.7",

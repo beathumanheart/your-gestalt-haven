@@ -136,7 +136,14 @@ editing one.** The short version: make a guard fail before trusting it, and
 - **Admin dashboard** (`src/pages/AdminDashboard.tsx`): Tabbed UI using components in `src/components/admin/`.
 
 ### PostHog Analytics
-- Initialized in `src/main.tsx` with EU host (`eu.i.posthog.com`), `maskAllInputs: true`, `respect_dnt: true`
+- Initialized in `src/main.tsx` with EU host (`eu.i.posthog.com`). `siteConfig`
+  sets `maskAllInputs: true` and pins `disable_session_recording: true`.
+  **`respect_dnt` is not set** — this line used to claim it was. `siteConfig`
+  also sets no `persistence`, so PostHog stores an identifier in a cookie and
+  in localStorage on the main pages; `/take/*` uses `persistence: "memory"`
+  and stores nothing. Verified in a browser, and described in the privacy
+  notice — if any of this changes, `src/content/privacy.ts` changes with it
+  (`privacyNotice.test.ts` fails otherwise).
 - All tracking functions exported from `src/hooks/useBookingAnalytics.ts` — use these, don't call `posthog.capture` directly
 - 8 funnel events defined in `FUNNEL_STEPS` constant; booking form inputs carry `data-ph-no-capture`
 - PostHog key set via `VITE_PUBLIC_POSTHOG_KEY` / `VITE_PUBLIC_POSTHOG_HOST` env vars

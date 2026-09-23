@@ -6,6 +6,17 @@
  * rather than on a reimplementation of them.
  */
 
+// Shared with take-signup so both build their messages the same way; see the
+// note in that file about why every line of it is the original.
+import {
+  button,
+  escapeHtml,
+  shell,
+  utf8ToBase64,
+  TRANSACTIONAL_HEADERS,
+  type BrevoAttachment,
+  type BrevoMessage,
+} from "../../_shared/email.ts";
 import { formatDateLong, formatTimeWithTz } from "./format.ts";
 import {
   generateCancelIcs,
@@ -14,22 +25,6 @@ import {
   type IcsBooking,
   type IcsOrganizer,
 } from "./ics.ts";
-
-export interface BrevoAttachment {
-  content: string;
-  name: string;
-}
-
-export interface BrevoMessage {
-  to: { email: string; name: string }[];
-  subject: string;
-  /** Both parts are always present: html-only mail is an accessibility gap
-   *  and carries a small spam-score penalty. */
-  htmlContent: string;
-  textContent: string;
-  attachment?: BrevoAttachment[];
-  headers?: Record<string, string>;
-}
 
 /**
  * Booking confirmations are transactional. Brevo will otherwise attach an
@@ -40,27 +35,7 @@ export interface BrevoMessage {
  * These headers ask Brevo to leave transactional mail alone. The account-level
  * toggles in the Brevo dashboard are authoritative; this is belt and braces.
  */
-export const TRANSACTIONAL_HEADERS: Record<string, string> = {
-  "X-Mailin-Track": "0",
-  "X-Mailin-Tag": "transactional",
-};
-
-export function utf8ToBase64(text: string): string {
-  const bytes = new TextEncoder().encode(text);
-  let binary = "";
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary);
-}
-
 // ── HTML fragments ─────────────────────────────────────────────
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 function detailsTable(rows: string): string {
   return `<div style="background: #f0ede8; border-radius: 12px; padding: 20px; margin: 24px 0;">
@@ -79,24 +54,6 @@ function notesRow(notes: string | null | undefined): string {
 
 function timeValue(time24: string, tzLabel: string): string {
   return `<strong>${time24}</strong> <span style="color: #7a7067; font-size: 12px;">${tzLabel}</span>`;
-}
-
-function shell(heading: string, gradient: string, body: string): string {
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="font-family: Georgia, 'Times New Roman', serif; background: #ffffff; margin: 0; padding: 40px 20px;">
-  <div style="max-width: 560px; margin: 0 auto; background: #faf8f5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-    <div style="background: ${gradient}; padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 400;">${heading}</h1>
-    </div>
-    <div style="padding: 32px;">${body}</div>
-  </div>
-</body></html>`;
-}
-
-function button(href: string, label: string): string {
-  return `<div style="text-align: center; margin: 28px 0;">
-        <a href="${href}" style="display: inline-block; background: linear-gradient(135deg, #4a7c5f, #5a9470); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500;">${label}</a>
-      </div>`;
 }
 
 const GREEN = "linear-gradient(135deg, #4a7c5f 0%, #5a9470 100%)";
@@ -388,3 +345,8 @@ export function buildCancellationEmails(input: CancellationInput): {
     },
   };
 }
+
+// Re-exported so existing importers (index.ts, the guardrail tests) keep
+// working unchanged after the move to _shared.
+export { utf8ToBase64, TRANSACTIONAL_HEADERS };
+export type { BrevoAttachment, BrevoMessage };

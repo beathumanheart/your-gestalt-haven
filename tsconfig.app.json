@@ -22,6 +22,12 @@
       ],
       "@edge/*": [
         "./supabase/functions/process-booking/lib/*"
+      ],
+      "@shared/*": [
+        "./supabase/functions/_shared/*"
+      ],
+      "@takesignup/*": [
+        "./supabase/functions/take-signup/lib/*"
       ]
     },
     "skipLibCheck": true,

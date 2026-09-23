@@ -17,6 +17,10 @@ export default defineConfig({
       // function. The guardrail tests import the real code rather than a copy
       // of it, so drift in the function shows up here.
       "@edge": path.resolve(__dirname, "./supabase/functions/process-booking/lib"),
+      // The worksheet email and the helpers both functions share. Imported by
+      // the guardrail tests so they assert on the real bytes, not a copy.
+      "@shared": path.resolve(__dirname, "./supabase/functions/_shared"),
+      "@takesignup": path.resolve(__dirname, "./supabase/functions/take-signup/lib"),
     },
   },
 });

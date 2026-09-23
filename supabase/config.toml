@@ -2,3 +2,8 @@ project_id = "ljjgokbrodfdhazeehgl"
 
 [functions.process-booking]
 verify_jwt = false
+
+[functions.take-signup]
+# Called from the public worksheet page by a reader who is not signed in, the
+# same footing as process-booking.
+verify_jwt = false

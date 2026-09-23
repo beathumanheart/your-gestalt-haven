@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon: heart-pulse SVG matching site header (terracotta #D17147) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#D17147" />
+
+    <title>The automatic yes — a worksheet on people-pleasing | Human Heart</title>
+
+    <meta name="description" content="A free worksheet on people-pleasing through Ferenczi, Winnicott and Gestalt: catch one yes, trace where it began, and try one small experiment." />
+    <meta name="author" content="Genia" />
+
+    <!-- Open Graph
+         Static fallback read by Telegram, Twitter, WhatsApp (bots don't run JS).
+         React-side PageMeta overrides these for Google and JS-capable crawlers. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Human Heart" />
+    <meta property="og:title" content="The automatic yes — a worksheet on people-pleasing | Human Heart" />
+    <meta property="og:description" content="A free worksheet on people-pleasing through Ferenczi, Winnicott and Gestalt: catch one yes, trace where it began, and try one small experiment." />
+    <meta property="og:url" content="https://humanheart.life/en/take/automatic-yes" />
+    <meta property="og:image" content="https://humanheart.life/og-image-en.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Genia — Gestalt counsellor" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The automatic yes — a worksheet on people-pleasing | Human Heart" />
+    <meta name="twitter:description" content="A free worksheet on people-pleasing through Ferenczi, Winnicott and Gestalt: catch one yes, trace where it began, and try one small experiment." />
+    <meta name="twitter:image" content="https://humanheart.life/og-image-en.jpg" />
+    <meta name="twitter:image:alt" content="Genia — Gestalt counsellor" />
+
+    <!-- Site-wide JSON-LD (static, so non-JS crawlers see it).
+         Both nodes are built from src/config/identity.ts and injected by the
+         siteJsonLd plugin in vite.config.ts — edit the module, not this file.
+
+         The nodes here are the English ones, which is what "/" serves. The
+         staticSite plugin rewrites them in Russian for the /ru pages it
+         generates — see setJsonLd in scripts/static-site/render.ts. -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://humanheart.life/#genia",
+  "name": "Genia",
+  "jobTitle": "Gestalt Counsellor",
+  "url": "https://humanheart.life/en",
+  "image": "https://humanheart.life/og-image-en.jpg",
+  "knowsAbout": [
+    "Gestalt therapy",
+    "grief counselling",
+    "existential therapy",
+    "relationship therapy"
+  ],
+  "knowsLanguage": [
+    "en",
+    "ru"
+  ],
+  "sameAs": [
+    "https://www.instagram.com/humanheart.life",
+    "https://www.youtube.com/@beathumanheart",
+    "https://humanheartbeat.substack.com/"
+  ],
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "KU Leuven",
+      "url": "https://www.kuleuven.be/",
+      "sameAs": "https://www.wikidata.org/wiki/Q833670"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "University of Tartu",
+      "url": "https://ut.ee/",
+      "sameAs": "https://www.wikidata.org/wiki/Q204181"
+    },
+    {
+      "@type": "EducationalOrganization",
+      "url": "https://education-psy.ru/"
+    }
+  ],
+  "hasCredential": [
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "diploma",
+      "name": "Diploma in Psychological Counselling",
+      "educationalLevel": "Diploma",
+      "recognizedBy": {
+        "@type": "EducationalOrganization",
+        "url": "https://education-psy.ru/"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "degree",
+      "name": "MSc in Bioethics",
+      "educationalLevel": "Master's degree",
+      "recognizedBy": {
+        "@type": "CollegeOrUniversity",
+        "name": "KU Leuven",
+        "url": "https://www.kuleuven.be/",
+        "sameAs": "https://www.wikidata.org/wiki/Q833670"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "degree",
+      "name": "MA in Philosophy",
+      "educationalLevel": "Master's degree",
+      "recognizedBy": {
+        "@type": "CollegeOrUniversity",
+        "name": "University of Tartu",
+        "url": "https://ut.ee/",
+        "sameAs": "https://www.wikidata.org/wiki/Q204181"
+      }
+    }
+  ],
+  "worksFor": {
+    "@id": "https://humanheart.life/#service"
+  }
+}</script>
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": "https://humanheart.life/#service",
+  "name": "Human Heart — Gestalt Counselling",
+  "description": "A warm, compassionate space for individual Gestalt counselling. Working with grief, relationships, and life's existential questions.",
+  "url": "https://humanheart.life/en",
+  "areaServed": "Worldwide (online)",
+  "knowsLanguage": [
+    "en",
+    "ru"
+  ]
+}</script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script type="module" crossorigin src="/assets/index-bViwzczJ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-VaFhDpbf.css">
+    <link rel="canonical" href="https://humanheart.life/en/take/automatic-yes" />
+    <link rel="alternate" hreflang="en" href="https://humanheart.life/en/take/automatic-yes" />
+    <link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/take/automatic-yes" />
+  </head>
+
+  <body>
+    <div id="root"><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;"><ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol></div><section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section><header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-transparent py-6"><nav class="mx-auto max-w-4xl md:max-w-5xl grid grid-cols-[auto_1fr_auto] items-center px-6 gap-x-[clamp(1.5rem,4vw,3.5rem)] md:gap-x-[max(32px,clamp(1.5rem,4vw,3.5rem))]"><button class="col-start-1 min-w-max flex items-center gap-2 font-display text-xl md:text-2xl font-medium text-foreground hover:text-primary transition-colors"><svg viewBox="0 0 40 40" class="w-8 h-8 md:w-10 md:h-10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 35L17.5 32.75C9 25.1 4 20.6 4 15C4 10.5 7.5 7 12 7C14.6 7 17.1 8.2 19 10.1L20 11.1L21 10.1C22.9 8.2 25.4 7 28 7C32.5 7 36 10.5 36 15C36 20.6 31 25.1 22.5 32.75L20 35Z" class="fill-terracotta"></path><path d="M8 20H14L16 16L20 24L24 18L26 20H32" class="stroke-cream" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="hidden sm:inline">Human Heart</span></button><div class="col-start-2 hidden md:flex items-center gap-8"><button class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors">About</button><button class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors">Services</button><button class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors">Credentials</button><button class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</button></div><div class="col-start-3 justify-self-end flex items-center gap-3"><div role="group" aria-label="Language" class="inline-flex items-center gap-0.5 p-1 rounded-full border border-border/50 bg-background/50 backdrop-blur-sm font-body text-[13px]"><button type="button" aria-pressed="true" aria-label="English" class="px-3 py-[5px] rounded-full bg-background text-foreground font-medium shadow-[0_1px_3px_hsl(var(--foreground)/0.08)]">EN</button><button type="button" aria-pressed="false" aria-label="Русский" class="px-3 py-[5px] rounded-full text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-colors cursor-pointer">RU</button></div><button class="hidden md:block btn-primary text-sm py-2.5 px-6">Book a Session</button><button class="md:hidden p-2 text-foreground" aria-label="Toggle menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu w-6 h-6"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button></div></nav></header><main class="min-h-screen bg-background pt-24 md:pt-28"><div class="ay ph-no-capture" data-ph-no-capture="true"><style>.ay{
+  --bg:#FAF8F5; --panel:#F3EFE8; --panel-2:#F6F2EC; --border:#E7E1DA; --border-soft:#EFEAE3;
+  --head:#464039; --ink:#5c554e; --mute:#8A8075; --kicker:#C2603A; --accent:#D17147;
+  --sage:#437059; --sage-dark:#3c5c4c; --sage-pale:#E0EBE6; --sage-panel:#E9F0EC; --sage-line:#D7E3DC;
+  --peach:#D8A98B; --peach-deep:#C69A7F; --peach-ink:#211811; --olive:#232A21; --olive-cream:#EFEBE1; --tan:#C4A78C;
+  --radius:16px;
+}
+.ay a{color:var(--sage);font-weight:600;text-decoration:none}
+.ay a:hover{text-decoration:underline;text-underline-offset:3px}
+.ay{max-width:980px;margin:0 auto;padding:clamp(26px,4vw,60px) clamp(18px,4vw,40px) 90px}
+.ay .col{max-width:720px}
+.ay .kicker{font:600 11px/1.3 Lora,serif;letter-spacing:.13em;text-transform:uppercase;color:var(--kicker)}
+.ay .crumb{font-size:14.5px;margin:0 0 18px}
+.ay .crumb a{font-weight:600}
+.ay .crumb span{color:var(--mute)}
+.ay /* hero: the thumbnail, .ay carried onto the page */
+.hero{position:relative;overflow:hidden;background:var(--peach);color:var(--peach-ink);border-radius:20px;
+      padding:clamp(26px,5vw,54px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);
+      gap:clamp(24px,4vw,44px);align-items:end}
+.ay .hero-text{position:relative;z-index:1}
+@media(max-width:760px){.ay .hero{grid-template-columns:1fr;align-items:start}}
+.ay .hero .kicker{color:var(--peach-ink);opacity:.8}
+.ay .hero h1{font-family:Fraunces,Georgia,serif;font-weight:600;font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;
+         font-size:clamp(50px,8.6vw,92px);line-height:.9;letter-spacing:-.015em;margin:14px 0 0}
+.ay .hero h1 em{display:block;font-style:italic;font-weight:560}
+.ay .hero-sub{font-size:clamp(17px,2.1vw,19px);line-height:1.5;margin:22px 0 0;max-width:30ch}
+.ay .hero-meta{font-size:14px;margin:12px 0 0;opacity:.85;max-width:36ch}
+.ay .signup{position:relative;z-index:1;background:var(--bg);color:var(--ink);border-radius:var(--radius);padding:22px 22px 18px;
+        box-shadow:0 18px 40px -18px rgba(33,24,17,.45)}
+.ay .signup h2, .ay .letter h2{font-family:Fraunces,Georgia,serif;font-variation-settings:'opsz' 36,'SOFT' 0,'WONK' 0;font-weight:520;
+        font-size:21px;line-height:1.2;margin:0;color:var(--head)}
+.ay .signup p{margin:6px 0 0;font-size:14.5px;line-height:1.6}
+.ay .fld{margin-top:14px}
+.ay .fld label.lbl{display:block;font-size:12.5px;font-weight:600;color:var(--head);margin-bottom:6px}
+.ay .fld input[type=email]{width:100%;border:1px solid var(--border);border-radius:999px;padding:12px 18px;font:15px Lora,Georgia,serif;
+        background:#fff;color:var(--head);outline:none;transition:border-color .3s,box-shadow .3s}
+.ay .fld input[type=email]:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(67,112,89,.15)}
+.ay .consent{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:13.5px;line-height:1.55;cursor:pointer}
+.ay .consent input{margin-top:3px;accent-color:var(--sage);width:16px;height:16px;flex:none}
+.ay .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:13px 26px;
+     font:600 15px Lora,Georgia,serif;color:#FAF8F5;background:linear-gradient(135deg,hsl(150 25% 35%) 0%,hsl(150 30% 45%) 100%);
+     box-shadow:0 4px 20px -4px rgba(70,64,57,.18);cursor:pointer;transition:transform .3s,box-shadow .3s;text-decoration:none}
+.ay .btn:hover{transform:translateY(-2px);box-shadow:0 20px 50px -15px rgba(70,64,57,.25);text-decoration:none}
+.ay .btn:focus-visible{outline:2px solid var(--sage);outline-offset:3px}
+.ay .btn.full{width:100%;margin-top:14px}
+.ay .btn.ghost{background:transparent;color:var(--sage);border:1px solid var(--border);box-shadow:none}
+.ay .btn.ghost:hover{background:var(--sage-pale);border-color:var(--sage)}
+.ay .small{font-size:12.5px;line-height:1.55;color:var(--mute);margin-top:10px}
+.ay .small a{font-weight:600}
+.ay .msg{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.55}
+.ay .msg.ok{display:block;background:var(--sage-pale);color:var(--sage-dark)}
+.ay .msg.err{display:block;background:#F7E7DF;color:#8A3F22}
+.ay .onpage p{margin:0}
+.ay .keep{display:flex;gap:12px;align-items:flex-start;margin-top:14px;cursor:pointer}
+.ay .keep input{appearance:none;-webkit-appearance:none;flex:none;width:38px;height:22px;border-radius:999px;background:#C9D8CF;position:relative;margin:2px 0 0;cursor:pointer;transition:background .3s}
+.ay .keep input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .3s}
+.ay .keep input:checked{background:var(--sage)}
+.ay .keep input:checked::after{transform:translateX(16px)}
+.ay .keep input:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
+.ay .keep b{display:block;font-weight:600;color:var(--sage-dark);font-size:14.5px;line-height:1.4}
+.ay .keep small{display:block;font-size:13px;line-height:1.5;color:var(--sage-dark);opacity:.85}
+.ay .confirmed{margin:0 0 18px;padding:14px 18px;border-radius:14px;background:var(--sage-pale);color:var(--sage-dark);font-size:15px}
+.ay .onpage{margin:26px 0 0;padding:16px 20px;border-radius:14px;background:var(--sage-panel);border:1px solid var(--sage-line);
+        color:var(--sage-dark);font-size:15px;line-height:1.65}
+.ay /* sections */
+section.sec{margin-top:clamp(56px,8vw,88px)}
+.ay h2.title{font-family:Fraunces,Georgia,serif;font-weight:420;font-variation-settings:'opsz' 72,'SOFT' 0,'WONK' 0;
+         font-size:clamp(30px,4.6vw,42px);line-height:1.08;letter-spacing:-.005em;color:var(--head);margin:10px 0 0}
+.ay .lead p{margin:16px 0 0}
+.ay .quote{margin:22px 0 0;padding:2px 0 2px 20px;border-left:2px solid var(--kicker)}
+.ay .quote q{quotes:none;display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;
+         font-size:clamp(21px,2.6vw,25px);line-height:1.3;color:var(--head)}
+.ay .quote .attr{margin-top:8px;font:600 10.5px/1.4 Lora,serif;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.ay .howto{display:grid;grid-template-columns:110px 1fr;gap:10px 18px;margin:26px 0 0}
+.ay .howto dt{font:600 11px/2.1 Lora,serif;letter-spacing:.13em;text-transform:uppercase;color:var(--sage-dark)}
+.ay .howto dd{margin:0;font-size:15.5px;line-height:1.7}
+@media(max-width:560px){.ay .howto{grid-template-columns:1fr;gap:2px}
+.ay .howto dd{margin-bottom:10px}}
+.ay h3.sub{font-family:Fraunces,Georgia,serif;font-weight:440;font-variation-settings:'opsz' 48,'SOFT' 0,'WONK' 0;font-size:24px;line-height:1.2;
+       color:var(--head);margin:44px 0 0}
+.ay .lenses{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
+@media(max-width:760px){.ay .lenses{grid-template-columns:1fr}}
+.ay .lens{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px 22px 20px}
+.ay .lens .yr{font:600 11px/1 Lora,serif;letter-spacing:.13em;color:var(--kicker)}
+.ay .lens .who{font-family:Fraunces,Georgia,serif;font-variation-settings:'opsz' 36,'SOFT' 0,'WONK' 0;font-weight:480;font-size:19px;line-height:1.15;color:var(--head);margin-top:10px}
+.ay .lens .what{font-style:italic;color:var(--sage-dark);font-size:14.5px;margin-top:10px}
+.ay .lens .gloss{font-size:14.5px;line-height:1.65;margin-top:4px}
+.ay .lens a{display:inline-block;margin-top:12px;font-size:14px}
+.ay /* prompts */
+.blocks{margin-top:34px}
+.ay .qb{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:8px;margin:0 0 30px;border:0;padding:0;min-width:0}
+.ay .qb > .num{font-family:Fraunces,Georgia,serif;font-variation-settings:'opsz' 48,'SOFT' 0,'WONK' 0;font-weight:500;font-size:21px;line-height:1.35;color:var(--kicker)}
+.ay .q{display:block;font-weight:500;color:var(--head);font-size:16.5px;line-height:1.55;padding:0}
+.ay legend.q{float:left;width:100%}
+.ay .hint{font-style:italic;color:var(--mute);font-size:14.5px;margin-top:2px}
+.ay .qb textarea, .ay .qb input[type=text]{width:100%;margin-top:10px;border:1px solid var(--border);border-radius:12px;background:#fff;
+        padding:11px 14px;font:15.5px/1.6 Lora,Georgia,serif;color:var(--head);resize:none;outline:none;transition:border-color .3s,box-shadow .3s}
+.ay .qb textarea{min-height:56px;overflow:hidden}
+.ay .qb textarea:focus, .ay .qb input[type=text]:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(67,112,89,.13)}
+.ay .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;clear:both}
+.ay .pill{position:relative;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;
+      padding:8px 15px;background:rgba(250,248,245,.75);font-size:14.5px;line-height:1.3;color:var(--ink);cursor:pointer;
+      transition:all .35s cubic-bezier(.4,0,.2,1);user-select:none}
+.ay .pill:hover{border-color:var(--accent)}
+.ay .pill input{position:absolute;opacity:0;width:1px;height:1px}
+.ay .pill:has(input:checked){background:var(--accent);border-color:var(--accent);color:#FAF8F5}
+.ay .pill:has(input:focus-visible){outline:2px solid var(--sage);outline-offset:2px}
+.ay .pill.other{padding:4px 6px 4px 15px}
+.ay .pill.other input[type=text]{position:static;opacity:1;width:170px;height:auto;margin:0;border:0;border-bottom:1px solid var(--border);border-radius:0;
+      padding:4px 6px;font:14.5px Lora,Georgia,serif;background:transparent;color:var(--head)}
+.ay .pill.other:has(input[type=checkbox]:checked) input[type=text]{color:#FAF8F5;border-color:rgba(250,248,245,.6)}
+.ay .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ay .two .clabel{font-style:italic;color:var(--sage-dark);font-size:14.5px;margin-top:12px}
+@media(max-width:560px){.ay .two{grid-template-columns:1fr;gap:0}}
+.ay .figwrap{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:24px;align-items:start}
+@media(max-width:560px){.ay .figwrap{grid-template-columns:1fr}
+.ay .figwrap .map{max-width:200px;margin:0 auto}}
+.ay .map svg{width:100%;height:auto;display:block;cursor:crosshair;touch-action:manipulation}
+.ay .map .cap{font-size:12.5px;color:var(--mute);text-align:center;margin-top:6px;line-height:1.4}
+.ay .frow{display:grid;grid-template-columns:190px minmax(0,1fr);gap:4px 18px;padding:14px 0;border-top:1px solid var(--border-soft)}
+.ay .frow:last-child{border-bottom:1px solid var(--border-soft)}
+.ay .frow .fl{font-family:Fraunces,Georgia,serif;font-variation-settings:'opsz' 24,'SOFT' 0,'WONK' 0;font-weight:500;color:var(--head);font-size:17px;line-height:1.25}
+.ay .frow .fh{font-style:italic;color:var(--mute);font-size:14px;line-height:1.45;margin-top:2px}
+.ay .frow textarea{margin-top:0}
+@media(max-width:560px){.ay .frow{grid-template-columns:1fr}}
+.ay .grow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;padding:12px 0;border-top:1px solid var(--border-soft)}
+.ay .grow:last-child{border-bottom:1px solid var(--border-soft)}
+.ay .grow input[type=text]{margin-top:0}
+.ay .grow .pills{margin-top:0;flex-wrap:nowrap}
+@media(max-width:640px){.ay .grow{grid-template-columns:1fr}
+.ay .grow .pills{flex-wrap:wrap}}
+.ay .sublist .sq{font-style:italic;color:var(--ink);font-size:15px;margin-top:16px}
+.ay .sublist textarea{margin-top:6px}
+.ay .example{margin:0 0 30px 42px;padding-left:16px;border-left:2px solid var(--sage);font-style:italic;color:var(--sage-dark);font-size:15px;line-height:1.65}
+.ay /* the turn */
+.turn{margin-top:clamp(56px,8vw,88px);background:var(--olive);color:var(--olive-cream);border-radius:20px;text-align:center;
+      padding:clamp(48px,8vw,96px) clamp(22px,6vw,80px)}
+.ay .turn .mark{font-style:italic;color:var(--tan);font-size:15px}
+.ay .turn q{quotes:none;display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;
+        font-size:clamp(28px,4.4vw,42px);line-height:1.2;max-width:26ch;margin:18px auto 0}
+.ay .turn .attr{margin-top:18px;font:600 11px/1.4 Lora,serif;letter-spacing:.13em;text-transform:uppercase;color:var(--tan)}
+.ay .turn .rule{width:52px;height:1px;background:var(--tan);margin:36px auto 0;opacity:.8}
+.ay .turn p{max-width:44ch;margin:30px auto 0;font-size:17px;line-height:1.7}
+.ay .turn p + p{margin-top:12px;font-family:Fraunces,Georgia,serif;font-style:italic;font-variation-settings:'opsz' 36,'SOFT' 0,'WONK' 0;font-size:21px}
+.ay /* pause */
+.move{display:grid;grid-template-columns:48px minmax(0,1fr);gap:4px 10px;padding:22px 0;border-top:1px solid var(--border)}
+.ay .move:last-of-type{border-bottom:1px solid var(--border)}
+.ay .move .mn{font-family:Fraunces,Georgia,serif;font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;font-weight:380;font-size:44px;line-height:.9;color:var(--kicker)}
+.ay .move .mt{font-family:Fraunces,Georgia,serif;font-variation-settings:'opsz' 36,'SOFT' 0,'WONK' 0;font-weight:520;font-size:21px;color:var(--head);line-height:1.2}
+.ay .move .mx{margin-top:4px;font-size:15.5px}
+.ay .mfld{margin-top:12px}
+.ay .mfld label{display:block;font-style:italic;color:var(--sage-dark);font-size:14.5px}
+.ay .mfld input[type=text]{width:100%;margin-top:6px;border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px 14px;
+      font:15.5px Lora,Georgia,serif;color:var(--head);outline:none}
+.ay .mfld input[type=text]:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(67,112,89,.13)}
+.ay .box-exp{margin-top:30px;background:var(--sage-panel);border:1px solid var(--sage-line);border-radius:var(--radius);padding:24px}
+.ay .box-exp h3, .ay .stays h3{font-family:Fraunces,Georgia,serif;font-variation-settings:'opsz' 36,'SOFT' 0,'WONK' 0;font-weight:520;font-size:22px;margin:0;color:var(--sage-dark)}
+.ay .box-exp p{margin:8px 0 0;color:#4a5b51;font-size:15.5px;line-height:1.7}
+.ay .box-exp .pill{background:rgba(250,248,245,.8)}
+.ay .note{margin-top:18px;font-style:italic;color:var(--mute);font-size:14.5px;line-height:1.65}
+.ay .stays{margin-top:34px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.ay .stays h3{color:var(--head)}
+.ay /* done */
+.done{margin-top:clamp(48px,7vw,72px);padding-top:26px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.ay .done .saved{font-size:13.5px;color:var(--mute);margin-left:auto}
+.ay /* letter + closing */
+.letter{margin-top:clamp(48px,7vw,72px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:end;
+        background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:clamp(22px,4vw,36px)}
+.ay .letter p{margin:8px 0 0;font-size:15.5px;line-height:1.7}
+.ay .letter form{display:flex;flex-wrap:wrap;gap:10px}
+.ay .letter form .fld{margin:0;flex:1 1 220px}
+.ay .letter form .btn{flex:0 0 auto}
+@media(max-width:760px){.ay .letter{grid-template-columns:1fr}}
+.ay .closing{margin-top:clamp(56px,8vw,88px);background:var(--peach);color:var(--peach-ink);border-radius:20px;padding:clamp(26px,5vw,54px)}
+.ay .closing q{quotes:none;display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;
+           font-size:clamp(24px,3.2vw,32px);line-height:1.25;max-width:30ch}
+.ay .closing .attr{margin-top:12px;font:600 11px/1.4 Lora,serif;letter-spacing:.13em;text-transform:uppercase}
+.ay .who{display:grid;grid-template-columns:150px minmax(0,1fr);gap:26px;align-items:center;margin-top:40px}
+.ay .who img{width:150px;height:150px;object-fit:cover;border-radius:16px;display:block}
+.ay .who .name{display:flex;align-items:flex-end;gap:10px;font-family:Fraunces,Georgia,serif;font-variation-settings:'opsz' 48,'SOFT' 0,'WONK' 0;font-weight:520;font-size:28px;line-height:1}
+.ay .who .role{font-style:italic;margin-top:6px}
+.ay .who p{margin:10px 0 0;font-size:15.5px;line-height:1.65}
+.ay .who .ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.ay .closing .btn.ghost{color:var(--peach-ink);border-color:rgba(33,24,17,.35)}
+.ay .closing .btn.ghost:hover{background:rgba(250,248,245,.35)}
+@media(max-width:560px){.ay .who{grid-template-columns:1fr}
+.ay .who img{width:120px;height:120px}}
+.ay details.src{margin-top:26px;font-size:13.5px;line-height:1.6;color:var(--ink)}
+.ay details.src summary{cursor:pointer;font-weight:600;color:var(--sage)}
+.ay details.src ol{margin:12px 0 0;padding-left:18px}
+.ay details.src li{margin-bottom:6px}
+.ay .fine{margin-top:18px;font-size:13px;font-style:italic;color:var(--mute)}
+@media (prefers-reduced-motion: reduce){.ay *{transition:none!important}}
+.ay /* print: the answers, .ay not the page chrome */
+@media print{
+  @page{size:A4;margin:16mm 16mm 18mm}
+.crumb,.signup,.onpage,.done,.letter,.who .ctas,details.src,.map .cap{display:none!important}
+  .ay{padding:0;max-width:none}
+  .hero{background:none;padding:0;display:block;border-radius:0}
+  .hero h1{font-size:44pt}
+  section.sec{break-before:page;margin-top:0}
+  .turn{break-before:page;background:none;color:#211811;border:1px solid #ddd}
+  .turn .attr,.turn .mark{color:#8A8075}
+  .closing{background:none;padding:0;break-before:page}
+  .qb,.frow,.grow,.move{break-inside:avoid}
+  .qb textarea,.qb input[type=text],.mfld input[type=text],.grow input[type=text]{border:0;border-bottom:1px solid #bbb;border-radius:0;background:none;padding:4px 0;box-shadow:none}
+  #begin{break-before:auto;margin-top:28px}
+  .lens a{display:none}
+  .lenses,.lens,.box-exp,.stays{break-inside:avoid}
+  .pill{border-color:#bbb;background:none}
+  .pill:has(input:checked){background:#e9e2da;color:#211811;border-color:#8A8075}
+}
+/* Print: the worksheet and the reader's answers, nothing else. */
+@media print {
+  header, footer, .ay .signup, .ay .onpage, .ay .done, .ay .letter,
+  .ay .closing .btnrow, .ay .sources, .ay .crumb { display: none !important; }
+  .ay { max-width: none; padding: 0; }
+  .ay section.part { break-before: page; }
+  .ay textarea, .ay input[type="text"] {
+    border: 0; border-bottom: 1px solid #C9C1B8; border-radius: 0;
+    resize: none; background: transparent; padding: 0 0 2px;
+  }
+  .ay .hero { background: none; color: inherit; box-shadow: none; padding: 0 0 12px; }
+  .ay .turn, .ay .closing { background: none; color: inherit; }
+}
+
+/* A dot placed by tapping is a pointer affordance; the textarea is the route
+   that always works. */
+@media (prefers-reduced-motion: reduce) {
+  .ay * { animation: none !important; transition: none !important; }
+}
+
+.ay .sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+</style><nav class="crumb" aria-label="Breadcrumb"><a href="/en/take">Take with you</a> <span>· Worksheet</span></nav><section class="hero hero-solo" aria-labelledby="ay-h1"><div class="hero-text"><div class="kicker">Worksheet · free</div><h1 id="ay-h1">The <em>automatic</em> yes</h1><p class="hero-sub">A worksheet on people-pleasing, through Ferenczi, Winnicott and Gestalt.</p><p class="hero-meta">Five short parts. About forty minutes. Go through it on this page, or take the PDF.</p></div></section><div class="onpage col"><p>Or go through it here. Nothing you write is sent anywhere — not to me, not to anyone. It isn’t saved either, unless you choose to keep it on this device; at the end you can print it or save it as a PDF.</p><label class="keep"><input type="checkbox" role="switch" aria-checked="false"><span><b>Keep my answers on this device</b><small>Stored in this browser only. Switch off to delete them.</small></span></label></div><section class="sec col" aria-labelledby="ay-intro"><div class="kicker">Before you begin</div><h2 class="title" id="ay-intro">A yes that arrives before you do</h2><div class="lead"><p>Some yeses are chosen: you know what you want, you weigh it, you agree. Others arrive first — before you have checked with yourself, sometimes before the other person has finished asking. This worksheet is about the second kind.</p><p>It looks at that yes through three lenses from one lineage, then asks you to meet it: slowly on paper, and once in real life.</p></div><dl class="howto"><dt>Time</dt><dd>About forty minutes in one sitting, or one part a day.</dd><dt>You need</dt><dd>One recent yes you would like to look at more closely — and a pen, if you print it.</dd><dt>Answers</dt><dd>Write what is true today. There is nothing to get right.</dd><dt>Care</dt><dd>If something surfaces with more force than you can hold, stop. Feel your feet on the floor and name five things you can see. Some of this is better explored with a counsellor or therapist than alone.</dd></dl><h3 class="title">Three lenses, one lineage</h3><div class="lenses"><div class="lens"><div class="yr">1932</div><div class="who">Sándor Ferenczi</div><div class="what">Where it begins</div><div class="gloss">Reading another person closely and early, when refusing them is not possible.</div><a href="#ferenczi">Go to part two</a></div><div class="lens"><div class="yr">1960</div><div class="who">D. W. Winnicott</div><div class="what">What it becomes</div><div class="gloss">A caretaker self that protects something more alive underneath.</div><a href="#winnicott">Go to part three</a></div><div class="lens"><div class="yr">1951–1970</div><div class="who">Gestalt</div><div class="what">How it lives now</div><div class="gloss">At the boundary between you and another person, where it can be noticed, chewed over and met.</div><a href="#introjection">Go to part four</a></div></div></section><section class="sec col part" id="now" aria-labelledby="now-t"><div class="kicker">Part one · Now</div><h2 class="title" id="now-t">Catch one yes</h2><div class="lead"><p>Start with something recent and ordinary: a favour, a plan, an extra task, a “sure” that came out before you had thought about it. Stay with the details. They carry the information.</p></div><div class="blocks"><div class="qb"><div class="num" aria-hidden="true">1</div><div><label class="q" for="now-1">What happened? Where were you, who asked, and what for?</label><textarea id="now-1" rows="3"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">2</div><div><label class="q" for="now-2">What did you sense they wanted — including anything they didn’t say?</label><textarea id="now-2" rows="2"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">3</div><div><fieldset><legend class="q">How long between the asking and your yes?</legend><div class="pills"><label class="pill"><input type="radio" name="now-3" value="before they had finished"><span>before they had finished</span></label><label class="pill"><input type="radio" name="now-3" value="a second or two"><span>a second or two</span></label><label class="pill"><input type="radio" name="now-3" value="after I had thought it over"><span>after I had thought it over</span></label></div></fieldset></div></div><div class="qb"><div class="num" aria-hidden="true">4</div><div><div class="figwrap"><div><label class="q" for="now-4">Just before the yes, what happened in your body? Mark it on the figure.</label><div class="hint">Throat, chest, stomach, jaw, face, breath — whatever you noticed.</div><textarea id="now-4" rows="5"></textarea></div><div class="map"><svg viewBox="0 0 150 230" role="img" aria-label="Body outline. Tap to mark where you felt it."><path d="M75 8c-14 0-24 12-24 29 0 14 7 25 16 29v12c-2 5-12 8-26 12-18 5-28 16-29 34l-2 106h130l-2-106c-1-18-11-29-29-34-14-4-24-7-26-12V66c9-4 16-15 16-29 0-17-10-29-24-29z" fill="#EFE7DC" stroke="#CDBFAE" stroke-width="1.5"></path></svg><div class="cap">Tap the figure to mark a spot; tap a mark to remove it.</div></div></div></div></div><div class="qb"><div class="num" aria-hidden="true">5</div><div><label class="q" for="now-5">What did you want, if anything?</label><div class="hint">A small preference counts.</div><textarea id="now-5" rows="2"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">6</div><div><div class="q">Afterwards, looking at both sides:</div><div class="two"><div><div class="clabel" id="now-6-0-l">What the yes cost</div><textarea id="now-6-0" rows="3" aria-labelledby="now-6-0-l"></textarea></div><div><div class="clabel" id="now-6-1-l">What the yes kept safe</div><textarea id="now-6-1" rows="3" aria-labelledby="now-6-1-l"></textarea></div></div></div></div></div></section><section class="sec col part" id="ferenczi" aria-labelledby="ferenczi-t"><div class="kicker">Part two · Where it began</div><h2 class="title" id="ferenczi-t">The radar</h2><div class="quote"><q>…subordinate themselves like automata to the will of the aggressor, to divine each one of his desires and to gratify these; completely oblivious of themselves…</q><div class="attr">Sándor Ferenczi · Confusion of Tongues between Adults and the Child · 1932</div></div><div class="lead"><p>Ferenczi was describing children overwhelmed by adults they could not refuse. For them, reading the adult closely was the most intelligent response available: it kept the bond intact, even when the bond was also where the danger came from. A 2025 paper in the Journal of Trauma &amp; Dissociation returns to his work and describes this adaptation as what lets an overwhelmed child keep “a bond of tenderness” with the adult.</p><p>Your own history may be much quieter. An adult’s temper, fragility, exhaustion or grief can call for the same skill.</p></div><div class="blocks"><div class="qb"><div class="num" aria-hidden="true">1</div><div><label class="q" for="ferenczi-1">Whose moods did you learn to read first — and roughly how old were you?</label><textarea id="ferenczi-1" rows="2"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">2</div><div><label class="q" for="ferenczi-2">What were the early signals?</label><div class="hint">A tone of voice, footsteps, a silence, the way a door closed.</div><textarea id="ferenczi-2" rows="2"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">3</div><div><fieldset><legend class="q">What did reading them early make possible?</legend><div class="pills"><label class="pill"><input type="checkbox" name="ferenczi-3" value="keeping the peace"><span>keeping the peace</span></label><label class="pill"><input type="checkbox" name="ferenczi-3" value="staying close"><span>staying close</span></label><label class="pill"><input type="checkbox" name="ferenczi-3" value="protecting someone else"><span>protecting someone else</span></label><label class="pill"><input type="checkbox" name="ferenczi-3" value="avoiding punishment"><span>avoiding punishment</span></label><label class="pill"><input type="checkbox" name="ferenczi-3" value="being wanted"><span>being wanted</span></label><label class="pill other"><input type="text" placeholder="your own" aria-label="your own" value=""></label></div></fieldset></div></div><div class="qb"><div class="num" aria-hidden="true">4</div><div><label class="q" for="ferenczi-4">Where does the radar switch on now? With whom, in which rooms?</label><textarea id="ferenczi-4" rows="3"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">5</div><div><fieldset><legend class="q">While it is on, what goes quiet in you?</legend><div class="pills"><label class="pill"><input type="checkbox" name="ferenczi-5" value="hunger"><span>hunger</span></label><label class="pill"><input type="checkbox" name="ferenczi-5" value="tiredness"><span>tiredness</span></label><label class="pill"><input type="checkbox" name="ferenczi-5" value="an opinion"><span>an opinion</span></label><label class="pill"><input type="checkbox" name="ferenczi-5" value="anger"><span>anger</span></label><label class="pill"><input type="checkbox" name="ferenczi-5" value="a wish to leave"><span>a wish to leave</span></label><label class="pill other"><input type="text" placeholder="your own" aria-label="your own" value=""></label></div></fieldset></div></div><div class="qb"><div class="num" aria-hidden="true">6</div><div><label class="q" for="ferenczi-6">It picks up what others miss. Where could you use it by choice, rather than by reflex?</label><textarea id="ferenczi-6" rows="3"></textarea></div></div></div></section><section class="sec col part" id="winnicott" aria-labelledby="winnicott-t"><div class="kicker">Part three · What it became</div><h2 class="title" id="winnicott-t">The caretaker</h2><div class="quote"><q>Only the True Self can be creative and only the True Self can feel real.</q><div class="attr">D. W. Winnicott · Ego Distortion in Terms of True and False Self · 1960</div></div><div class="lead"><p>When a baby’s spontaneous gestures keep being met with the adult’s own instead, Winnicott observed, the baby learns to comply — and compliance slowly becomes a self. He called it the False Self; one of his patients called hers the “Caretaker Self”. Its job, he wrote, is “to hide and protect the True Self, whatever that may be.” Compliance in itself is not the problem: “the ability to compromise is an achievement.” The difficulty begins when the caretaker is the only one who ever answers the door.</p></div><div class="blocks"><div class="qb"><div class="num" aria-hidden="true">1</div><div><div class="q">Write its job description.</div><div><label class="clabel" for="winnicott-1-0">Working hours</label><div class="hint">When and where does it clock in?</div><textarea id="winnicott-1-0" rows="2"></textarea></div><div><label class="clabel" for="winnicott-1-1">Core skills</label><div class="hint">What is it excellent at?</div><textarea id="winnicott-1-1" rows="2"></textarea></div><div><label class="clabel" for="winnicott-1-2">House rules</label><div class="hint">What is it never allowed to do?</div><textarea id="winnicott-1-2" rows="2"></textarea></div><div><label class="clabel" for="winnicott-1-3">A day off</label><div class="hint">If it took one, what might happen?</div><textarea id="winnicott-1-3" rows="2"></textarea></div></div></div><div class="qb"><div class="num" aria-hidden="true">2</div><div><label class="q" for="winnicott-2">What has it been protecting?</label><div class="hint">Behind the caretaker: a want, a feeling, a way of being yourself.</div><textarea id="winnicott-2" rows="2"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">3</div><div><div class="q">“The spontaneous gesture is the True Self in action.” This week, catch three moments when your body moved first.</div><div class="hint">A laugh, a reach, a wish to leave, a “no” in the throat.</div><div class="grow"><input type="text" id="winnicott-3-0" placeholder="The moment" aria-label="The moment 1" value=""><div class="pills" role="radiogroup" aria-label="The moment 1"><label class="pill"><input type="radio" name="winnicott-3-0-c" value="acted on it"><span>acted on it</span></label><label class="pill"><input type="radio" name="winnicott-3-0-c" value="held it"><span>held it</span></label><label class="pill"><input type="radio" name="winnicott-3-0-c" value="swallowed it"><span>swallowed it</span></label></div></div><div class="grow"><input type="text" id="winnicott-3-1" placeholder="The moment" aria-label="The moment 2" value=""><div class="pills" role="radiogroup" aria-label="The moment 2"><label class="pill"><input type="radio" name="winnicott-3-1-c" value="acted on it"><span>acted on it</span></label><label class="pill"><input type="radio" name="winnicott-3-1-c" value="held it"><span>held it</span></label><label class="pill"><input type="radio" name="winnicott-3-1-c" value="swallowed it"><span>swallowed it</span></label></div></div><div class="grow"><input type="text" id="winnicott-3-2" placeholder="The moment" aria-label="The moment 3" value=""><div class="pills" role="radiogroup" aria-label="The moment 3"><label class="pill"><input type="radio" name="winnicott-3-2-c" value="acted on it"><span>acted on it</span></label><label class="pill"><input type="radio" name="winnicott-3-2-c" value="held it"><span>held it</span></label><label class="pill"><input type="radio" name="winnicott-3-2-c" value="swallowed it"><span>swallowed it</span></label></div></div></div></div></div></section><section class="sec col part" id="introjection" aria-labelledby="introjection-t"><div class="kicker">Part four · The rule underneath</div><h2 class="title" id="introjection-t">Chew the rule</h2><div class="lead"><p>Ferenczi gave psychoanalysis the word introjection in 1909. Fritz and Laura Perls carried it into Gestalt therapy with a bodily image: an introject is something swallowed whole — a rule taken in before it could be tasted, chewed, and then kept or refused. The automatic yes often rests on one or two of them.</p></div><div class="blocks"><div class="qb"><div class="num" aria-hidden="true">1</div><div><fieldset><legend class="q">Tick any that sound familiar, or add your own.</legend><div class="pills"><label class="pill"><input type="checkbox" name="introjection-1" value="“Don’t make a fuss.”"><span>“Don’t make a fuss.”</span></label><label class="pill"><input type="checkbox" name="introjection-1" value="“Keep the peace.”"><span>“Keep the peace.”</span></label><label class="pill"><input type="checkbox" name="introjection-1" value="“Their feelings are your job.”"><span>“Their feelings are your job.”</span></label><label class="pill"><input type="checkbox" name="introjection-1" value="“Needing things is a burden.”"><span>“Needing things is a burden.”</span></label><label class="pill"><input type="checkbox" name="introjection-1" value="“Be easy to be around.”"><span>“Be easy to be around.”</span></label><label class="pill"><input type="checkbox" name="introjection-1" value="“If someone is upset, fix it.”"><span>“If someone is upset, fix it.”</span></label><label class="pill"><input type="checkbox" name="introjection-1" value="“Good people don’t disappoint.”"><span>“Good people don’t disappoint.”</span></label><label class="pill other"><input type="text" placeholder="your own" aria-label="your own" value=""></label></div></fieldset></div></div><div class="qb"><div class="num" aria-hidden="true">2</div><div><label class="q" for="introjection-2">Choose one and write it here, word for word.</label><textarea id="introjection-2" rows="2"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">3</div><div><div class="q">Now chew it, slowly.</div><div class="sublist"><div><label class="sq" for="introjection-3-0">Whose voice does it speak in?</label><textarea id="introjection-3-0" rows="1"></textarea></div><div><label class="sq" for="introjection-3-1">When did it make sense — in which situation?</label><textarea id="introjection-3-1" rows="2"></textarea></div><div><label class="sq" for="introjection-3-2">What did it protect, and whom?</label><textarea id="introjection-3-2" rows="2"></textarea></div><div><label class="sq" for="introjection-3-3">What in it is still worth keeping?</label><textarea id="introjection-3-3" rows="1"></textarea></div><div><label class="sq" for="introjection-3-4">What in it no longer fits your life?</label><textarea id="introjection-3-4" rows="1"></textarea></div></div></div></div><div class="qb"><div class="num" aria-hidden="true">4</div><div><label class="q" for="introjection-4">Rewrite it in your own words, as something you would choose.</label><textarea id="introjection-4" rows="3"></textarea></div></div><p class="example">For instance, “Keep the peace” might become: “I care about peace, and I can live through some friction on the way to a real one.”</p></div></section><section class="turn" aria-label="Arnold Beisser · The Paradoxical Theory of Change · 1970"><div class="mark">the turn</div><q>Change occurs when one becomes what he is, not when he tries to become what he is not.</q><div class="attr">Arnold Beisser · The Paradoxical Theory of Change · 1970</div><hr><p>So what follows does not ask you to stop saying yes. It asks you to be there when you say it.</p><p class="wonk">A yes you are present for is already a different yes.</p></section><section class="sec col part" id="pause" aria-labelledby="ay-pause-t"><div class="kicker">Part five · Next time</div><h2 class="title" id="ay-pause-t">A pause at the boundary</h2><div class="lead"><p>Gestalt has a name for what the yes once was: a creative adjustment — the best response available in a situation that needed it. The situation has changed; the response stayed. What moves it is contact: being there with your body and your want, while the other person is there too.</p></div><div class="move"><span class="mn">1</span><div class="mx"><h3 class="mt">Feel the pull.</h3><p>Notice where it lands — perhaps the place you marked in part one. Say to yourself: there’s the pull.</p><div class="mfld"><label class="clabel" for="pause-1-f0">Where it lands for me:</label><textarea id="pause-1-f0" rows="2"></textarea></div></div></div><div class="move"><span class="mn">2</span><div class="mx"><h3 class="mt">Buy a breath.</h3><p>Pick a sentence that makes room, or write your own:</p><fieldset><legend class="sr-only">Buy a breath.</legend><div class="pills"><label class="pill"><input type="checkbox" name="pause-2" value="“Let me check and come back to you.”"><span>“Let me check and come back to you.”</span></label><label class="pill"><input type="checkbox" name="pause-2" value="“Give me a minute to think.”"><span>“Give me a minute to think.”</span></label><label class="pill"><input type="checkbox" name="pause-2" value="“I’m not sure yet.”"><span>“I’m not sure yet.”</span></label><label class="pill"><input type="checkbox" name="pause-2" value="“Can I tell you tomorrow?”"><span>“Can I tell you tomorrow?”</span></label></div></fieldset></div></div><div class="move"><span class="mn">3</span><div class="mx"><h3 class="mt">Find your part.</h3><p>What do I want here, even a little? What am I willing to give — all of it, some of it, none of it? Answer from there:</p><fieldset><legend class="sr-only">Find your part.</legend><div class="pills"><label class="pill"><input type="radio" name="pause-3" value="yes"><span>yes</span></label><label class="pill"><input type="radio" name="pause-3" value="partly"><span>partly</span></label><label class="pill"><input type="radio" name="pause-3" value="not now"><span>not now</span></label><label class="pill"><input type="radio" name="pause-3" value="no"><span>no</span></label></div></fieldset><div class="mfld"><label class="clabel" for="pause-3-f0">What I want:</label><textarea id="pause-3-f0" rows="2"></textarea></div><div class="mfld"><label class="clabel" for="pause-3-f1">What I’m willing to give:</label><textarea id="pause-3-f1" rows="2"></textarea></div></div></div><div class="box-exp" id="experiment"><h3>A small experiment</h3><p>Choose one low-stakes moment this week, with someone where a little friction is survivable. The first solution was right for a bond that could not hold a no. The experiment finds out whether this one can.</p><div><label class="clabel" for="experiment-where">Where, and with whom:</label><textarea id="experiment-where" rows="2"></textarea></div><fieldset><legend class="clabel">What I’ll try:</legend><div class="pills"><label class="pill"><input type="checkbox" name="experiment-try" value="a pause"><span>a pause</span></label><label class="pill"><input type="checkbox" name="experiment-try" value="a partial yes"><span>a partial yes</span></label><label class="pill"><input type="checkbox" name="experiment-try" value="saying a preference"><span>saying a preference</span></label><label class="pill"><input type="checkbox" name="experiment-try" value="a small no"><span>a small no</span></label></div></fieldset></div><p class="note">If a no has ever been met with threats, punishment or harm in a relationship, the old solution may still be protecting you there. That belongs with support, not with an experiment.</p></section><section class="sec col part" id="after" aria-labelledby="ay-after-t"><div class="kicker">Afterwards</div><h2 class="title" id="ay-after-t">What happened</h2><div class="lead"><p>Fill this in after the experiment, while it is still fresh.</p></div><div class="blocks"><div class="qb"><div class="num" aria-hidden="true">1</div><div><label class="q" for="after-1">What I did:</label><textarea id="after-1" rows="3"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">2</div><div><label class="q" for="after-2">What I felt, and where:</label><textarea id="after-2" rows="3"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">3</div><div><label class="q" for="after-3">What the other person did:</label><textarea id="after-3" rows="3"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">4</div><div><label class="q" for="after-4">What happened between us afterwards — that day, that week:</label><textarea id="after-4" rows="3"></textarea></div></div><div class="qb"><div class="num" aria-hidden="true">5</div><div><label class="q" for="after-5">What I learned:</label><textarea id="after-5" rows="3"></textarea></div></div></div><div class="stays"><h3>What stays with you</h3><ul><li>Something I noticed</li><li>A rule I’m chewing</li><li>The next experiment</li></ul></div></section><div class="done col"><button type="button" class="btn">Print or save as PDF</button><button type="button" class="btn ghost">Clear my answers</button><span class="saved" role="status" aria-live="polite">Not saved — print or save as PDF to keep your answers.</span></div><section class="closing" aria-label="Genia"><q>The True Self comes from the aliveness of the body tissues and the working of body-functions, including the heart’s action and breathing.</q><div class="attr">D. W. Winnicott · 1960</div><div class="who"><picture><source srcset="/assets/portrait-640-BiYyQWEx.webp" type="image/webp"><img src="/assets/portrait-640-CvSJ4aMt.jpg" width="640" height="640" loading="lazy" decoding="async" alt="Genia"></picture><div><strong>Genia</strong><span>Gestalt Counsellor · Human Heart</span></div></div><p class="note">Sessions online, in English and Russian.</p><div class="btnrow"><a class="btn" href="/en/#contact">Book a Session</a><a class="btn ghost" href="https://www.youtube.com/@beathumanheart" target="_blank" rel="noopener noreferrer">Watch on YouTube</a></div></section><details class="sources"><summary>Sources</summary><ul><li>Beisser, A. (1970). The paradoxical theory of change. In J. Fagan &amp; I. L. Shepherd (Eds.), Gestalt Therapy Now. Palo Alto: Science and Behavior Books.</li><li>Ferenczi, S. (1909). Introjection and transference. In First Contributions to Psycho-Analysis (1952). London: Hogarth Press.</li><li>Ferenczi, S. (1949). Confusion of tongues between the adults and the child: The language of tenderness and of passion. International Journal of Psycho-Analysis, 30(4), 225–230. Read at Wiesbaden, 1932.</li><li>Frankel, J. (2002). Exploring Ferenczi’s concept of identification with the aggressor: Its role in trauma, everyday life, and the therapeutic relationship. Psychoanalytic Dialogues, 12(1), 101–139.</li><li>Howell, E. F. (2026). The buried, but recently unearthed treasure of Sandor Ferenczi’s work: Its relevance to current practice and sociocultural life. Journal of Trauma &amp; Dissociation, 27(1), 50–62. Published online November 2025.</li><li>Perls, F. S. (1947). Ego, Hunger and Aggression. London: Allen &amp; Unwin.</li><li>Perls, F., Hefferline, R., &amp; Goodman, P. (1951). Gestalt Therapy: Excitement and Growth in the Human Personality. New York: Julian Press.</li><li>Winnicott, D. W. (1965). Ego distortion in terms of true and false self (1960). In The Maturational Processes and the Facilitating Environment (pp. 140–152). London: Hogarth Press.</li></ul></details><p class="fine col">For reflection and self-study. This worksheet is not counselling and does not replace it.</p></div></main><footer class="py-12 px-6 bg-cream-dark border-t border-border"><div class="container-narrow"><div class="flex flex-col md:flex-row items-center justify-between gap-6"><div class="text-center md:text-left"><a class="font-display text-2xl text-foreground hover:text-primary transition-colors mb-2 block" href="/en">Human Heart</a><p class="font-body text-sm text-muted-foreground">Therapy with Genia</p></div><div class="flex flex-wrap items-center justify-center gap-4 md:gap-6"><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/en/#about">About</a><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/en/#services">Services</a><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/en/#contact">Contact</a><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/en/offer-agreement">Offer Agreement</a><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/en/take">Take with you</a></div><div class="text-center md:text-right"><a href="mailto:be@humanheart.life" class="font-body text-sm text-primary hover:text-foreground transition-colors">be@humanheart.life</a><p class="font-body text-xs text-muted-foreground mt-2">© 2026 Human Heart. All rights reserved.</p></div></div><div class="mt-7 pt-6 border-t border-border flex flex-wrap items-center justify-center gap-3"><a href="https://humanheartbeat.substack.com/" target="_blank" rel="noopener noreferrer" title="Substack" aria-label="Substack" class="flex items-center justify-center w-[38px] h-[38px] rounded-full border border-border text-muted-foreground hover:text-terracotta hover:border-terracotta/45 hover:bg-terracotta/10 hover:-translate-y-0.5 transition-all duration-200"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true"><path d="M4 3h16v2.5H4zM4 7.6h16v2.5H4zM4 12.2 12 17l8-4.8V21l-8-4.8L4 21z"></path></svg></a><a href="https://www.instagram.com/humanheart.life" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram" class="flex items-center justify-center w-[38px] h-[38px] rounded-full border border-border text-muted-foreground hover:text-terracotta hover:border-terracotta/45 hover:bg-terracotta/10 hover:-translate-y-0.5 transition-all duration-200"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram w-4 h-4"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg></a><a href="https://www.youtube.com/@beathumanheart" target="_blank" rel="noopener noreferrer" title="YouTube" aria-label="YouTube" class="flex items-center justify-center w-[38px] h-[38px] rounded-full border border-border text-muted-foreground hover:text-terracotta hover:border-terracotta/45 hover:bg-terracotta/10 hover:-translate-y-0.5 transition-all duration-200"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube w-4 h-4"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><path d="m10 15 5-3-5-3z"></path></svg></a></div></div></footer></div>
+    <!-- prerendered -->
+  </body>
+</html>

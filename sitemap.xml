@@ -5,7 +5,7 @@
 >
 <url>
     <loc>https://humanheart.life/en</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en" />
@@ -14,7 +14,7 @@
   </url>
   <url>
     <loc>https://humanheart.life/ru</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en" />
@@ -23,7 +23,7 @@
   </url>
 <url>
     <loc>https://humanheart.life/en/take</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/take" />
@@ -32,7 +32,7 @@
   </url>
   <url>
     <loc>https://humanheart.life/ru/take</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/take" />
@@ -41,7 +41,7 @@
   </url>
 <url>
     <loc>https://humanheart.life/en/take/feelings-map</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/take/feelings-map" />
@@ -50,7 +50,7 @@
   </url>
   <url>
     <loc>https://humanheart.life/ru/take/feelings-map</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/take/feelings-map" />
@@ -58,8 +58,16 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/take/feelings-map" />
   </url>
 <url>
+    <loc>https://humanheart.life/en/take/automatic-yes</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/take/automatic-yes" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/take/automatic-yes" />
+  </url>
+<url>
     <loc>https://humanheart.life/en/offer-agreement</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/offer-agreement" />
@@ -68,7 +76,7 @@
   </url>
   <url>
     <loc>https://humanheart.life/ru/offer-agreement</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/offer-agreement" />
@@ -76,26 +84,8 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/offer-agreement" />
   </url>
 <url>
-    <loc>https://humanheart.life/en/book/bioethical-consultation</loc>
-    <lastmod>2026-09-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/book/bioethical-consultation" />
-    <xhtml:link rel="alternate" hreflang="ru"        href="https://humanheart.life/ru/book/bioethical-consultation" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/book/bioethical-consultation" />
-  </url>
-  <url>
-    <loc>https://humanheart.life/ru/book/bioethical-consultation</loc>
-    <lastmod>2026-09-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/book/bioethical-consultation" />
-    <xhtml:link rel="alternate" hreflang="ru"        href="https://humanheart.life/ru/book/bioethical-consultation" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/book/bioethical-consultation" />
-  </url>
-<url>
     <loc>https://humanheart.life/en/book/individual-therapy</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/book/individual-therapy" />
@@ -104,7 +94,7 @@
   </url>
   <url>
     <loc>https://humanheart.life/ru/book/individual-therapy</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/book/individual-therapy" />
@@ -112,8 +102,26 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/book/individual-therapy" />
   </url>
 <url>
+    <loc>https://humanheart.life/en/book/bioethical-consultation</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/book/bioethical-consultation" />
+    <xhtml:link rel="alternate" hreflang="ru"        href="https://humanheart.life/ru/book/bioethical-consultation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/book/bioethical-consultation" />
+  </url>
+  <url>
+    <loc>https://humanheart.life/ru/book/bioethical-consultation</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/book/bioethical-consultation" />
+    <xhtml:link rel="alternate" hreflang="ru"        href="https://humanheart.life/ru/book/bioethical-consultation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/book/bioethical-consultation" />
+  </url>
+<url>
     <loc>https://humanheart.life/en/book/relationship-interpersonal-therapy</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/book/relationship-interpersonal-therapy" />
@@ -122,7 +130,7 @@
   </url>
   <url>
     <loc>https://humanheart.life/ru/book/relationship-interpersonal-therapy</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/book/relationship-interpersonal-therapy" />

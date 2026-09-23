@@ -34,10 +34,10 @@ export interface PrivacyContent {
 
 export const privacyEN: PrivacyContent = {
   title: "Privacy",
-  updated: "Last updated: [[DATE THIS IS PUBLISHED]]",
+  updated: "Last updated: 23 September 2026",
   intro: [
     "This page explains what happens to the information you give this site, and what it collects while you read. It is a small practice, so the answer is mostly: very little, and not for long.",
-    "The practice is run by [[LEGAL NAME, and the trading name if different]], at [[POSTAL ADDRESS]] in Belgium. For anything on this page, write to be@humanheart.life.",
+    "The practice is run by Human Heart, in Brussels 1000, Belgium. For anything on this page, write to be@humanheart.life.",
   ],
   sections: [
     {
@@ -47,7 +47,7 @@ export const privacyEN: PrivacyContent = {
         "The booking form asks for your name, your email address (twice, to catch a typo), your time zone, and the session and time you choose. There is an optional box for anything you would like me to know beforehand.",
         "That box is yours to leave empty. Whatever you write in it is treated as confidential clinical material: it is never used for anything but preparing for our work, and analytics on this site is configured so that it cannot be recorded or sent anywhere — see below.",
         "This is kept because you asked for a session and I need it to hold one. Where what you write concerns your health, it is kept on the basis of your explicit consent in writing it, and under the confidentiality that applies to counselling.",
-        "It is stored in the site's database and kept for [[HOW LONG BOOKINGS ARE KEPT — e.g. two years after the last session]], then deleted. You can ask for it sooner.",
+        "It is stored in the site's database and kept for two years after our last session, then deleted. You can ask for it sooner than that, and it will be.",
       ],
     },
     {

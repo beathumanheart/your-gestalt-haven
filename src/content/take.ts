@@ -54,6 +54,13 @@ export const takeEN: TakeContent = {
       description: "Six rings, read from the outside in. The middle is the need.",
     },
     {
+      slug: "automatic-yes",
+      status: "live",
+      kind: "Worksheet",
+      title: "The automatic yes",
+      description: "Five short parts, for the yes that arrives before you do.",
+    },
+    {
       // Title is provisional — the page itself is not written yet.
       slug: "safety-plan",
       status: "prep",

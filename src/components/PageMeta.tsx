@@ -22,6 +22,14 @@ interface PageMetaProps {
   canonicalPath?: string;
   /** Adds <meta name="robots" content="noindex,nofollow"> */
   noIndex?: boolean;
+  /**
+   * Languages this page exists in. Absent means both.
+   *
+   * A page in one language claims no alternate in the other and points
+   * x-default at itself — the same head the build writes for it, so the
+   * runtime and the generated file cannot disagree.
+   */
+  langs?: readonly ("en" | "ru")[];
 }
 
 /**
@@ -38,6 +46,7 @@ const PageMeta = ({
   descriptionRu = defaults.descriptionRu,
   canonicalPath,
   noIndex = false,
+  langs,
 }: PageMetaProps) => {
   const { language } = useLanguage();
   const isRu = language === "ru";
@@ -51,11 +60,12 @@ const PageMeta = ({
 
   const canonicalUrl = canonicalPath ? `${SITE_URL}${canonicalPath}` : undefined;
   const lang = language as "en" | "ru";
-  const altPath      = canonicalPath ? swapLang(canonicalPath, lang) : undefined;
+  const singleLanguage = langs?.length === 1;
+  const altPath      = canonicalPath && !singleLanguage ? swapLang(canonicalPath, lang) : undefined;
   const altUrl       = altPath ? `${SITE_URL}${altPath}` : undefined;
   // x-default points to English (primary language)
   const xDefaultUrl  = canonicalPath
-    ? `${SITE_URL}${lang === "en" ? canonicalPath : (altPath ?? canonicalPath)}`
+    ? `${SITE_URL}${lang === "en" || singleLanguage ? canonicalPath : (altPath ?? canonicalPath)}`
     : undefined;
 
   return (
@@ -81,7 +91,7 @@ const PageMeta = ({
       <meta property="og:image:height"     content="630" />
       <meta property="og:image:alt"        content={ogImageAlt} />
       <meta property="og:locale"           content={locale} />
-      <meta property="og:locale:alternate" content={altLocale} />
+      {!singleLanguage && <meta property="og:locale:alternate" content={altLocale} />}
 
       <meta name="twitter:title"      content={title} />
       <meta name="twitter:description" content={description} />

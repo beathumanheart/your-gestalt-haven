@@ -44,6 +44,15 @@ export interface StaticRoute extends RouteText {
   path: string;
   priority: string;
   changefreq: string;
+  /**
+   * The languages this route exists in. Absent means all of them, which is
+   * what every route assumed before a single-language one arrived.
+   *
+   * A route listed here for one language gets one file, one sitemap entry, and
+   * a head that claims no alternate in the other — linking to a page that does
+   * not exist is worse than not linking at all.
+   */
+  langs?: readonly MetaLang[];
 }
 
 export const OG_IMAGE_ALT: Record<MetaLang, string> = {
@@ -97,6 +106,17 @@ export const OFFER_AGREEMENT_TEXT: RouteText = {
     "Условия оказания терапевтических услуг на Human Heart — гештальт-консультирование с Женей.",
 };
 
+export const AUTOMATIC_YES_TEXT: RouteText = {
+  titleEn: "The automatic yes — a worksheet on people-pleasing | Human Heart",
+  descriptionEn:
+    "A free worksheet on people-pleasing through Ferenczi, Winnicott and Gestalt: catch one yes, trace where it began, and try one small experiment.",
+  // English-only route (see `langs` on its entry below): the RU fields are
+  // never rendered, and are kept equal rather than left to drift.
+  titleRu: "The automatic yes — a worksheet on people-pleasing | Human Heart",
+  descriptionRu:
+    "A free worksheet on people-pleasing through Ferenczi, Winnicott and Gestalt: catch one yes, trace where it began, and try one small experiment.",
+};
+
 /**
  * Routes whose text is known at build time.
  *
@@ -115,6 +135,13 @@ export const STATIC_ROUTES: readonly StaticRoute[] = [
   { path: "", priority: "1.0", changefreq: "monthly", ...HOME_TEXT },
   { path: "/take", priority: "0.7", changefreq: "monthly", ...TAKE_TEXT },
   { path: "/take/feelings-map", priority: "0.7", changefreq: "monthly", ...FEELINGS_MAP_TEXT },
+  {
+    path: "/take/automatic-yes",
+    priority: "0.7",
+    changefreq: "monthly",
+    langs: ["en"],
+    ...AUTOMATIC_YES_TEXT,
+  },
   { path: "/offer-agreement", priority: "0.3", changefreq: "yearly", ...OFFER_AGREEMENT_TEXT },
 ] as const;
 

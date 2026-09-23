@@ -221,14 +221,30 @@ test.describe("the per-session offer", () => {
     expect(service.name).toBe("Individual Therapy");
   });
 
-  test("is absent where no price is published", async ({ request }) => {
-    // bioethical-consultation is deliberately unpriced; the node exists, the
-    // offer does not, because show_price decides both.
-    const html = await (await request.get("/en/book/bioethical-consultation")).text();
-    const service = nodes(html).find((n) => n["@type"] === "Service");
+  test("is present on every booking page, because every session publishes a price", async ({
+    request,
+  }) => {
+    // What this asserts is live data, so it is deliberately not the place the
+    // show_price *rule* is pinned — that belongs in serviceNode.test.tsx,
+    // where a withheld row can be constructed. An earlier version of this
+    // test named bioethical-consultation as the unpriced example and broke the
+    // day it was put on the scale, which is the hazard of asserting a rule
+    // against a row someone can edit.
+    const sitemap = await (await request.get("/sitemap.xml")).text();
+    const bookingPaths = [...sitemap.matchAll(/<loc>https:\/\/humanheart\.life(\/en\/book\/[^<]+)<\/loc>/g)]
+      .map((m) => m[1]);
 
-    expect(service).toBeTruthy();
-    expect(service).not.toHaveProperty("offers");
+    expect(bookingPaths.length, "no booking pages in the sitemap").toBeGreaterThan(0);
+
+    for (const path of bookingPaths) {
+      const service = nodes(await (await request.get(path)).text()).find(
+        (n) => n["@type"] === "Service",
+      );
+      expect(service, `${path} has no Service node`).toBeTruthy();
+      expect(service.offers, `${path} publishes no offer`).toMatchObject({
+        priceCurrency: "EUR",
+      });
+    }
   });
 
   test("is not on pages that describe no session", async ({ request }) => {
@@ -266,5 +282,56 @@ test.describe("the per-session offer", () => {
     // "runtime" proves the component adopted the build's node rather than
     // leaving it and adding its own.
     expect(found.attr).toBe("runtime");
+  });
+});
+
+/**
+ * The worksheet is English-only, which is new: every other route exists in
+ * both languages, and the build now has to be told when one does not.
+ */
+test.describe("an English-only route", () => {
+  test("is served with its own head", async ({ request }) => {
+    const html = await (await request.get("/en/take/automatic-yes")).text();
+
+    expect(html).toContain(
+      "<title>The automatic yes — a worksheet on people-pleasing | Human Heart</title>",
+    );
+    expect(html).toContain(
+      '<link rel="canonical" href="https://humanheart.life/en/take/automatic-yes" />',
+    );
+  });
+
+  test("claims no Russian alternate it cannot honour", async ({ request }) => {
+    const html = await (await request.get("/en/take/automatic-yes")).text();
+
+    expect(html).not.toContain('hreflang="ru"');
+    expect(html).not.toContain("og:locale:alternate");
+    // x-default belongs on the only page there is.
+    expect(html).toContain(
+      '<link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/take/automatic-yes" />',
+    );
+  });
+
+  test("has no generated file in the language it does not exist in", async ({ request }) => {
+    // The SPA fallback still answers, and redirects the reader to English —
+    // but the head it serves is the fallback's, not a Russian page's.
+    const html = await (await request.get("/ru/take/automatic-yes")).text();
+    expect(html).not.toContain("<!-- prerendered -->");
+  });
+
+  test("appears once in the sitemap, English only", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+
+    expect(xml).toContain("<loc>https://humanheart.life/en/take/automatic-yes</loc>");
+    expect(xml).not.toContain("<loc>https://humanheart.life/ru/take/automatic-yes</loc>");
+  });
+
+  test("serves the worksheet's words without JavaScript", async ({ request }) => {
+    const html = await (await request.get("/en/take/automatic-yes")).text();
+    const body = html.match(/<div id="root">([\s\S]*?)<\/div>\s*<!-- prerendered -->/);
+
+    expect(body, "the worksheet was not prerendered").toBeTruthy();
+    expect(body![1]).toContain("automatic");
+    expect(body![1].length).toBeGreaterThan(10000);
   });
 });

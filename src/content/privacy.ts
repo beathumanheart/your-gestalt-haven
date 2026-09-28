@@ -112,7 +112,6 @@ export const privacyEN: PrivacyContent = {
       ],
       paras: [
         "Write to be@humanheart.life and you will have an answer within a month.",
-        "If you are not satisfied, you can complain to the Belgian Data Protection Authority (Gegevensbeschermingsautoriteit / Autorité de protection des données), which publishes how to do so at www.dataprotectionauthority.be.",
       ],
     },
   ],

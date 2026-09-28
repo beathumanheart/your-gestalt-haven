@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { AutomaticYesContent } from "@/content/automaticYes";
 import type { SignupOutcomeMessages } from "@/content/signupMessages";
 import type { SignupSource } from "@/config/signup";
+import { trackPdfRequested, trackPdfResult } from "@/hooks/useWorksheetAnalytics";
 
 /**
  * Submitting one of the two sign-up forms.
@@ -15,8 +16,12 @@ import type { SignupSource } from "@/config/signup";
  * worksheet's content there put 23 KB of its prose into every page load. See
  * src/content/signupMessages.ts.
  *
- * No PostHog call: /take/* counts page opens and nothing else, and that stays
- * true even though this form now talks to a server.
+ * The PDF request is counted — asked for, and then what became of it — so the
+ * gap between the two is visible when Brevo drops one. Nothing about the
+ * person is sent with either event; see useWorksheetAnalytics. The letter is
+ * deliberately not counted here: Brevo is the record of who is on the list,
+ * and a second count of the same thing in a second system is one more place
+ * for it to be wrong.
  */
 
 /**
@@ -51,6 +56,11 @@ export const useSignup = (m: SignupOutcomeMessages, source: SignupSource) => {
     setState("sending");
     setMessage("");
 
+    // Before the call, so a request that never comes back is still counted.
+    // Counting only successes would make a broken worksheet look like a
+    // worksheet nobody wanted.
+    if (pdf) trackPdfRequested({ source, with_letter: letter });
+
     const { data, error } = await supabase.functions.invoke("take-signup", {
       body: { email, pdf, letter, company, source, lang: "en" },
     });
@@ -60,6 +70,7 @@ export const useSignup = (m: SignupOutcomeMessages, source: SignupSource) => {
       // both as an error, so the status decides which sentence to show.
       const status = (error as { context?: { status?: number } }).context?.status;
       setState("error");
+      if (pdf) trackPdfResult({ source, with_letter: letter, outcome: "failed" });
       setMessage(
         status === 429 ? m.rate_limited : status === 400 ? m.invalid : m.error,
       );
@@ -69,6 +80,14 @@ export const useSignup = (m: SignupOutcomeMessages, source: SignupSource) => {
     const result = data as { pdf?: string; letter?: string } | null;
     const pdfFailed = pdf && result?.pdf !== "sent";
     const letterFailed = letter && result?.letter !== "pending";
+
+    if (pdf) {
+      trackPdfResult({
+        source,
+        with_letter: letter,
+        outcome: pdfFailed ? "failed" : "sent",
+      });
+    }
 
     if (pdfFailed || letterFailed) {
       setState("error");

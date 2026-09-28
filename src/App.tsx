@@ -13,6 +13,7 @@ import {
 } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import TakeBoundary from "./components/TakeBoundary";
+import ScrollToTop from "./components/ScrollToTop";
 
 /**
  * The homepage is the only route loaded eagerly.
@@ -94,6 +95,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <TakeBoundary />
+        <ScrollToTop />
         {/* One boundary around every route rather than one per route: the
             homepage is not lazy, so it never suspends, and a route resolving
             its chunk is the only thing this can be waiting for. The fallback

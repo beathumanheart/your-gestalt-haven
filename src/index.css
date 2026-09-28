@@ -168,6 +168,17 @@
     @apply py-20 md:py-32 px-6 md:px-12;
   }
 
+  /* Width and centring only — no gutter. Every caller supplies its own
+     horizontal padding on the section or <main> around it, because the
+     sections want different amounts (px-6 on the homepage, clamp() on the
+     /take pages). Adding padding here would double it everywhere that
+     already does.
+
+     The trap that sets: a page that forgets lands flush against the edge of
+     a phone, which is what /en/letter and /en/privacy did until it was
+     measured. e2e/mobile-layout.spec.ts walks the routes and fails on a
+     gutter under 16px, so the next page to forget is caught rather than
+     shipped. */
   .container-narrow {
     @apply max-w-4xl mx-auto;
   }

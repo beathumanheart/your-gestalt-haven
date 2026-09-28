@@ -81,7 +81,7 @@ export const privacyEN: PrivacyContent = {
       paras: [
         "This site uses PostHog, on its European servers, to count how pages are used. Session recording is switched off in the code, so no replay of your visit exists.",
         "On the main pages it records which pages were opened, clicks on links and buttons, and basic loading speed, and it stores an identifier in your browser — a cookie and a local storage entry — so that repeat visits are not counted as new people.",
-        "On the “Take with you” pages, including the worksheets, it counts page opens and nothing else, and stores nothing on your device.",
+        "On the “Take with you” pages, including the worksheets, it counts page opens, and — if you ask for a worksheet by email — that a request was made and whether it was sent. Your address is not part of that count. It stores nothing on your device.",
       ],
     },
     {

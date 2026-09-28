@@ -74,6 +74,14 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/take/automatic-yes" />
   </url>
 <url>
+    <loc>https://humanheart.life/en/letter</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en"        href="https://humanheart.life/en/letter" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/letter" />
+  </url>
+<url>
     <loc>https://humanheart.life/en/offer-agreement</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>yearly</changefreq>

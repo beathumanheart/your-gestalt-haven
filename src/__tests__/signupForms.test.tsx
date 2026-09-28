@@ -22,6 +22,20 @@ vi.mock("@/contexts/LanguageContext", () => ({
 }));
 
 const ok = (body: Record<string, string>) => ({ data: { ok: true, ...body }, error: null });
+
+/**
+ * The message element is display:none until it carries `ok` or `err`, so
+ * asserting the text exists proves nothing — findByText matches hidden nodes.
+ * These assert the state class, which is what makes it visible at all.
+ */
+const shownMessage = async (text: string, kind: "ok" | "err") => {
+  const el = await screen.findByText(text);
+  expect(
+    el.className,
+    `the message is in the DOM but has no "${kind}" class, so it is invisible`,
+  ).toContain(kind);
+  return el;
+};
 const failed = (status: number) => ({ data: null, error: { context: { status } } });
 
 beforeEach(() => invoke.mockReset());
@@ -40,7 +54,7 @@ describe("the PDF form", () => {
     render(<SignupCard c={c} />);
     fillAndSend();
 
-    expect(await screen.findByText(c.signup.done)).toBeTruthy();
+    await shownMessage(c.signup.done, "ok");
   });
 
   it("says the letter is pending when it was ticked", async () => {
@@ -49,7 +63,7 @@ describe("the PDF form", () => {
     fireEvent.click(screen.getByRole("checkbox"));
     fillAndSend();
 
-    expect(await screen.findByText(c.signup.done_with_letter)).toBeTruthy();
+    await shownMessage(c.signup.done_with_letter, "ok");
   });
 
   it("does not claim success when a requested part failed", async () => {
@@ -60,7 +74,7 @@ describe("the PDF form", () => {
     fireEvent.click(screen.getByRole("checkbox"));
     fillAndSend();
 
-    expect(await screen.findByText(c.signup.error)).toBeTruthy();
+    await shownMessage(c.signup.error, "err");
   });
 
   it("passes the letter box through as sent, unticked by default", async () => {
@@ -78,7 +92,7 @@ describe("the PDF form", () => {
     render(<SignupCard c={c} />);
     fillAndSend();
 
-    expect(await screen.findByText(c.signup.rate_limited)).toBeTruthy();
+    await shownMessage(c.signup.rate_limited, "err");
   });
 
   it("shows the invalid-address sentence on 400", async () => {
@@ -86,7 +100,7 @@ describe("the PDF form", () => {
     render(<SignupCard c={c} />);
     fillAndSend();
 
-    expect(await screen.findByText(c.signup.invalid)).toBeTruthy();
+    await shownMessage(c.signup.invalid, "err");
   });
 
   it("shows the general error when the network fails", async () => {
@@ -94,14 +108,14 @@ describe("the PDF form", () => {
     render(<SignupCard c={c} />);
     fillAndSend();
 
-    expect(await screen.findByText(c.signup.error)).toBeTruthy();
+    await shownMessage(c.signup.error, "err");
   });
 
   it("stops a second submission once it has succeeded", async () => {
     invoke.mockResolvedValue(ok({ pdf: "sent", letter: "skipped" }));
     render(<SignupCard c={c} />);
     fillAndSend();
-    await screen.findByText(c.signup.done);
+    await shownMessage(c.signup.done, "ok");
 
     fireEvent.click(screen.getByRole("button"));
     expect(invoke).toHaveBeenCalledTimes(1);
@@ -114,7 +128,7 @@ describe("the letter-only form", () => {
     render(<LetterForm c={c} />);
     fillAndSend();
 
-    expect(await screen.findByText(c.letter.done)).toBeTruthy();
+    await shownMessage(c.letter.done, "ok");
     expect(invoke.mock.calls[0][1].body).toMatchObject({ pdf: false, letter: true });
   });
 });

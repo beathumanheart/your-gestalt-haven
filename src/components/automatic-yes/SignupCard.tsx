@@ -82,7 +82,14 @@ const SignupCard = ({ c }: { c: AutomaticYesContent }) => {
       <div className="small">
         {c.signup.small} <a href={langPath("/privacy")}>{c.signup.privacy}</a>
       </div>
-      <div className="msg" role="status" aria-live="polite">
+      {/* .msg is display:none until it carries ok or err — without the state
+          class the text is in the DOM and invisible, which is what "I clicked
+          and nothing happened" looks like. */}
+      <div
+        className={`msg${state === "done" ? " ok" : state === "error" ? " err" : ""}`}
+        role="status"
+        aria-live="polite"
+      >
         {message}
       </div>
     </form>

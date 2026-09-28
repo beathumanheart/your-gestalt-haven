@@ -1,16 +1,22 @@
 import { useState } from "react";
 import type { AutomaticYesContent } from "@/content/automaticYes";
+import type { SignupSource } from "@/config/signup";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useSignup } from "./useSignup";
+import { outcomeMessages, useSignup } from "./useSignup";
 
 /**
  * The monthly letter on its own, for a reader who has finished the worksheet
  * and did not want the PDF by email. Letter only, so no PDF is sent.
  */
 
-const LetterForm = ({ c }: { c: AutomaticYesContent }) => {
+/**
+ * `source` is required, not defaulted: a new place to subscribe from has to
+ * name itself, rather than silently attributing its subscribers to the
+ * worksheet page.
+ */
+const LetterForm = ({ c, source }: { c: AutomaticYesContent; source: SignupSource }) => {
   const { langPath } = useLanguage();
-  const { state, message, submit } = useSignup(c, "automatic-yes");
+  const { state, message, submit } = useSignup(outcomeMessages(c), source);
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
 
@@ -40,6 +46,12 @@ const LetterForm = ({ c }: { c: AutomaticYesContent }) => {
             id="lt-email"
             name="email"
             autoComplete="email"
+            /* Both markers, because this form renders on the letter page and
+               in the footer modal, outside the worksheet root that carries
+               them. data-ph-no-capture stops autocapture sending the value;
+               ph-no-capture stops session replay recording it. */
+            data-ph-no-capture
+            className="ph-no-capture"
             placeholder={c.signup.placeholder}
             required
             disabled={sending || done}

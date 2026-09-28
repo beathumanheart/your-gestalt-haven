@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { Youtube } from "lucide-react";
 import { navigationEN, navigationRU } from "@/content/navigation";
+import { letterEN } from "@/content/letter";
+import LetterModal from "@/components/letter/LetterModal";
 
 const Footer = () => {
   const { language, langPath } = useLanguage();
   const c = language === "ru" ? navigationRU : navigationEN;
+  const [letterOpen, setLetterOpen] = useState(false);
 
   const socials = [
     { name: "YouTube", href: c.social.youtube, icon: <Youtube className="w-4 h-4" /> },
@@ -55,6 +59,27 @@ const Footer = () => {
             >
               {c.footerTakeWithYou}
             </Link>
+            {/* One quiet item among the others, not a call to action. The
+                letter is English-only — there is no Russian list and no
+                Russian confirmation template — so a Russian reader gets a
+                link to the English page rather than a form that would sign
+                them up to a letter they did not ask for. */}
+            {language === "en" ? (
+              <button
+                type="button"
+                onClick={() => setLetterOpen(true)}
+                className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {letterEN.footerLink}
+              </button>
+            ) : (
+              <Link
+                to="/en/letter"
+                className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {letterEN.footerLink}
+              </Link>
+            )}
           </div>
           
           <div className="text-center md:text-right">
@@ -87,6 +112,9 @@ const Footer = () => {
           ))}
         </div>
       </div>
+
+      {/* Opened by the click above and by nothing else — see LetterModal. */}
+      <LetterModal open={letterOpen} onClose={() => setLetterOpen(false)} />
     </footer>
   );
 };

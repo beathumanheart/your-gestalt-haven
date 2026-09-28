@@ -577,7 +577,7 @@ const AutomaticYes = () => {
         </span>
       </div>
 
-      {SIGNUP_ENABLED && <LetterForm c={c} />}
+      {SIGNUP_ENABLED && <LetterForm c={c} source="automatic-yes" />}
 
       <section className="closing" aria-label={c.closing.name}>
         <q>{c.closing.quote}</q>

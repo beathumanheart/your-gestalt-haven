@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { AutomaticYesContent } from "@/content/automaticYes";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useSignup } from "./useSignup";
+import { outcomeMessages, useSignup } from "./useSignup";
 
 /**
  * The PDF sign-up, with the letter as a separate unticked box.
@@ -13,7 +13,7 @@ import { useSignup } from "./useSignup";
 
 const SignupCard = ({ c }: { c: AutomaticYesContent }) => {
   const { langPath } = useLanguage();
-  const { state, message, submit } = useSignup(c, "automatic-yes");
+  const { state, message, submit } = useSignup(outcomeMessages(c), "automatic-yes");
   const [email, setEmail] = useState("");
   const [letter, setLetter] = useState(false);
   const [company, setCompany] = useState("");
@@ -44,6 +44,10 @@ const SignupCard = ({ c }: { c: AutomaticYesContent }) => {
           id="st-email"
           name="email"
           autoComplete="email"
+          /* Belt and braces: the worksheet root carries these too, but an
+             address typed into a field should not depend on an ancestor. */
+          data-ph-no-capture
+          className="ph-no-capture"
           placeholder={c.signup.placeholder}
           required
           disabled={sending || done}

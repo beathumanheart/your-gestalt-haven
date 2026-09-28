@@ -239,7 +239,7 @@ section.sec{margin-top:clamp(56px,8vw,88px)}
 /* Print: the worksheet and the reader's answers, nothing else. */
 @media print {
   header, footer, .ay .signup, .ay .onpage, .ay .done, .ay .letter,
-  .ay .closing .btnrow, .ay .sources, .ay .crumb { display: none !important; }
+  .ay .closing .ctas, .ay .src, .ay .crumb { display: none !important; }
   .ay { max-width: none; padding: 0; }
   .ay section.part { break-before: page; }
   .ay textarea, .ay input[type="text"] {
@@ -582,36 +582,41 @@ const AutomaticYes = () => {
       <section className="closing" aria-label={c.closing.name}>
         <q>{c.closing.quote}</q>
         <div className="attr">{c.closing.attribution}</div>
+        {/* .who is a two-column grid: portrait, then everything else. The
+            name and role are block elements with their own classes — as
+            <strong>/<span> they are inline and run together. */}
         <div className="who">
           <picture>
             <source srcSet={portraitWebp} type="image/webp" />
             <img src={portraitJpg} width={640} height={640} loading="lazy" decoding="async" alt={c.closing.name} />
           </picture>
           <div>
-            <strong>{c.closing.name}</strong>
-            <span>{c.closing.role}</span>
+            <div className="name">
+              <span>{c.closing.name}</span>
+            </div>
+            <div className="role">{c.closing.role}</div>
+            <p>{c.closing.sessions}</p>
+            <div className="ctas">
+              {/* Same target as the header's button, without its analytics
+                  call: /take/* counts page opens and nothing else. */}
+              <a className="btn" href={langPath("/#contact")}>
+                {c.closing.book}
+              </a>
+              <a className="btn ghost" href={SOCIAL_URLS.youtube} target="_blank" rel="noopener noreferrer">
+                {c.closing.watch}
+              </a>
+            </div>
           </div>
-        </div>
-        <p className="note">{c.closing.sessions}</p>
-        <div className="btnrow">
-          {/* Same target as the header's button, without its analytics call:
-              /take/* counts page opens and nothing else. */}
-          <a className="btn" href={langPath("/#contact")}>
-            {c.closing.book}
-          </a>
-          <a className="btn ghost" href={SOCIAL_URLS.youtube} target="_blank" rel="noopener noreferrer">
-            {c.closing.watch}
-          </a>
         </div>
       </section>
 
-      <details className="sources">
+      <details className="src col">
         <summary>{c.sourcesTitle}</summary>
-        <ul>
+        <ol>
           {c.sources.map((source) => (
             <li key={source}>{source}</li>
           ))}
-        </ul>
+        </ol>
       </details>
 
       <p className="fine col">{c.closing.fine}</p>

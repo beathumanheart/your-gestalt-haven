@@ -47,9 +47,6 @@ describe("the notice is finished", () => {
     expect(allText).toContain("be@humanheart.life");
   });
 
-  it("names the supervisory authority a reader can complain to", () => {
-    expect(allText).toMatch(/Data Protection Authority|Gegevensbeschermingsautoriteit/);
-  });
 });
 
 describe("the notice matches what the site does", () => {

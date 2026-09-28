@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+<style>
+  body { margin:0; background:hsl(40 33% 97%); color:hsl(30 10% 25%); font-family:Lora,serif; -webkit-font-smoothing:antialiased; }
+  a { color:hsl(150 25% 35%); }
+  a:hover { color:hsl(30 10% 25%); }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes pulseSoft { 0%,100%{opacity:1} 50%{opacity:.7} }
+  input[type=range] { -webkit-appearance:none; appearance:none; background:transparent; }
+  input[type=range]::-webkit-slider-runnable-track { height:2px; background:hsl(35 20% 85%); border-radius:2px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:26px; height:26px; margin-top:-12px; border-radius:50%; background:hsl(150 25% 35%); border:4px solid hsl(40 33% 97%); box-shadow:0 2px 8px hsl(30 10% 25% / .25); cursor:grab; }
+</style>
+</helmet>
+<div style="background:hsl(40 33% 97%)">
+
+  <header data-screen-label="Header" style="position:absolute;top:0;left:0;right:0;z-index:50;padding:24px 0;background:transparent">
+    <nav style="max-width:896px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px">
+      <div style="display:flex;align-items:center;gap:8px;font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:hsl(30 10% 25%);cursor:pointer">
+        <svg viewBox="0 0 40 40" style="width:40px;height:40px" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 35L17.5 32.75C9 25.1 4 20.6 4 15C4 10.5 7.5 7 12 7C14.6 7 17.1 8.2 19 10.1L20 11.1L21 10.1C22.9 8.2 25.4 7 28 7C32.5 7 36 10.5 36 15C36 20.6 31 25.1 22.5 32.75L20 35Z" fill="hsl(18 60% 55%)"></path>
+          <path d="M8 20H14L16 16L20 24L24 18L26 20H32" stroke="hsl(40 33% 97%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span>Human Heart Beat</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:32px">
+        <span style="font-size:14px;color:hsl(30 8% 50%);cursor:pointer">About</span>
+        <span style="font-size:14px;color:hsl(30 8% 50%);cursor:pointer">Services</span>
+        <span style="font-size:14px;color:hsl(30 8% 50%);cursor:pointer">Credentials</span>
+        <span style="font-size:14px;color:hsl(30 8% 50%);cursor:pointer">Contact</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;border:1px solid hsl(35 20% 88% / .5);background:hsl(40 33% 97% / .5);backdrop-filter:blur(4px);font-family:Lora,serif;font-size:13px">
+          <span style="padding:5px 12px;border-radius:999px;background:hsl(40 33% 97%);color:hsl(30 10% 25%);font-weight:500;box-shadow:0 1px 3px hsl(30 10% 25% / .08)">EN</span>
+          <span style="padding:5px 12px;border-radius:999px;color:hsl(30 8% 50%);cursor:pointer;transition:color .2s, background .2s" style-hover="background:hsl(35 30% 90% / .6);color:hsl(30 10% 25%)">RU</span>
+        </div>
+        <button style="background:linear-gradient(135deg, hsl(150 25% 35%) 0%, hsl(150 30% 45%) 100%);box-shadow:0 4px 20px -4px hsl(30 10% 25% / 0.08);color:hsl(40 33% 97%);padding:10px 24px;border:none;border-radius:999px;font-family:Lora,serif;font-weight:500;font-size:14px;cursor:pointer">Book a Session</button>
+      </div>
+    </nav>
+  </header>
+
+  <section data-screen-label="Hero" style="position:relative;min-height:900px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <div style="position:absolute;inset:0">
+      <img src="src/assets/hero-therapy.jpg" alt="Warm, inviting therapy space with soft natural light" style="width:100%;height:100%;object-fit:cover" />
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom, hsl(40 33% 97% / .7), hsl(40 33% 97% / .5), hsl(40 33% 97%))"></div>
+    </div>
+    <div style="position:relative;z-index:10;max-width:896px;margin:0 auto;text-align:center;padding:80px 24px 0">
+      <p style="font-size:16px;text-transform:uppercase;letter-spacing:.3em;color:hsl(150 25% 35%);margin:0 0 24px">Therapy with Genia</p>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:300;color:hsl(30 10% 25%);line-height:1.1;margin:0 0 32px">A Space for You <br />
+        <span style="font-style:italic;font-weight:400;color:hsl(150 25% 35%)">to Breathe</span>
+      </h1>
+      <p style="font-size:20px;color:hsl(30 8% 50%);max-width:672px;margin:0 auto 40px;line-height:1.625">I'm here to walk with you through life's hardest moments — with presence, compassion, and care.</p>
+      <div style="display:flex;gap:16px;justify-content:center;align-items:center">
+        <button style="padding:16px 32px;border-radius:999px;font-family:Lora,serif;font-weight:500;font-size:16px;border:1px solid hsl(35 20% 88%);background:transparent;color:hsl(30 10% 25%);cursor:pointer">Learn More</button>
+        <button style="background:linear-gradient(135deg, hsl(150 25% 35%) 0%, hsl(150 30% 45%) 100%);box-shadow:0 4px 20px -4px hsl(30 10% 25% / 0.08);color:hsl(40 33% 97%);padding:16px 32px;border:none;border-radius:999px;font-family:Lora,serif;font-weight:500;font-size:16px;cursor:pointer">Book a Session</button>
+      </div>
+    </div>
+    <div style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%)">
+      <div style="width:1px;height:48px;background:hsl(35 20% 88%);animation:pulseSoft 3s ease-in-out infinite"></div>
+    </div>
+  </section>
+
+  <section data-screen-label="About" style="padding:128px 48px;background:hsl(35 30% 90% / .3)">
+    <div style="max-width:896px;margin:0 auto">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
+        <div>
+          <p style="font-size:14px;text-transform:uppercase;letter-spacing:.2em;color:hsl(150 25% 35%);margin:0 0 16px">Welcome</p>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:hsl(30 10% 25%);margin:0 0 32px;line-height:1.1">I'm glad <br /><span style="font-style:italic">you're here</span></h2>
+          <div style="display:flex;flex-direction:column;gap:20px;color:hsl(30 8% 50%);line-height:1.625">
+            <p style="margin:0">I work with what makes us human — grief and loss, relationships of all kinds (romantic, family, friendships, work), questions of meaning, loneliness, time, and purpose.</p>
+            <p style="margin:0">If you're feeling scared, uncertain, anxious, or just... stuck — that's already enough reason to reach out.</p>
+            <p style="margin:0">In longer-term work, we go deeper — exploring patterns, reactions, and what drives them. With commitment from both of us, real and lasting change becomes possible.</p>
+            <p style="margin:0;color:hsl(150 25% 35%);font-weight:500">Even considering therapy is a brave step. You're already looking inward.</p>
+          </div>
+
+        </div>
+        <div style="display:flex;justify-content:center">
+          <div style="position:relative">
+            <div style="width:320px;height:320px;border-radius:999px;background:hsl(150 20% 90%);padding:12px;box-shadow:0 20px 50px -15px hsl(30 10% 25% / 0.15)">
+              <div style="width:100%;height:100%;border-radius:999px;background:hsl(18 50% 85%);padding:8px;animation:float 6s ease-in-out infinite">
+                <div style="width:100%;height:100%;border-radius:999px;background:hsl(40 33% 97%);box-shadow:0 8px 30px -8px hsl(30 10% 25% / 0.1);overflow:hidden">
+                  <img src="src/assets/portrait.jpeg" alt="Genia, Gestalt counsellor" style="width:100%;height:100%;object-fit:cover" />
+                </div>
+              </div>
+            </div>
+            <div style="position:absolute;top:-16px;right:-16px;width:16px;height:16px;border-radius:999px;background:hsl(18 60% 55% / .6)"></div>
+            <div style="position:absolute;bottom:-24px;left:-8px;width:24px;height:24px;border-radius:999px;background:hsl(150 25% 35% / .4)"></div>
+            <div style="position:absolute;top:50%;right:-32px;width:12px;height:12px;border-radius:999px;background:hsl(18 60% 55% / .5)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Credentials" style="padding:128px 48px;background:hsl(150 25% 35% / .05)">
+    <div style="max-width:896px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:64px">
+        <div style="display:inline-block;padding:48px;border-radius:24px;background:linear-gradient(145deg, hsl(40 40% 98%) 0%, hsl(40 30% 95%) 100%);border:1px solid hsl(35 20% 88%)">
+          <svg viewBox="0 0 24 24" style="width:32px;height:32px;display:block;margin:0 auto 24px" fill="none" stroke="hsl(18 60% 55%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path></svg>
+          <blockquote style="font-family:'Cormorant Garamond',serif;font-size:24px;color:hsl(30 10% 25%);font-style:italic;max-width:672px;line-height:1.625;margin:0">"I walk beside you, not ahead. Together, we explore what it means to be fully alive in this moment."</blockquote>
+        </div>
+      </div>
+      <div style="text-align:center;margin-bottom:64px">
+        <p style="font-size:14px;text-transform:uppercase;letter-spacing:.2em;color:hsl(150 25% 35%);margin:0 0 16px">About Me</p>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:hsl(30 10% 25%);margin:0 0 24px">Training &amp; <span style="font-style:italic">Background</span></h2>
+        <p style="color:hsl(30 8% 50%);max-width:672px;margin:0 auto">I share what's professionally relevant and leave space for you to discover the rest through our work together.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px">
+        <div style="text-align:center;padding:32px;border-radius:24px;background:hsl(40 33% 97%);box-shadow:0 4px 20px -4px hsl(30 10% 25% / 0.08)">
+          <div style="width:64px;height:64px;border-radius:999px;background:hsl(150 20% 90%);margin:0 auto 24px;display:flex;align-items:center;justify-content:center">
+            <svg viewBox="0 0 24 24" style="width:28px;height:28px" fill="none" stroke="hsl(150 25% 35%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"></path></svg>
+          </div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:hsl(30 10% 25%);margin:0 0 16px">Education</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px">
+            <li style="font-size:14px;color:hsl(30 8% 50%);line-height:1.625">Diploma in Psychological Counselling (Saint Petersburg, Russia)</li>
+            <li style="font-size:14px;color:hsl(30 8% 50%);line-height:1.625">MSc in Bioethics (KU Leuven, Belgium)</li>
+            <li style="font-size:14px;color:hsl(30 8% 50%);line-height:1.625">MA in Philosophy (University of Tartu, Estonia)</li>
+            <li style="font-size:14px;color:hsl(30 8% 50%);line-height:1.625">Training at <a href="https://mig.institute/" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;text-decoration-color:hsl(150 25% 35% / .5);text-underline-offset:4px;color:inherit"><span style="text-decoration:underline dotted;text-decoration-color:hsl(150 25% 35% / .5);text-underline-offset:4px;cursor:help">International Institute of Gestalt</span></a>, Montenegro (ongoing)</li>
+          </ul>
+        </div>
+        <div style="text-align:center;padding:32px;border-radius:24px;background:hsl(40 33% 97%);box-shadow:0 4px 20px -4px hsl(30 10% 25% / 0.08)">
+          <div style="width:64px;height:64px;border-radius:999px;background:hsl(150 20% 90%);margin:0 auto 24px;display:flex;align-items:center;justify-content:center">
+            <svg viewBox="0 0 24 24" style="width:28px;height:28px" fill="none" stroke="hsl(150 25% 35%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>
+          </div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:hsl(30 10% 25%);margin:0 0 16px">Ethics &amp; Practice</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px">
+            <li style="font-size:14px;color:hsl(30 8% 50%);line-height:1.625">I work to the ethical standards published by the European Association for <span style="text-decoration:underline dotted;text-decoration-color:hsl(150 25% 35% / .5);text-underline-offset:4px;cursor:help">Gestalt</span> Therapy (EAGT)</li>
+            <li style="font-size:14px;color:hsl(30 8% 50%);line-height:1.625">Weekly personal therapy and supervision</li>
+            <li style="font-size:14px;color:hsl(30 8% 50%);line-height:1.625">I welcome everyone — all backgrounds, identities, and ways of being</li>
+          </ul>
+        </div>
+        <div style="text-align:center;padding:32px;border-radius:24px;background:hsl(40 33% 97%);box-shadow:0 4px 20px -4px hsl(30 10% 25% / 0.08)">
+          <div style="width:64px;height:64px;border-radius:999px;background:hsl(150 20% 90%);margin:0 auto 24px;display:flex;align-items:center;justify-content:center">
+            <svg viewBox="0 0 24 24" style="width:28px;height:28px" fill="none" stroke="hsl(150 25% 35%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 2.598a1 1 0 0 0 .55.55l2.598 1.05a1 1 0 0 1 0 1.967l-2.598 1.05a1 1 0 0 0-.55.55l-1.05 2.598a1 1 0 0 1-1.967 0l-1.05-2.598a1 1 0 0 0-.55-.55l-2.598-1.05a1 1 0 0 1 0-1.967l2.598-1.05a1 1 0 0 0 .55-.55z"></path><path d="M20 14.5v1M19.5 15h1M5 18.5v1M4.5 19h1"></path></svg>
+          </div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:hsl(30 10% 25%);margin:0 0 16px">Working Alongside</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px">
+            <li style="font-size:14px;color:hsl(30 8% 50%);line-height:1.625">If you are already working with a psychiatrist or doctor, I can work alongside that care — with your consent.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Services" style="padding:128px 48px">
+    <div style="max-width:896px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:40px">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:hsl(30 10% 25%);margin:0 0 16px">What We Might <span style="font-style:italic">Work On</span></h2>
+        <p style="color:hsl(30 8% 50%);max-width:576px;margin:0 auto;line-height:1.625">None of these will describe you exactly — your story is your own. These are simply the doors people most often come through.</p>
+      </div>
+
+      <div style="margin-bottom:56px">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+          <div style="padding:24px 26px;border-radius:16px;background:hsl(40 33% 97%);border:1px solid hsl(35 20% 88%)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <svg viewBox="0 0 24 24" style="width:17px;height:17px;flex-shrink:0" fill="none" stroke="hsl(18 60% 55%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+              <h4 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:hsl(30 10% 25%);margin:0">Grief &amp; loss</h4>
+            </div>
+            <p style="font-size:14px;line-height:1.75;color:hsl(30 8% 50%);margin:0">Death of someone close · Anticipatory grief and long illness · Miscarriage and childlessness · Losing a home or country · The end of a relationship · Grief no one around you recognises</p>
+          </div>
+          <div style="padding:24px 26px;border-radius:16px;background:hsl(40 33% 97%);border:1px solid hsl(35 20% 88%)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <svg viewBox="0 0 24 24" style="width:17px;height:17px;flex-shrink:0" fill="none" stroke="hsl(18 60% 55%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <h4 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:hsl(30 10% 25%);margin:0">Relationships</h4>
+            </div>
+            <p style="font-size:14px;line-height:1.75;color:hsl(30 8% 50%);margin:0">Partners and intimacy · Repeating patterns in who you choose · Parents and family roles · Friendship, distance and drifting apart · Conflict and boundaries at work · Loneliness inside a relationship</p>
+          </div>
+          <div style="padding:24px 26px;border-radius:16px;background:hsl(40 33% 97%);border:1px solid hsl(35 20% 88%)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <svg viewBox="0 0 24 24" style="width:17px;height:17px;flex-shrink:0" fill="none" stroke="hsl(18 60% 55%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5S5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
+              <h4 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:hsl(30 10% 25%);margin:0">Anxiety &amp; feeling stuck</h4>
+            </div>
+            <p style="font-size:14px;line-height:1.75;color:hsl(30 8% 50%);margin:0">Constant low-level worry · Dread with no clear cause · Burnout and exhaustion · Procrastination and self-criticism · Shame and perfectionism · Anger you don't know where to put</p>
+          </div>
+          <div style="padding:24px 26px;border-radius:16px;background:hsl(40 33% 97%);border:1px solid hsl(35 20% 88%)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <svg viewBox="0 0 24 24" style="width:17px;height:17px;flex-shrink:0" fill="none" stroke="hsl(18 60% 55%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+              <h4 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:hsl(30 10% 25%);margin:0">Transitions &amp; meaning</h4>
+            </div>
+            <p style="font-size:14px;line-height:1.75;color:hsl(30 8% 50%);margin:0">Emigration and life between countries · Career change or losing work · Becoming a parent · Ageing, time and mortality · Identity, values and belonging · "Is this really my life?"</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:24px;padding:22px 0;border-top:1px solid hsl(35 20% 88%);border-bottom:1px solid hsl(35 20% 88%)">
+        <div style="display:flex;align-items:baseline;gap:12px">
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:19px;color:hsl(30 10% 25%);margin:0;white-space:nowrap">Short-term</h3>
+          <p style="color:hsl(30 8% 50%);line-height:1.6;font-size:14.5px;margin:0">Up to 10 sessions — when one thing needs attention, and an end we can both see.</p>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:12px">
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:19px;color:hsl(30 10% 25%);margin:0;white-space:nowrap">Long-term</h3>
+          <p style="color:hsl(30 8% 50%);line-height:1.6;font-size:14.5px;margin:0">Six months and on — when it's less about one thing, and more about how your life fits together.</p>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;padding:18px 30px;border-radius:999px;background:hsl(35 30% 90% / .5);border:1px solid hsl(35 20% 88%);display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 28px;font-size:14px;color:hsl(30 8% 50%)">
+        <span style="display:flex;align-items:center;gap:8px;color:hsl(30 10% 25%)">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px" fill="none" stroke="hsl(150 25% 35%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
+          Online, wherever you are
+        </span>
+        <span style="width:1px;height:16px;background:hsl(35 20% 85%)"></span>
+        <span style="display:flex;align-items:center;gap:8px;color:hsl(30 10% 25%)">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px" fill="none" stroke="hsl(150 25% 35%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+          50 minutes, usually weekly
+        </span>
+        <span style="width:1px;height:16px;background:hsl(35 20% 85%)"></span>
+        <span>Payment within 24h</span>
+      </div>
+      <p style="font-size:13.5px;color:hsl(30 8% 50%);text-align:center;margin:0 0 56px">Bank transfer, Wise, Revolut or crypto.</p>
+
+      <div style="padding:26px 32px;border-radius:20px;background:hsl(35 30% 90% / .5);border:1px solid hsl(35 20% 88%);display:grid;grid-template-columns:1fr 1.1fr;gap:36px;align-items:center">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <svg viewBox="0 0 24 24" style="width:17px;height:17px" fill="none" stroke="hsl(150 25% 35%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"></rect><path d="M2 10h20"></path></svg>
+            <p style="font-size:13px;text-transform:uppercase;letter-spacing:.2em;color:hsl(150 25% 35%);margin:0">Solidarity Pricing</p>
+          </div>
+          <p style="color:hsl(30 8% 50%);font-size:14.5px;margin:0;line-height:1.6">This works because we trust each other — those who can pay more make it possible for those who can't. Choose the number that's honest for your life right now.</p>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:2px">
+            <span style="font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1;color:hsl(30 10% 25%)">€{{ rate }}</span>
+            <span style="font-size:13px;color:hsl(30 8% 50%)">per 50 min</span>
+            <span style="margin-left:auto;font-size:13px;color:hsl(150 25% 35%)">{{ rateLabel }}</span>
+          </div>
+          <input type="range" min="40" max="190" step="5" value="{{ rate }}" onChange="{{ onRate }}" style="width:100%;height:26px;margin:6px 0 0;display:block" />
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:hsl(30 8% 50%)">
+            <span>€40</span><span>€190</span>
+          </div>
+          <p style="margin:10px 0 0;font-size:13.5px;line-height:1.6;color:hsl(30 8% 50%);min-height:44px">{{ rateNote }}</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section data-screen-label="Contact / Booking" style="padding:128px 48px">
+    <div style="max-width:896px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:48px">
+        <p style="font-size:14px;text-transform:uppercase;letter-spacing:.2em;color:hsl(150 25% 35%);margin:0 0 16px">Book a Session</p>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:hsl(30 10% 25%);margin:0 0 24px">Ready to <span style="font-style:italic">Begin?</span></h2>
+        <p style="color:hsl(30 8% 50%);max-width:576px;margin:0 auto">The first step is often the hardest. I'm here to make it as easy as possible.</p>
+      </div>
+
+      <div style="background:linear-gradient(145deg, hsl(40 40% 98%) 0%, hsl(40 30% 95%) 100%);box-shadow:0 8px 30px -8px hsl(30 10% 25% / 0.1);border-radius:16px;border:1px solid hsl(35 20% 88% / .5);overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:24px 32px 16px">
+          <div style="display:flex;align-items:center;flex:1">
+            <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:hsl(30 10% 25%)">
+              <span style="width:28px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;border:1px solid hsl(150 25% 35%);color:hsl(150 25% 35%);background:hsl(150 25% 35% / .1)">1</span>
+              <span>Session</span>
+            </div>
+            <div style="flex:1;height:1px;margin:0 16px;background:hsl(35 20% 88%)"></div>
+          </div>
+          <div style="display:flex;align-items:center;flex:1">
+            <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:hsl(30 8% 50%)">
+              <span style="width:28px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;border:1px solid hsl(35 20% 88%);color:hsl(30 8% 50%)">2</span>
+              <span>Date &amp; Time</span>
+            </div>
+            <div style="flex:1;height:1px;margin:0 16px;background:hsl(35 20% 88%)"></div>
+          </div>
+          <div style="display:flex;align-items:center;flex:1">
+            <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:hsl(30 8% 50%)">
+              <span style="width:28px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;border:1px solid hsl(35 20% 88%);color:hsl(30 8% 50%)">3</span>
+              <span>Details</span>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid hsl(35 20% 88%)"></div>
+        <div style="padding:32px;min-height:400px">
+          <p style="color:hsl(30 8% 50%);margin:0 0 24px">Choose your session type</p>
+          <div style="display:grid;gap:12px">
+            <div style="text-align:left;padding:20px;border-radius:12px;border:2px solid hsl(35 20% 88%);cursor:pointer;transition:border-color .3s, background .3s" style-hover="border-color:hsl(150 25% 35% / .4);background:hsl(35 30% 90% / .35)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between">
+                <div style="flex:1;display:flex;align-items:center;gap:8px">
+                  <h3 style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:hsl(30 10% 25%);margin:0">Session type one</h3>
+                  <svg viewBox="0 0 24 24" style="width:14px;height:14px;color:hsl(30 8% 50%)" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"></path></svg>
+                </div>
+                <span style="display:flex;align-items:center;gap:4px;font-size:14px;color:hsl(30 8% 50%);margin-left:16px;white-space:nowrap">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                  50 min
+                </span>
+              </div>
+              <p style="font-size:14px;color:hsl(30 8% 50%);margin:8px 0 0">Description as set in your dashboard.</p>
+            </div>
+            <div style="text-align:left;padding:20px;border-radius:12px;border:2px solid hsl(35 20% 88%);cursor:pointer;transition:border-color .3s, background .3s" style-hover="border-color:hsl(150 25% 35% / .4);background:hsl(35 30% 90% / .35)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between">
+                <div style="flex:1;display:flex;align-items:center;gap:8px">
+                  <h3 style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:hsl(30 10% 25%);margin:0">Session type two</h3>
+                  <svg viewBox="0 0 24 24" style="width:14px;height:14px;color:hsl(30 8% 50%)" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"></path></svg>
+                </div>
+                <span style="display:flex;align-items:center;gap:4px;font-size:14px;color:hsl(30 8% 50%);margin-left:16px;white-space:nowrap">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                  50 min
+                </span>
+              </div>
+              <p style="font-size:14px;color:hsl(30 8% 50%);margin:8px 0 0">Description as set in your dashboard.</p>
+            </div>
+            <div style="text-align:left;padding:20px;border-radius:12px;border:2px solid hsl(35 20% 88%);cursor:pointer;transition:border-color .3s, background .3s" style-hover="border-color:hsl(150 25% 35% / .4);background:hsl(35 30% 90% / .35)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between">
+                <div style="flex:1;display:flex;align-items:center;gap:8px">
+                  <h3 style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:hsl(30 10% 25%);margin:0">Session type three</h3>
+                  <svg viewBox="0 0 24 24" style="width:14px;height:14px;color:hsl(30 8% 50%)" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"></path></svg>
+                </div>
+                <span style="display:flex;align-items:center;gap:4px;font-size:14px;color:hsl(30 8% 50%);margin-left:16px;white-space:nowrap">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                  50 min
+                </span>
+              </div>
+              <p style="font-size:14px;color:hsl(30 8% 50%);margin:8px 0 0">Description as set in your dashboard.</p>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid hsl(35 20% 88%)"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 32px">
+          <span style="display:flex;align-items:center;gap:4px;font-size:14px;color:hsl(30 8% 50%);opacity:0">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Back</span>
+          <button style="display:flex;align-items:center;gap:4px;background:linear-gradient(135deg, hsl(150 25% 35%) 0%, hsl(150 30% 45%) 100%);box-shadow:0 4px 20px -4px hsl(30 10% 25% / 0.08);color:hsl(40 33% 97%);padding:10px 24px;border:none;border-radius:999px;font-family:Lora,serif;font-weight:500;font-size:14px;opacity:.4;cursor:not-allowed">Next
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <p style="font-size:14px;color:hsl(30 8% 50%);text-align:center;margin:24px auto 0;max-width:672px">If you prefer, just reach out directly on <a href="https://t.me/humanheartbeat" target="_blank" rel="noopener noreferrer" style="color:hsl(30 10% 25%);font-weight:500;text-decoration:underline;text-underline-offset:2px">Telegram</a> or <span style="display:inline-flex;align-items:center;gap:4px;color:hsl(30 10% 25%);font-weight:500;text-decoration:underline;text-underline-offset:2px;cursor:pointer">be@humanheart.life<svg viewBox="0 0 24 24" style="width:12px;height:12px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></span></p>
+    </div>
+  </section>
+
+  <footer data-screen-label="Footer" style="padding:48px 24px;background:hsl(40 25% 92%);border-top:1px solid hsl(35 20% 88%)">
+    <div style="max-width:896px;margin:0 auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:24px">
+        <div>
+          <a href="#" style="font-family:'Cormorant Garamond',serif;font-size:24px;color:hsl(30 10% 25%);display:block;margin-bottom:8px;text-decoration:none">Human Heart Beat</a>
+          <p style="font-size:14px;color:hsl(30 8% 50%);margin:0">Therapy with Genia</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:24px">
+          <a href="#" style="font-size:14px;color:hsl(30 8% 50%);text-decoration:none">About</a>
+          <a href="#" style="font-size:14px;color:hsl(30 8% 50%);text-decoration:none">Services</a>
+          <a href="#" style="font-size:14px;color:hsl(30 8% 50%);text-decoration:none">Contact</a>
+          <a href="#" style="font-size:14px;color:hsl(30 8% 50%);text-decoration:none">Offer Agreement</a>
+        </div>
+        <div style="text-align:right">
+          <a href="mailto:be@humanheart.life" style="font-size:14px;color:hsl(150 25% 35%);text-decoration:none">be@humanheart.life</a>
+          <p style="font-size:12px;color:hsl(30 8% 50%);margin:8px 0 0">© 2026 Human Heart Beat. All rights reserved.</p>
+        </div>
+      </div>
+      <div style="margin-top:28px;padding-top:24px;border-top:1px solid hsl(35 20% 88%);display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:12px">
+        <a href="https://substack.com/humanheartbeat" target="_blank" rel="noopener noreferrer" title="Substack" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:999px;border:1px solid hsl(35 20% 88%);color:hsl(30 8% 50%);text-decoration:none;background:transparent;transition:color .2s, background .2s, border-color .2s, transform .2s" style-hover="color:hsl(18 60% 50%);border-color:hsl(18 60% 55% / .45);background:hsl(18 60% 55% / .1);transform:translateY(-2px)">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;flex-shrink:0" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M4 3h16v2.5H4zM4 7.6h16v2.5H4zM4 12.2 12 17l8-4.8V21l-8-4.8L4 21z"></path></svg>
+          </a>
+        <a href="https://instagram.com/humanheartbeat" target="_blank" rel="noopener noreferrer" title="Instagram" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:999px;border:1px solid hsl(35 20% 88%);color:hsl(30 8% 50%);text-decoration:none;background:transparent;transition:color .2s, background .2s, border-color .2s, transform .2s" style-hover="color:hsl(18 60% 50%);border-color:hsl(18 60% 55% / .45);background:hsl(18 60% 55% / .1);transform:translateY(-2px)">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"></circle></svg>
+          </a>
+        <a href="https://youtube.com/@humanheartbeat" target="_blank" rel="noopener noreferrer" title="YouTube" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:999px;border:1px solid hsl(35 20% 88%);color:hsl(30 8% 50%);text-decoration:none;background:transparent;transition:color .2s, background .2s, border-color .2s, transform .2s" style-hover="color:hsl(18 60% 50%);border-color:hsl(18 60% 55% / .45);background:hsl(18 60% 55% / .1);transform:translateY(-2px)">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="4"></rect><path d="M11 9.5l4 2.5-4 2.5z" fill="currentColor" stroke="none"></path></svg>
+          </a>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultRate&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:80,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:40,&quot;max&quot;:190,&quot;step&quot;:5,&quot;unit&quot;:&quot;€&quot;,&quot;section&quot;:&quot;Solidarity pricing&quot;}}">
+class Component extends DCLogic {
+  state = { rate: null };
+  renderVals() {
+    const rate = this.state.rate ?? this.props.defaultRate ?? 80;
+    const b = rate < 70 ? 0 : rate <= 110 ? 1 : 2;
+    return {
+      rate,
+      rateLabel: ["When resources are tight", "A fair rate for most", "Helping someone else access care"][b],
+      rateNote: [
+        "Choose here if you're studying, between jobs, carrying debt or medical costs, or supporting others financially. No explanation asked for.",
+        "Choose here if your income covers your needs with some room left over. This is what most people pay.",
+        "Choose here if you own property or have savings, travel for pleasure, or have family to fall back on. Your rate quietly funds someone else's."
+      ][b],
+      onRate: (e) => this.setState({ rate: Number(e.target.value) })
+    };
+  }
+}
+</script>
+</body>
+</html>

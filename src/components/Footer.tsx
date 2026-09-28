@@ -113,6 +113,15 @@ const Footer = () => {
               readable to a screen reader and on hover — see
               letterModal.test.tsx, which addresses it by name.
 
+              The envelope is deliberate, and the ambiguity with it was raised
+              and accepted rather than overlooked: it sits a few lines under
+              the be@humanheart.life mailto, so "email me" competes with "a
+              monthly letter by email". Newspaper and MailPlus were offered as
+              glyphs that separate the two, and a visible caption under the
+              row; Genia chose to keep the envelope, because the icon is mainly
+              for people who already know what it is and a caption costs the
+              brevity the icon was for. Do not swap it as a tidy-up.
+
               English-only. There is no Russian list and no Russian
               confirmation template, so a Russian reader is given the English
               page rather than a form that would subscribe them to a letter

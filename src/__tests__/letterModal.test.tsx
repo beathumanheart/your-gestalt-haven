@@ -57,7 +57,8 @@ const renderFooter = () =>
   );
 
 const dialog = () => screen.queryByRole("dialog");
-const footerItem = () => screen.getByText(letterEN.footerLink);
+/** An icon, so it is addressed by its accessible name rather than its text. */
+const footerItem = () => screen.getByRole("button", { name: letterEN.footerLink });
 
 beforeEach(() => {
   invoke.mockReset();
@@ -70,9 +71,28 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("the footer item", () => {
-  it("is there, worded as the letter is named", () => {
+  it("is an icon that still says what it is", () => {
+    // It sits in the row of social icons and carries no visible words, so the
+    // name has to be on the control itself or it is a mystery button.
     renderFooter();
-    expect(footerItem()).toBeInTheDocument();
+    const item = footerItem();
+
+    expect(item).toHaveAttribute("aria-label", letterEN.footerLink);
+    expect(item, "no hover title, so a sighted reader cannot tell what it is").toHaveAttribute(
+      "title",
+      letterEN.footerLink,
+    );
+    expect(item.textContent, "the footer spells the letter out in words again").toBe("");
+  });
+
+  it("sits with the social icons rather than among the worded links", () => {
+    // The point of the change: one more place to find Genia, not another
+    // sentence in the footer.
+    renderFooter();
+    const youtube = screen.getByRole("link", { name: "YouTube" });
+
+    expect(footerItem().parentElement).toBe(youtube.parentElement);
+    expect(footerItem().className).toBe(youtube.className);
   });
 
   it("opens the dialog when clicked", () => {
@@ -94,6 +114,8 @@ describe("the footer item", () => {
     const link = screen.getByRole("link", { name: letterEN.footerLink });
     expect(link).toHaveAttribute("href", "/en/letter");
     expect(screen.queryByRole("button", { name: letterEN.footerLink })).toBeNull();
+    // Same icon, same circle — only the behaviour differs.
+    expect(link.className).toBe(screen.getByRole("link", { name: "YouTube" }).className);
   });
 });
 

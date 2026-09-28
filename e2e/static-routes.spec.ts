@@ -380,14 +380,14 @@ test.describe("the monthly letter", () => {
     await page.waitForTimeout(6000);
     await expect(dialog, "the dialog opened without being asked for").toHaveCount(0);
 
-    await page.getByText("The monthly letter").first().click();
+    await page.getByRole("button", { name: "The monthly letter" }).click();
     await expect(dialog).toBeVisible();
     await expect(page.getByRole("dialog").getByLabel(/email/i)).toBeVisible();
   });
 
   test("the dialog closes on Escape and gives the page its scroll back", async ({ page }) => {
     await page.goto("/en");
-    await page.getByText("The monthly letter").first().click();
+    await page.getByRole("button", { name: "The monthly letter" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
     await page.keyboard.press("Escape");

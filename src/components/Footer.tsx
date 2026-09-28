@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
-import { Youtube } from "lucide-react";
+import { Mail, Youtube } from "lucide-react";
 import { navigationEN, navigationRU } from "@/content/navigation";
 import { letterEN } from "@/content/letter";
 import LetterModal from "@/components/letter/LetterModal";
@@ -14,6 +14,12 @@ const Footer = () => {
   const socials = [
     { name: "YouTube", href: c.social.youtube, icon: <Youtube className="w-4 h-4" /> },
   ];
+
+  /* Same circle as the social icons, so the row reads as one row. */
+  const ICON_BUTTON =
+    "flex items-center justify-center w-[38px] h-[38px] rounded-full border border-border " +
+    "text-muted-foreground hover:text-terracotta hover:border-terracotta/45 " +
+    "hover:bg-terracotta/10 hover:-translate-y-0.5 transition-all duration-200";
 
   return (
     <footer className="py-12 px-6 bg-cream-dark border-t border-border">
@@ -59,27 +65,6 @@ const Footer = () => {
             >
               {c.footerTakeWithYou}
             </Link>
-            {/* One quiet item among the others, not a call to action. The
-                letter is English-only — there is no Russian list and no
-                Russian confirmation template — so a Russian reader gets a
-                link to the English page rather than a form that would sign
-                them up to a letter they did not ask for. */}
-            {language === "en" ? (
-              <button
-                type="button"
-                onClick={() => setLetterOpen(true)}
-                className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {letterEN.footerLink}
-              </button>
-            ) : (
-              <Link
-                to="/en/letter"
-                className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {letterEN.footerLink}
-              </Link>
-            )}
           </div>
           
           <div className="text-center md:text-right">
@@ -105,11 +90,44 @@ const Footer = () => {
               rel="noopener noreferrer"
               title={s.name}
               aria-label={s.name}
-              className="flex items-center justify-center w-[38px] h-[38px] rounded-full border border-border text-muted-foreground hover:text-terracotta hover:border-terracotta/45 hover:bg-terracotta/10 hover:-translate-y-0.5 transition-all duration-200"
+              className={ICON_BUTTON}
             >
               {s.icon}
             </a>
           ))}
+
+          {/* An icon in the same row rather than a worded item in the links
+              above: the letter is one more place to find Genia, and the words
+              for it belong on its own page, not in the footer.
+
+              `title` and `aria-label` carry the name, so an icon is still
+              readable to a screen reader and on hover — see
+              letterModal.test.tsx, which addresses it by name.
+
+              English-only. There is no Russian list and no Russian
+              confirmation template, so a Russian reader is given the English
+              page rather than a form that would subscribe them to a letter
+              they did not ask for. */}
+          {language === "en" ? (
+            <button
+              type="button"
+              onClick={() => setLetterOpen(true)}
+              title={letterEN.footerLink}
+              aria-label={letterEN.footerLink}
+              className={ICON_BUTTON}
+            >
+              <Mail className="w-4 h-4" />
+            </button>
+          ) : (
+            <Link
+              to="/en/letter"
+              title={letterEN.footerLink}
+              aria-label={letterEN.footerLink}
+              className={ICON_BUTTON}
+            >
+              <Mail className="w-4 h-4" />
+            </Link>
+          )}
         </div>
       </div>
 

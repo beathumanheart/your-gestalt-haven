@@ -34,6 +34,7 @@ const INDEXABLE = [
     path: "/ru/take/feelings-map",
     title: "Что со мной происходит — карта чувств | Human Heart",
   },
+  { path: "/en/letter", title: "The monthly letter | Human Heart" },
   { path: "/en/offer-agreement", title: "Offer Agreement | Human Heart" },
   { path: "/ru/offer-agreement", title: "Договор оферты | Human Heart" },
 ];
@@ -333,5 +334,80 @@ test.describe("an English-only route", () => {
     expect(body, "the worksheet was not prerendered").toBeTruthy();
     expect(body![1]).toContain("automatic");
     expect(body![1].length).toBeGreaterThan(10000);
+  });
+});
+
+/**
+ * The letter page, and the footer item that opens the dialog.
+ *
+ * The page is the half of this feature that has to exist as a real document:
+ * it is what a link to "the monthly letter" can point at, and the only part a
+ * crawler will ever see. The dialog is the half that must never appear on its
+ * own — asserted in the browser here, because a real page has the timers,
+ * scrolling and pointer events that jsdom does not.
+ */
+test.describe("the monthly letter", () => {
+  test("the page is served with its own words, before any JavaScript runs", async ({ request }) => {
+    const html = await (await request.get("/en/letter")).text();
+    const body = html.match(/<div id="root">([\s\S]*?)<\/div>\s*<!-- prerendered -->/);
+
+    expect(body, "the letter page was not prerendered").toBeTruthy();
+    // What it is, not just that a form exists.
+    expect(body![1]).toContain("One longer piece a month");
+    expect(body![1]).toContain("Gestalt Counsellor");
+  });
+
+  test("claims no Russian alternate, because there is no Russian letter", async ({ request }) => {
+    const html = await (await request.get("/en/letter")).text();
+
+    expect(html).not.toContain('hreflang="ru"');
+    expect(html).not.toContain("og:locale:alternate");
+    expect(html).toContain(
+      '<link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/letter" />',
+    );
+  });
+
+  test("the footer item opens the dialog, and only on a click", async ({ page }) => {
+    await page.goto("/en");
+
+    const dialog = page.getByRole("dialog");
+
+    // Everything that would open it by itself: a long wait, scrolling the
+    // whole page, and the pointer leaving the top of the viewport.
+    await page.mouse.wheel(0, 20000);
+    await page.mouse.move(400, 0);
+    await page.mouse.move(400, -5).catch(() => {});
+    await page.waitForTimeout(6000);
+    await expect(dialog, "the dialog opened without being asked for").toHaveCount(0);
+
+    await page.getByRole("button", { name: "The monthly letter" }).click();
+    await expect(dialog).toBeVisible();
+    await expect(page.getByRole("dialog").getByLabel(/email/i)).toBeVisible();
+  });
+
+  test("the dialog closes on Escape and gives the page its scroll back", async ({ page }) => {
+    await page.goto("/en");
+    await page.getByRole("button", { name: "The monthly letter" }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    // A page that cannot be scrolled after a dialog closes is the bug this
+    // catches; the restore lives in the effect cleanup, not the button.
+    expect(await page.evaluate(() => document.body.style.overflow)).not.toBe("hidden");
+  });
+
+  test("a Russian reader is offered the English page, not a form", async ({ page }) => {
+    await page.goto("/ru");
+
+    const item = page.getByRole("link", { name: "The monthly letter" });
+    await expect(item).toHaveAttribute("href", "/en/letter");
+    await item.click();
+    await expect(page).toHaveURL(/\/en\/letter$/);
+  });
+
+  test("/ru/letter sends the reader to the English page", async ({ page }) => {
+    await page.goto("/ru/letter");
+    await expect(page).toHaveURL(/\/en\/letter$/);
   });
 });

@@ -117,6 +117,18 @@ export const AUTOMATIC_YES_TEXT: RouteText = {
     "A free worksheet on people-pleasing through Ferenczi, Winnicott and Gestalt: catch one yes, trace where it began, and try one small experiment.",
 };
 
+export const LETTER_TEXT: RouteText = {
+  titleEn: "The monthly letter | Human Heart",
+  descriptionEn:
+    "One longer piece a month, on feelings and relationships. Written by Genia, a Gestalt Counsellor working online in English and Russian.",
+  // English-only route (see `langs` on its entry below): there is no Russian
+  // list and no Russian confirmation email, so the RU fields repeat the EN
+  // ones rather than advertising a letter that does not exist.
+  titleRu: "The monthly letter | Human Heart",
+  descriptionRu:
+    "One longer piece a month, on feelings and relationships. Written by Genia, a Gestalt Counsellor working online in English and Russian.",
+};
+
 export const PRIVACY_TEXT: RouteText = {
   titleEn: "Privacy | Human Heart",
   descriptionEn:
@@ -153,6 +165,7 @@ export const STATIC_ROUTES: readonly StaticRoute[] = [
     langs: ["en"],
     ...AUTOMATIC_YES_TEXT,
   },
+  { path: "/letter", priority: "0.5", changefreq: "monthly", langs: ["en"], ...LETTER_TEXT },
   { path: "/offer-agreement", priority: "0.3", changefreq: "yearly", ...OFFER_AGREEMENT_TEXT },
 ] as const;
 

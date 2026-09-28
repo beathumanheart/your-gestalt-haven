@@ -20,6 +20,13 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendEmail } from "../_shared/send.ts";
 import { buildWorksheetEmail } from "./lib/emails.ts";
+import {
+  confirmationReturnUrl,
+  pageUrl,
+  refuse,
+  type SourceKey,
+  worksheetUrl,
+} from "./lib/sources.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,22 +36,6 @@ const corsHeaders = {
 
 const RATE_MAX = 5;
 const RATE_WINDOW_SECS = 600;
-
-/**
- * Where each page's worksheet lives.
- *
- * Server-side on purpose: the PDF URL is never taken from the request, so a
- * caller cannot make this function email an arbitrary link over the
- * practice's own domain and signature.
- */
-const SOURCES = {
-  "automatic-yes": {
-    pdfPath: "/downloads/the-automatic-yes-human-heart.pdf",
-    pagePath: "/en/take/automatic-yes",
-  },
-} as const;
-
-type SourceKey = keyof typeof SOURCES;
 
 const siteUrl = () => Deno.env.get("SITE_URL") || "https://humanheart.life";
 
@@ -128,7 +119,7 @@ async function requestLetterConfirmation(
     email,
     includeListIds: [listId],
     templateId,
-    redirectionUrl: `${siteUrl()}${SOURCES[source].pagePath}?letter=confirmed`,
+    redirectionUrl: confirmationReturnUrl(siteUrl(), source),
   };
 
   // Only when the attributes exist in Brevo; sending unknown ones is rejected.
@@ -196,11 +187,18 @@ Deno.serve(async (req: Request): Promise<Response> => {
     if (!email || email.length > 254 || !PLAUSIBLE_EMAIL.test(email)) {
       return errorResponse(400, "VALIDATION_FAILED", "That address does not look right.", requestId);
     }
-    if (!(source in SOURCES)) {
-      return errorResponse(400, "VALIDATION_FAILED", "Unknown source.", requestId);
-    }
-    if (!pdf && !letter) {
-      return errorResponse(400, "VALIDATION_FAILED", "Nothing was asked for.", requestId);
+    // The rules live in lib/sources.ts, where they are tested; this turns a
+    // reason into the sentence that fits it. A source with no worksheet asking
+    // for one is refused rather than falling through to an email carrying a
+    // broken link.
+    const refusal = refuse(source, { pdf, letter });
+    if (refusal) {
+      const said = {
+        "unknown-source": "Unknown source.",
+        "nothing-asked-for": "Nothing was asked for.",
+        "no-worksheet": "That source has no worksheet.",
+      }[refusal];
+      return errorResponse(400, "VALIDATION_FAILED", said, requestId);
     }
 
     const supabase = createClient(
@@ -222,10 +220,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     let pdfResult: "sent" | "failed" | "skipped" = "skipped";
     if (pdf) {
+      // Narrowed by `refuse` above: only a source carrying a pdfPath reaches here.
       const message = buildWorksheetEmail({
         email,
-        pdfUrl: `${siteUrl()}${SOURCES[source].pdfPath}`,
-        pageUrl: `${siteUrl()}${SOURCES[source].pagePath}`,
+        pdfUrl: worksheetUrl(siteUrl(), source),
+        pageUrl: pageUrl(siteUrl(), source),
       });
       const result = await sendEmail(brevoApiKey, message);
       pdfResult = result.ok ? "sent" : "failed";

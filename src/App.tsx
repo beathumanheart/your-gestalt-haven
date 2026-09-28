@@ -33,6 +33,7 @@ const TakeIndex = lazy(() => import("./pages/TakeIndex"));
 const TakeItemSoon = lazy(() => import("./pages/TakeItemSoon"));
 const TakeAutomaticYes = lazy(() => import("./pages/TakeAutomaticYes"));
 const Privacy = lazy(() => import("./pages/Privacy"));
+const Letter = lazy(() => import("./pages/Letter"));
 const FeelingsLegacyRedirect = lazy(() => import("./pages/FeelingsLegacyRedirect"));
 
 // Booking. Reached by a deliberate click; a visitor who never books never
@@ -168,6 +169,14 @@ const App = () => (
               }
             />
             <Route
+              path="/:lang/letter"
+              element={
+                <LangLayout>
+                  <Letter />
+                </LangLayout>
+              }
+            />
+            <Route
               path="/:lang/offer-agreement"
               element={
                 <LangLayout>
@@ -232,6 +241,10 @@ const App = () => (
 
             {/* Root-level feeling defaults to English */}
             <Route path="/feeling" element={<Navigate to="/en/feeling" replace />} />
+
+            {/* Root-level letter defaults to English — the only language it
+                is written in. */}
+            <Route path="/letter" element={<Navigate to="/en/letter" replace />} />
 
             {/* Root-level take defaults to English */}
             <Route path="/take" element={<Navigate to="/en/take" replace />} />

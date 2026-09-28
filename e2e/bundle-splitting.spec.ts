@@ -24,6 +24,14 @@ import { test, expect } from "@playwright/test";
 const OTHER_ROUTE_MARKERS: Array<[string, string]> = [
   ["the feelings-map dataset", "Карта описывает и спрашивает"],
   ["the admin offers editor", "Free session for grief support"],
+  // The worksheet's prose, 23 KB of it. Added after the footer's letter form
+  // imported src/content/automaticYes.ts for a handful of message strings and
+  // Rollup moved the whole module into the entry — so every visitor downloaded
+  // Ferenczi before seeing the homepage. The strings now live in
+  // src/content/signupMessages.ts for exactly this reason. "Ferenczi" itself
+  // is no good as a marker: it is also in the route's meta description, which
+  // legitimately ships in the entry.
+  ["the automatic-yes worksheet", "identification with the aggressor"],
 ];
 
 /**

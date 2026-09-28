@@ -296,6 +296,39 @@ describe("renderSitemap", () => {
   });
 });
 
+describe("the letter route", () => {
+  const letter = STATIC_ROUTES.find((r) => r.path === "/letter");
+
+  it("is indexable, so the page can be found rather than only linked", () => {
+    // Its whole reason to exist beside the dialog is that it is a page a
+    // person can be sent to and a crawler can read. Absent from STATIC_ROUTES
+    // it gets no file, and the host answers 404 to everyone but the SPA.
+    expect(letter, "/letter is not in STATIC_ROUTES").toBeTruthy();
+  });
+
+  it("is written in English only, because there is one list and one template", () => {
+    expect(letter!.langs).toEqual(["en"]);
+    const xml = renderSitemap(STATIC_ROUTES, "2026-01-01");
+    expect(xml).toContain("<loc>https://humanheart.life/en/letter</loc>");
+    expect(xml).not.toContain("<loc>https://humanheart.life/ru/letter</loc>");
+  });
+
+  it("carries its own head, not the homepage's", () => {
+    const html = renderRoutePage(template, {
+      canonicalPath: "/en/letter",
+      lang: "en",
+      text: letter!,
+      langs: letter!.langs,
+    });
+
+    expect(html).toContain("<title>The monthly letter | Human Heart</title>");
+    expect(html).toContain(
+      '<link rel="canonical" href="https://humanheart.life/en/letter" />',
+    );
+    expect(html).not.toContain('hreflang="ru"');
+  });
+});
+
 describe("a single-language route's head", () => {
   const only = STATIC_ROUTES.find((r) => (r.langs ?? LANGS).length === 1)!;
   const html = renderRoutePage(template, {

@@ -125,7 +125,7 @@ describe("the PDF form", () => {
 describe("the letter-only form", () => {
   it("asks for the letter and not the PDF", async () => {
     invoke.mockResolvedValue(ok({ pdf: "skipped", letter: "pending" }));
-    render(<LetterForm c={c} />);
+    render(<LetterForm c={c} source="automatic-yes" />);
     fillAndSend();
 
     await shownMessage(c.letter.done, "ok");

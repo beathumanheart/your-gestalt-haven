@@ -25,6 +25,8 @@
  * ============================================================
  */
 
+import { signupMessages } from "./signupMessages";
+
 export interface Quote {
   text: string;
   attribution: string;
@@ -108,18 +110,18 @@ export const automaticYesEN: AutomaticYesContent = {
   signup: {
     title: "Take the PDF with you",
     text: "Ten printable pages, sent to your inbox.",
-    label: "Email",
-    placeholder: "you@example.com",
+    label: signupMessages.label,
+    placeholder: signupMessages.placeholder,
     consent: "Also send me the monthly letter: one longer piece a month, on feelings and relationships. Leaving takes one click.",
     button: "Send me the PDF",
-    sending: "Sending…",
+    sending: signupMessages.sending,
     small: "Your address is used only for what you choose here. The emails go out through Brevo; the address is not passed on to anyone else.",
     privacy: "Privacy",
     done: "Sent. It should arrive within a few minutes — if not, the spam folder is worth a look.",
     done_with_letter: "Sent. It should arrive within a few minutes. A second email asks you to confirm the monthly letter.",
-    invalid: "That address doesn’t look complete yet.",
-    error: "Something went wrong on the way. Please try again in a minute.",
-    rate_limited: "Too many attempts from here. Please wait a few minutes and try again.",
+    invalid: signupMessages.invalid,
+    error: signupMessages.error,
+    rate_limited: signupMessages.rate_limited,
   },
   onPage: "Or go through it here. Nothing you write is sent anywhere — not to me, not to anyone. It isn’t saved either, unless you choose to keep it on this device; at the end you can print it or save it as a PDF.",
   keepLabel: "Keep my answers on this device",
@@ -548,9 +550,9 @@ export const automaticYesEN: AutomaticYesContent = {
     kicker: "The monthly letter",
     title: "A longer letter, once a month",
     text: "What doesn’t fit into a video: one question about feelings and relationships, thought through slowly.",
-    button: "Subscribe",
+    button: signupMessages.subscribe,
     small: "One email a month. Leaving takes one click.",
-    done: "Thank you. Please confirm your address from the email that has just been sent.",
+    done: signupMessages.letterPending,
   },
   closing: {
     quote: "The True Self comes from the aliveness of the body tissues and the working of body-functions, including the heart’s action and breathing.",

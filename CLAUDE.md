@@ -83,7 +83,11 @@ head, which is the part that was missing.
   all snapshots. Change a price and a human sees the new figure (React
   re-renders over the markup with live data) while a crawler sees the old one
   until something triggers a deploy — so **redeploy after changing pricing or
-  session copy**. A scheduled rebuild or a build hook is the fix — issue #67.
+  session copy**. `rebuild-frontend.yml` does this nightly (04:00 UTC) and can
+  be run by hand from the Actions tab; it is the *only* thing a schedule may
+  point at, because `deploy-production.yml` also applies migrations and
+  redeploys the booking function, which must never run unattended on a timer.
+  `rebuildWorkflow.test.ts` fails if a backend step appears in it.
 - Only `#root` is prerendered, so head tags injected at runtime are not. The
   per-session `Service` node is therefore emitted **twice, from one builder**
   (`src/config/serviceNode.ts`): the build writes it into booking pages so a

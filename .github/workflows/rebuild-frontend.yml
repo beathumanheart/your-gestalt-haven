@@ -1,0 +1,113 @@
+name: Rebuild frontend
+
+# Republishes the site from the current main, with no backend steps.
+#
+# It exists because the pages are prerendered: what a crawler reads is whatever
+# the database said at the last build, so a price or a session description
+# changed in Supabase does not reach them until something rebuilds (#67).
+#
+# A schedule must not point at "Deploy — Production". That workflow also runs
+# `supabase db push` and redeploys the booking function, so a cron on it would
+# apply whatever migration happened to be sitting on main — unattended, at
+# 04:00, with booking as the blast radius (#70). Those steps are deliberately
+# absent here, not conditioned: a condition is one edited expression away from
+# running on a timer.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 04:00 UTC daily, when nobody is booking. Bounds how long a price change
+    # can be stale in the prerendered HTML to one day; a database webhook can
+    # replace this later if a day turns out to be too loose.
+    - cron: "0 4 * * *"
+
+# The same group as the deploy, so a scheduled rebuild and a real deploy can
+# never publish over one another.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    name: Build & publish (no backend steps)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The checks stay. A rebuild that publishes a broken frontend is its own
+      # problem, and this runs with nobody watching.
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+
+      # The build prerenders every route in a headless browser, so this job
+      # needs one; the e2e step below uses it too.
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: E2E tests
+        run: npm run test:e2e
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.POSTHOG_KEY_PRODUCTION }}
+          VITE_PUBLIC_POSTHOG_HOST: https://eu.i.posthog.com
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.POSTHOG_KEY_PRODUCTION }}
+          VITE_PUBLIC_POSTHOG_HOST: https://eu.i.posthog.com
+
+      - name: Copy index.html to 404.html for SPA routing
+        run: cp dist/index.html dist/404.html
+
+      - name: Deploy to GitHub Pages (production)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          cname: humanheart.life
+
+      # peaceiris pushes the branch and exits; GitHub Pages then builds it, and
+      # that build can fail on its own — it did once, leaving the old social
+      # cards live for thirteen minutes behind two successful-looking deploys.
+      # Unattended, nobody would see it, so the job waits and fails if it errors.
+      - name: Wait for the Pages build to publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for attempt in $(seq 1 30); do
+            sleep 10
+            status=$(gh api "repos/${GITHUB_REPOSITORY}/pages/builds/latest" --jq .status 2>/dev/null || echo "unknown")
+            echo "attempt ${attempt}: ${status}"
+            case "$status" in
+              built)   echo "Pages published."; exit 0 ;;
+              errored) echo "::error title=Pages build failed::The branch was pushed but GitHub Pages did not publish it."; exit 1 ;;
+            esac
+          done
+          echo "::error title=Pages build did not finish::Still not published after five minutes."
+          exit 1

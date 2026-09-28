@@ -23,55 +23,61 @@ const Privacy = () => {
   return (
     <>
       <PageMeta {...PRIVACY_TEXT} canonicalPath="/en/privacy" langs={["en"] as const} />
-      <Header />
-      <main className="min-h-screen bg-background pt-24 md:pt-28">
-        <div className="container-narrow max-w-3xl py-12 md:py-16">
-          <h1 className="font-display text-3xl md:text-4xl font-light text-foreground mb-2">
-            {c.title}
-          </h1>
-          <p className="font-body text-sm text-muted-foreground mb-10">{c.updated}</p>
+      {/* min-h-screen on the column, flex-1 on main. It used to be
+          min-h-screen on <main> itself, which made the document at least a
+          viewport tall *plus* the header and footer — so a short page always
+          scrolled, and left dead space between the last line and the footer. */}
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 bg-background px-6 pt-24 md:pt-28">
+          <div className="container-narrow max-w-3xl py-12 md:py-16">
+            <h1 className="font-display text-3xl md:text-4xl font-light text-foreground mb-2">
+              {c.title}
+            </h1>
+            <p className="font-body text-sm text-muted-foreground mb-10">{c.updated}</p>
 
-          {c.intro.map((para) => (
-            <p className="font-body text-foreground leading-relaxed mb-4" key={para}>
-              {para}
-            </p>
-          ))}
+            {c.intro.map((para) => (
+              <p className="font-body text-foreground leading-relaxed mb-4" key={para}>
+                {para}
+              </p>
+            ))}
 
-          {c.sections.map((section) => (
-            <section className="mt-10" id={section.id} key={section.id}>
-              <h2 className="font-display text-2xl font-light text-foreground mb-3">
-                {section.title}
-              </h2>
+            {c.sections.map((section) => (
+              <section className="mt-10" id={section.id} key={section.id}>
+                <h2 className="font-display text-2xl font-light text-foreground mb-3">
+                  {section.title}
+                </h2>
 
-              {section.rows && (
-                <dl className="mb-4">
-                  {section.rows.map((row) => (
-                    <div className="flex gap-2 mb-1.5" key={row.term}>
-                      <dt className="font-body font-medium text-foreground whitespace-nowrap">
-                        {row.term}
-                      </dt>
-                      <dd className="font-body text-muted-foreground">{row.text}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
+                {section.rows && (
+                  <dl className="mb-4">
+                    {section.rows.map((row) => (
+                      <div className="flex gap-2 mb-1.5" key={row.term}>
+                        <dt className="font-body font-medium text-foreground whitespace-nowrap">
+                          {row.term}
+                        </dt>
+                        <dd className="font-body text-muted-foreground">{row.text}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
 
-              {section.paras?.map((para) => (
-                <p className="font-body text-foreground leading-relaxed mb-4" key={para}>
-                  {para}
-                </p>
-              ))}
-            </section>
-          ))}
+                {section.paras?.map((para) => (
+                  <p className="font-body text-foreground leading-relaxed mb-4" key={para}>
+                    {para}
+                  </p>
+                ))}
+              </section>
+            ))}
 
-          {c.closing.map((para) => (
-            <p className="font-body text-sm text-muted-foreground leading-relaxed mt-10" key={para}>
-              {para}
-            </p>
-          ))}
-        </div>
-      </main>
-      <Footer />
+            {c.closing.map((para) => (
+              <p className="font-body text-sm text-muted-foreground leading-relaxed mt-10" key={para}>
+                {para}
+              </p>
+            ))}
+          </div>
+        </main>
+        <Footer />
+      </div>
     </>
   );
 };

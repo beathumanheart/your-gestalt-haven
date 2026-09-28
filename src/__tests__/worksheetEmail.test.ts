@@ -48,6 +48,14 @@ describe("the worksheet email", () => {
     expect(message.headers).toEqual(TRANSACTIONAL_HEADERS);
   });
 
+  it("keeps the channel name on one line", () => {
+    // Without this the pipe wraps and the next line opens with "| Human Heart",
+    // which reads as a broken character rather than a name.
+    const link = message.htmlContent.match(/<a [^>]*>Genia \| Human Heart<\/a>/)?.[0];
+    expect(link, "the channel link is not in the HTML part").toBeTruthy();
+    expect(link).toContain("white-space: nowrap");
+  });
+
   it("keeps the care line from the worksheet's first page", () => {
     expect(message.textContent).toContain("better explored with a counsellor or therapist than alone");
   });

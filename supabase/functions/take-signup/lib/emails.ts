@@ -42,7 +42,7 @@ export function buildWorksheetEmail(input: WorksheetEmailInput): BrevoMessage {
       ${button(escapeHtml(pdfUrl), "Download the PDF")}
       <p style="font-size: 16px; line-height: 1.7; color: #3d3833; margin: 0 0 18px;">It goes with the long-form video on people-pleasing on YouTube, <a href="${escapeHtml(
         YOUTUBE_URL,
-      )}" style="color: #4a7c5f;">Genia | Human Heart</a>. If you would rather fill it in on screen, the same worksheet is <a href="${escapeHtml(
+      )}" style="color: #4a7c5f; white-space: nowrap;">Genia | Human Heart</a>. If you would rather fill it in on screen, the same worksheet is <a href="${escapeHtml(
     pageUrl,
   )}" style="color: #4a7c5f;">on the site</a>.</p>
       <p style="font-size: 16px; line-height: 1.7; color: #3d3833; margin: 0 0 18px;">One line from the first page: if something surfaces with more force than you can hold, stop. Some of this is better explored with a counsellor or therapist than alone.</p>

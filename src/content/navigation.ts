@@ -16,8 +16,6 @@ export interface NavItem {
 }
 
 export interface SocialLinks {
-  substack: string;
-  instagram: string;
   youtube: string;
 }
 
@@ -39,8 +37,6 @@ export interface NavigationContent {
 // Same URLs for both languages. The handles themselves live in
 // src/config/social.ts — change them there, not here.
 const SOCIAL_LINKS: SocialLinks = {
-  substack: SOCIAL_URLS.substack,
-  instagram: SOCIAL_URLS.instagram,
   youtube: SOCIAL_URLS.youtube,
 };
 

@@ -1,22 +1,13 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
-import { Instagram, Youtube } from "lucide-react";
+import { Youtube } from "lucide-react";
 import { navigationEN, navigationRU } from "@/content/navigation";
-
-// lucide has no Substack glyph — inline the mark (design handoff SVG).
-const SubstackIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden="true">
-    <path d="M4 3h16v2.5H4zM4 7.6h16v2.5H4zM4 12.2 12 17l8-4.8V21l-8-4.8L4 21z" />
-  </svg>
-);
 
 const Footer = () => {
   const { language, langPath } = useLanguage();
   const c = language === "ru" ? navigationRU : navigationEN;
 
   const socials = [
-    { name: "Substack", href: c.social.substack, icon: <SubstackIcon /> },
-    { name: "Instagram", href: c.social.instagram, icon: <Instagram className="w-4 h-4" /> },
     { name: "YouTube", href: c.social.youtube, icon: <Youtube className="w-4 h-4" /> },
   ];
 

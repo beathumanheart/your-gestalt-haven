@@ -14,24 +14,22 @@
 /**
  * Bare handles, without the leading "@".
  *
- * Note these are deliberately separate values rather than one shared
- * name: the accounts do not use identical handles (Instagram carries a
- * dot, YouTube uses a different word order), and past renames have not
- * moved them in lockstep.
+ * Deliberately separate values rather than one shared name: the accounts do
+ * not use identical handles, and past renames have not moved them in lockstep.
+ *
+ * Instagram and Substack were here and are gone — the letter runs from Brevo
+ * now, and neither is linked from the site. Nothing here is a claim that an
+ * account does not exist; it is the list the site points at.
  */
 export const HANDLES = {
-  instagram: "humanheart.life",
   youtube: "beathumanheart",
   telegram: "humanheartbeat",
-  substack: "humanheartbeat",
 } as const;
 
 /** Full profile URLs, built from the handles above. */
 export const SOCIAL_URLS = {
-  instagram: `https://www.instagram.com/${HANDLES.instagram}`,
   youtube: `https://www.youtube.com/@${HANDLES.youtube}`,
   telegram: `https://t.me/${HANDLES.telegram}`,
-  substack: `https://${HANDLES.substack}.substack.com/`,
 } as const;
 
 export type SocialPlatform = keyof typeof SOCIAL_URLS;
@@ -41,11 +39,7 @@ export type SocialPlatform = keyof typeof SOCIAL_URLS;
  * Telegram is a contact channel rather than a public profile, so it is
  * intentionally left out.
  */
-export const SAME_AS: readonly string[] = [
-  SOCIAL_URLS.instagram,
-  SOCIAL_URLS.youtube,
-  SOCIAL_URLS.substack,
-];
+export const SAME_AS: readonly string[] = [SOCIAL_URLS.youtube];
 
 /** Display form of a handle, prefixed with "@" — for use in copy. */
 export const displayHandle = (platform: keyof typeof HANDLES): string =>

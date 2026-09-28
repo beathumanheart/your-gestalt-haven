@@ -19,10 +19,15 @@ if (!posthogKey) {
   }
 }
 
-/* The free material under /take/* counts page opens and nothing else, and
-   writes nothing to the device. Which configuration applies is decided here,
+/* The free material under /take/* counts page opens, and a worksheet PDF
+   being asked for and what became of it — nothing about the person, and
+   nothing written to the device. Which configuration applies is decided here,
    from the entry path; TakeBoundary keeps a client-side navigation from
-   crossing between the two inside one page load. */
+   crossing between the two inside one page load.
+
+   This runs before createRoot, synchronously, so PostHog is initialised
+   before any component can render — a capture from a form handler cannot
+   race it. */
 posthog.init(
   posthogKey,
   isTakePath(window.location.pathname) ? takeConfig : siteConfig,

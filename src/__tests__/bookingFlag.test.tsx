@@ -121,23 +121,56 @@ const SESSION_ROWS = vi.hoisted(() => [
 
 vi.mock("@/hooks/useAvailability", () => ({
   useSessionTypes: () => ({ sessionTypes: SESSION_ROWS, loading: false }),
-  useAvailableSlots: () => ({ slots: [], loading: false }),
+  useAvailableSlots: () => ({ slots: [], loading: false, minimumNoticeMinutes: 0 }),
 }));
 
+/* The calendar inside the wizard fetches its own available dates, from a
+   different module. Unmocked, it queried the stub below for a chain it does
+   not implement and threw *after* the suite finished — 614 passing tests and
+   a non-zero exit, locally invisible and reproducible only in CI. Mocked
+   here so these cases stay about the flag. */
+vi.mock("@/hooks/useAvailableDates", () => ({
+  useAvailableDates: () => ({ availableDays: new Set<string>(), horizonDate: null, loading: false }),
+}));
+
+/**
+ * A query stub that answers any chain.
+ *
+ * Written as a self-returning proxy rather than a hand-listed set of methods,
+ * because the hand-listed version is what broke CI: a component reached for
+ * `.lte()`, which was not in the list, and the resulting TypeError surfaced
+ * as an unhandled rejection after every test had already passed. The suite
+ * reported 614 green and exited non-zero.
+ *
+ * Any unknown method returns the builder; awaiting it resolves to the session
+ * rows. So a hook added to the wizard later cannot fail this file for a
+ * reason unrelated to the flag — which is the only thing it is here to test.
+ */
 vi.mock("@/integrations/supabase/client", () => {
-  const row = { data: SESSION_ROWS[0], error: null };
+  const result = { data: SESSION_ROWS, error: null };
+  const single = { data: SESSION_ROWS[0], error: null };
+
+  const builder: Record<string | symbol, unknown> = new Proxy(
+    {},
+    {
+      get(_t, prop) {
+        if (prop === "then") {
+          // Awaiting the chain itself yields the rows.
+          return (resolve: (v: unknown) => unknown) => resolve(result);
+        }
+        if (prop === "single" || prop === "maybeSingle") {
+          return () => Promise.resolve(single);
+        }
+        return () => builder;
+      },
+    },
+  );
+
   return {
     supabase: {
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            eq: () => ({ single: () => Promise.resolve(row) }),
-            order: () => Promise.resolve({ data: SESSION_ROWS, error: null }),
-            single: () => Promise.resolve(row),
-          }),
-        }),
-      }),
-      functions: { invoke: vi.fn() },
+      from: () => builder,
+      functions: { invoke: vi.fn().mockResolvedValue({ data: null, error: null }) },
+      auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }) },
     },
   };
 });

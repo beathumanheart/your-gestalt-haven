@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Header from "./Header";
-import { navigationEN } from "@/content/navigation";
+import { ctaLabel, navigationEN } from "@/content/navigation";
 
 // ── Mocks ──────────────────────────────────────────────────────
 
@@ -46,10 +46,10 @@ describe("Header – navigateToSection", () => {
     expect(mockNavigate).toHaveBeenCalledWith(`/en/#${firstNavItem.sectionId}`);
   });
 
-  it("clicking Book a Session navigates to /#contact", () => {
+  it("clicking the contact CTA navigates to /#contact", () => {
     render(<Header />);
-    // The desktop Book a Session button
-    const bookButtons = screen.getAllByRole("button", { name: navigationEN.bookSession });
+    // The desktop contact CTA
+    const bookButtons = screen.getAllByRole("button", { name: ctaLabel(navigationEN) });
     fireEvent.click(bookButtons[0]);
     expect(mockNavigate).toHaveBeenCalledWith("/en/#contact");
   });

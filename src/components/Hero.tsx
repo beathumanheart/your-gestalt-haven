@@ -2,7 +2,7 @@ import heroImage from "@/assets/hero-therapy.jpg";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { heroEN, heroRU } from "@/content/hero";
-import { navigationEN, navigationRU } from "@/content/navigation";
+import { ctaLabel, navigationEN, navigationRU } from "@/content/navigation";
 import { trackBookNowClick } from "@/hooks/useBookingAnalytics";
 
 
@@ -68,7 +68,7 @@ const Hero = () => {
               onClick={() => { trackBookNowClick("hero"); navigate(langPath("/#contact")); }}
               className="order-1 sm:order-2 btn-primary"
             >
-              {nav.bookSession}
+              {ctaLabel(nav)}
             </button>
           </div>
         </div>

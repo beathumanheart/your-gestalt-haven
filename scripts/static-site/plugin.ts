@@ -19,46 +19,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import { loadEnv, type Plugin, type ResolvedConfig } from "vite";
-import {
-  BOOKING_CHANGEFREQ,
-  BOOKING_PRIORITY,
-  LANGS,
-  STATIC_ROUTES,
-  bookingRouteText,
-  type BookingMetaSource,
-  type RouteText,
-} from "../../src/config/pageMetadata";
-import {
-  assertNoForbiddenPaths,
-  renderRoutePage,
-  renderSitemap,
-  type SitemapRoute,
-} from "./render";
+import { LANGS } from "../../src/config/pageMetadata";
+import { collectRoutes, type GeneratedRoute, type SessionRow } from "./routes";
+import { assertNoForbiddenPaths, renderRoutePage, renderSitemap } from "./render";
 import { buildServiceNode } from "../../src/config/serviceNode";
 import { prerenderRoutes, type PrerenderTarget } from "./prerender";
-
-interface GeneratedRoute extends SitemapRoute {
-  text: RouteText;
-  /** Present for booking routes: the row their Service node is built from. */
-  session?: SessionRow;
-}
-
-/**
- * The pricing columns come along because the page's Service node carries the
- * offer derived from them. They are read, never interpreted, here —
- * `sessionPricing` decides what a row publishes, so `show_price: false` keeps
- * a withheld price out of the markup by construction.
- */
-type SessionRow = BookingMetaSource & {
-  slug: string | null;
-  show_price?: boolean | null;
-  pricing_type?: string | null;
-  price?: number | null;
-  min_price?: number | null;
-  max_price?: number | null;
-  currency?: string | null;
-  duration_minutes?: number | null;
-};
 
 /**
  * Session types come from the database, so the booking pages that get a file
@@ -103,25 +68,6 @@ const fetchSessionRows = async (env: Record<string, string>): Promise<SessionRow
 
   return (data ?? []).filter((row): row is SessionRow => Boolean(row.slug));
 };
-
-const collectRoutes = (sessions: SessionRow[]): GeneratedRoute[] => [
-  // `langs` is pulled out with the rest of the route's own fields so it does
-  // not end up inside `text`, which is only the head's words.
-  ...STATIC_ROUTES.map(({ path: routePath, priority, changefreq, langs, ...text }) => ({
-    path: routePath,
-    priority,
-    changefreq,
-    langs,
-    text,
-  })),
-  ...sessions.map((session) => ({
-    path: `/book/${session.slug}`,
-    priority: BOOKING_PRIORITY,
-    changefreq: BOOKING_CHANGEFREQ,
-    text: bookingRouteText(session),
-    session,
-  })),
-];
 
 export const staticSite = (): Plugin => {
   let config: ResolvedConfig;

@@ -8,12 +8,15 @@ import {
 } from "../../scripts/static-site/render";
 import { injectSiteJsonLd } from "../../scripts/static-site/jsonLd";
 import {
+  BOOKING_PRIORITY,
+  HOME_TEXT,
   LANGS,
   STATIC_ROUTES,
   bookingRouteText,
   type MetaLang,
   type StaticRoute,
 } from "@/config/pageMetadata";
+import { collectRoutes } from "../../scripts/static-site/routes";
 
 /**
  * The real template, not a fixture. The failure this guards against is
@@ -367,5 +370,101 @@ describe("assertNoForbiddenPaths", () => {
     expect(() => assertNoForbiddenPaths(["/en/s/abc123"])).toThrow(/capability-token/);
     expect(() => assertNoForbiddenPaths(["/ru/c/abc123"])).toThrow(/capability-token/);
     expect(() => assertNoForbiddenPaths(["/en/admin"])).toThrow(/capability-token/);
+  });
+});
+
+/**
+ * The six service routes, and what must still be true of them now that the
+ * calendar is off.
+ *
+ * `/:lang/book/:slug` keeps its path deliberately: six of the URLs in the
+ * sitemap point at it, on a domain Google only began indexing recently, and
+ * this is a static host with no server-side redirects. Renaming them to
+ * `/sessions/` would mean either six 404s or six redirect stubs.
+ *
+ * These rows are fixtures, not a query. The routes are assembled from the
+ * database at build time, and a guard that needs Supabase reachable is a guard
+ * that passes when it is not — which is exactly the failure mode
+ * docs/writing-guards.md is about.
+ */
+describe("the six service routes", () => {
+  const SESSIONS = [
+    { slug: "individual-therapy", name: "Individual Therapy", name_ru: "Индивидуальная терапия" },
+    {
+      slug: "bioethical-consultation",
+      name: "Bioethical Consultation",
+      name_ru: "Биоэтическая консультация",
+    },
+    {
+      slug: "relationship-interpersonal-therapy",
+      name: "Relationship Therapy",
+      name_ru: "Терапия отношений",
+    },
+  ];
+
+  const routes = collectRoutes(SESSIONS as Parameters<typeof collectRoutes>[0]);
+  const bookRoutes = routes.filter((r) => r.path.startsWith("/book/"));
+  const xml = renderSitemap(routes, "2026-01-01");
+
+  it("is three slugs in two languages, so six URLs — not five and not seven", () => {
+    // The count is the assertion. A dropped row is the regression, and
+    // "some book routes exist" would not notice one.
+    expect(bookRoutes).toHaveLength(3);
+
+    const locs = [...xml.matchAll(/<loc>([^<]+\/book\/[^<]+)<\/loc>/g)].map((m) => m[1]);
+    expect(locs).toHaveLength(6);
+
+    for (const { slug } of SESSIONS) {
+      for (const lang of ["en", "ru"]) {
+        expect(locs, `${lang}/book/${slug} missing from the sitemap`).toContain(
+          `https://humanheart.life/${lang}/book/${slug}`,
+        );
+      }
+    }
+  });
+
+  it("keeps its priority, which the flag must not change", () => {
+    // 0.8, as before this change. Taking the calendar off the site does not
+    // make these pages less important — with the wizard gone they are the
+    // only description of the work there is.
+    expect(BOOKING_PRIORITY).toBe("0.8");
+
+    for (const route of bookRoutes) {
+      expect(route.priority, `${route.path} lost its priority`).toBe(BOOKING_PRIORITY);
+    }
+
+    const blocks = xml.split("<url>").filter((u) => u.includes("/book/"));
+    expect(blocks, "no book routes in the sitemap to check").toHaveLength(6);
+    for (const block of blocks) {
+      expect(block).toContain(`<priority>${BOOKING_PRIORITY}</priority>`);
+    }
+  });
+
+  it("is bilingual, with the full alternate set on each", () => {
+    const block = xml
+      .split("<url>")
+      .find((u) => u.includes("<loc>https://humanheart.life/en/book/individual-therapy</loc>"))!;
+
+    expect(block).toContain('hreflang="en"');
+    expect(block).toContain('hreflang="ru"');
+    expect(block).toContain('hreflang="x-default"');
+  });
+
+  it("carries the session's own head, not the homepage's", () => {
+    for (const session of SESSIONS) {
+      const html = renderRoutePage(template, {
+        canonicalPath: `/en/book/${session.slug}`,
+        lang: "en",
+        text: bookingRouteText(session),
+      });
+
+      expect(html).toContain(session.name);
+      expect(html).not.toContain(`<title>${HOME_TEXT.titleEn}</title>`);
+    }
+  });
+
+  it("writes no file at a forbidden path", () => {
+    // The tripwire still holds over the routes this change produces.
+    expect(() => assertNoForbiddenPaths(routes.map((r) => r.path))).not.toThrow();
   });
 });

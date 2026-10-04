@@ -1,19 +1,40 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ChevronRight, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BookingWidget from "@/components/booking/BookingWidget";
+import GetInTouch from "@/components/contact/GetInTouch";
+import SolidarityScale from "@/components/SolidarityScale";
 import { supabase } from "@/integrations/supabase/client";
 import type { SessionType } from "@/components/booking/SessionTypeSelector";
 import PageMeta from "@/components/PageMeta";
 import { bookingRouteText } from "@/config/pageMetadata";
 import { ServiceJsonLd } from "@/components/JsonLd";
+import { BOOKING_ENABLED } from "@/config/booking";
+import { servicePageEN, servicePageRU } from "@/content/servicePage";
 
+/**
+ * A service page for one session type — the same route, component and URL as
+ * the old booking page.
+ *
+ * The six `/:lang/book/:slug` paths keep their paths deliberately. They are
+ * six of the URLs in the sitemap, on a domain Google only began indexing
+ * recently, and this is a static host with no server-side redirects: renaming
+ * them to `/sessions/` would mean either six 404s or six redirect stubs. A URL
+ * is an identifier, not a promise.
+ *
+ * With `BOOKING_ENABLED` off the page ends with an invitation to write. With
+ * it on, the picker returns above that invitation and the invitation drops to
+ * a secondary line. Both states render, and both are tested — a flag only ever
+ * exercised in one state rots, and turning booking back on would become a
+ * rebuild rather than a config change.
+ */
 const BookSession = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { language, langPath } = useLanguage();
+  const c = language === "ru" ? servicePageRU : servicePageEN;
   const [session, setSession] = useState<SessionType | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -26,13 +47,13 @@ const BookSession = () => {
       .from("session_types")
       .select("*")
       .eq("is_active", true);
-    
+
     if (isUuid) {
       query.eq("id", sessionId);
     } else {
       query.eq("slug", sessionId);
     }
-    
+
     query.single().then(({ data, error }) => {
       if (error || !data) setNotFound(true);
       else setSession(data as unknown as SessionType);
@@ -46,13 +67,6 @@ const BookSession = () => {
   const description = session
     ? (language === "ru" && session.description_ru) ? session.description_ru : session.description
     : null;
-
-  const formatPrice = (value: number) =>
-    new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: session?.currency || "EUR",
-      maximumFractionDigits: 0,
-    }).format(value);
 
   // Same builder the build step uses to write this page's static file, so the
   // head a crawler is served and the head React renders cannot disagree.
@@ -77,13 +91,30 @@ const BookSession = () => {
       <Header />
       <div className="pt-28 pb-16 section-padding">
         <div className="container-narrow">
-          <Link
-            to={langPath("/")}
-            className="inline-flex items-center gap-2 font-body text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {language === "ru" ? "На главную" : "Back to home"}
-          </Link>
+          {/* Breadcrumb, not a back-link: this page is one of a set, and
+              saying so is more use than an arrow pointing home. */}
+          <nav aria-label={c.breadcrumbLabel} className="mb-10">
+            <ol className="flex items-center gap-1.5 font-body text-sm text-muted-foreground">
+              <li>
+                <Link
+                  to={langPath("/#services")}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {c.breadcrumbServices}
+                </Link>
+              </li>
+              {session && (
+                <>
+                  <li aria-hidden="true">
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </li>
+                  <li className="text-foreground" aria-current="page">
+                    {name}
+                  </li>
+                </>
+              )}
+            </ol>
+          </nav>
 
           {loading && (
             <div className="space-y-4 mb-12">
@@ -95,55 +126,93 @@ const BookSession = () => {
 
           {notFound && !loading && (
             <p className="font-body text-muted-foreground text-center py-20">
-              {language === "ru" ? "Сессия не найдена." : "Session not found."}
+              {c.notFound}
             </p>
           )}
 
           {session && (
             <>
-              <div className="mb-10">
-                <p className="font-body text-sm uppercase tracking-[0.2em] text-primary mb-3">
-                  {language === "ru" ? "Бронирование" : "Book a session"}
-                </p>
+              <header className="mb-10">
                 <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-light text-foreground mb-4">
                   {name}
                 </h1>
-                <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-5">
-                  <span className="flex items-center gap-1.5 font-body text-sm">
-                    <Clock className="w-4 h-4" />
-                    {session.duration_minutes}{" "}
-                    {language === "ru" ? "минут" : "minutes"}
-                  </span>
-                  {session.show_price &&
-                    session.pricing_type === "solidarity" &&
-                    session.min_price != null &&
-                    session.max_price != null && (
-                      <span className="font-body text-sm font-medium text-primary">
-                        {formatPrice(session.min_price)} – {formatPrice(session.max_price)}
-                        <span className="text-xs text-muted-foreground ml-1">
-                          ({language === "ru" ? "солидарная шкала" : "sliding scale"})
-                        </span>
-                      </span>
-                    )}
-                  {session.show_price &&
-                    session.pricing_type !== "solidarity" &&
-                    session.price != null && (
-                      <span className="font-body text-sm font-medium text-foreground">
-                        {new Intl.NumberFormat(undefined, {
-                          style: "currency",
-                          currency: session.currency || "EUR",
-                        }).format(session.price)}
-                      </span>
-                    )}
-                </div>
-                {description && (
-                  <p className="font-body text-muted-foreground max-w-2xl whitespace-pre-wrap leading-relaxed">
+                <p className="flex items-center gap-1.5 font-body text-sm text-muted-foreground">
+                  <Clock className="w-4 h-4" />
+                  {session.duration_minutes} {c.minutes}
+                </p>
+              </header>
+
+              {/* The session's own description, as prose in a text column
+                  rather than a card blurb — this is the page's reading
+                  matter, not a label on a tile. */}
+              {description && (
+                <div className="mb-12 max-w-[62ch]">
+                  <p className="font-body text-[17px] text-foreground/85 whitespace-pre-wrap leading-[1.8]">
                     {description}
                   </p>
-                )}
-              </div>
+                </div>
+              )}
 
-              <BookingWidget initialSessionId={session?.id} />
+              {/*
+                The fuller "what this is for" section.
+
+                Genia writes this: two or three hundred words per session type
+                on what actually happens in one, who it tends to suit, and
+                what the first one is like. The slot is rendered visibly and
+                deliberately rather than left out, because the risk this
+                change carries is making six pages *shorter* instead of
+                better — the opposite of what the indexing work was for. A
+                silently empty slot is how that goes unnoticed until it shows
+                up in the index.
+
+                To fill it: add the prose to src/content/servicePage.ts keyed
+                by slug, and render it here in place of this placeholder.
+              */}
+              <section
+                data-testid="what-this-is-for"
+                aria-labelledby="what-this-is-for-heading"
+                className="mb-12 max-w-[62ch] border-l-2 border-border pl-5"
+              >
+                <h2
+                  id="what-this-is-for-heading"
+                  className="font-display text-2xl font-light text-foreground mb-2.5"
+                >
+                  {c.whatThisIsForHeading}
+                </h2>
+                <p className="font-body text-sm text-muted-foreground leading-relaxed">
+                  {c.whatThisIsForPending}
+                </p>
+              </section>
+
+              {/* The scale, and the terms it sits under. Neither is gated:
+                  with the calendar off this is where the price is stated. */}
+              <SolidarityScale />
+              <p
+                data-testid="terms-line"
+                className="font-body text-[13.5px] text-muted-foreground mt-3.5 mb-12"
+              >
+                {c.termsLead}{" "}
+                <Link
+                  to={langPath("/offer-agreement")}
+                  className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+                >
+                  {c.termsLinkText}
+                </Link>
+                {c.termsTail}
+              </p>
+
+              {BOOKING_ENABLED ? (
+                <>
+                  <BookingWidget initialSessionId={session.id} />
+                  {/* Secondary: the picker is the way in, this is the
+                      alternative for someone who would rather write. */}
+                  <div className="mt-8">
+                    <GetInTouch compact />
+                  </div>
+                </>
+              ) : (
+                <GetInTouch />
+              )}
             </>
           )}
         </div>

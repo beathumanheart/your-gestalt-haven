@@ -296,8 +296,6 @@ describe("with BOOKING_ENABLED off", () => {
       "/en/offer-agreement",
     );
     expect(screen.getByTestId("get-in-touch")).toBeInTheDocument();
-    // The slot for the prose Genia is writing is visible, not silently empty.
-    expect(screen.getByTestId("what-this-is-for")).toBeInTheDocument();
   });
 
   it("puts no date picker or booking submit on the service page", async () => {

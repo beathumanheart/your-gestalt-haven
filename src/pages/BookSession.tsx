@@ -153,37 +153,6 @@ const BookSession = () => {
                 </div>
               )}
 
-              {/*
-                The fuller "what this is for" section.
-
-                Genia writes this: two or three hundred words per session type
-                on what actually happens in one, who it tends to suit, and
-                what the first one is like. The slot is rendered visibly and
-                deliberately rather than left out, because the risk this
-                change carries is making six pages *shorter* instead of
-                better — the opposite of what the indexing work was for. A
-                silently empty slot is how that goes unnoticed until it shows
-                up in the index.
-
-                To fill it: add the prose to src/content/servicePage.ts keyed
-                by slug, and render it here in place of this placeholder.
-              */}
-              <section
-                data-testid="what-this-is-for"
-                aria-labelledby="what-this-is-for-heading"
-                className="mb-12 max-w-[62ch] border-l-2 border-border pl-5"
-              >
-                <h2
-                  id="what-this-is-for-heading"
-                  className="font-display text-2xl font-light text-foreground mb-2.5"
-                >
-                  {c.whatThisIsForHeading}
-                </h2>
-                <p className="font-body text-sm text-muted-foreground leading-relaxed">
-                  {c.whatThisIsForPending}
-                </p>
-              </section>
-
               {/* The scale, and the terms it sits under. Neither is gated:
                   with the calendar off this is where the price is stated. */}
               <SolidarityScale />

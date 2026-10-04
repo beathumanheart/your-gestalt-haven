@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { automaticYesEN } from "@/content/automaticYes";
 import { SIGNUP_ENABLED } from "@/config/signup";
+import { BOOKING_ENABLED } from "@/config/booking";
 import { SOCIAL_URLS } from "@/config/social";
 import portraitWebp from "@/assets/portrait-640.webp";
 import portraitJpg from "@/assets/portrait-640.jpg";
@@ -600,7 +601,7 @@ const AutomaticYes = () => {
               {/* Same target as the header's button, without its analytics
                   call: /take/* counts page opens and nothing else. */}
               <a className="btn" href={langPath("/#contact")}>
-                {c.closing.book}
+                {BOOKING_ENABLED ? c.closing.book : c.closing.getInTouch}
               </a>
               <a className="btn ghost" href={SOCIAL_URLS.youtube} target="_blank" rel="noopener noreferrer">
                 {c.closing.watch}

@@ -1,84 +1,13 @@
-import { useState } from "react";
-import { Heart, Users, Flame, Clock, Video, CreditCard } from "lucide-react";
+import { Heart, Users, Flame, Clock, Video } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { servicesEN, servicesRU } from "@/content/services";
-import type { ServicesContent } from "@/content/services";
-import { useSessionTypes } from "@/hooks/useAvailability";
-import { publishedScale, scaleBand } from "@/lib/pricing";
+import SolidarityScale from "./SolidarityScale";
 
 const TOPIC_ICONS = [Heart, Users, Flame, Clock];
-
-/**
- * The solidarity slider, drawn from the scale the database publishes.
- *
- * Its own component so the chosen rate can start at the bottom of the scale
- * without the bounds having to be known before the fetch resolves — mounting
- * it is what fixes the starting value.
- */
-const SolidaritySlider = ({
-  c,
-  min,
-  max,
-  currency,
-}: {
-  c: ServicesContent;
-  min: number;
-  max: number;
-  currency: string;
-}) => {
-  // The low end of the scale, not the middle: the first number a reader sees
-  // should be the one that asks least of them.
-  const [rate, setRate] = useState(min);
-  const { label: bandLabel, note: bandNote } = c.bands[scaleBand(rate, min, max)];
-
-  const money = (value: number) =>
-    new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(value);
-
-  return (
-    <div>
-      <div className="flex items-baseline flex-wrap gap-x-2.5 gap-y-1 mb-0.5">
-        <span className="font-display text-[34px] leading-none text-foreground">{money(rate)}</span>
-        <span className="font-body text-[13px] text-muted-foreground">{c.perUnit}</span>
-        <span className="ml-auto font-body text-[13px] text-primary text-right">{bandLabel}</span>
-      </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={5}
-        value={rate}
-        onChange={(e) => setRate(Number(e.target.value))}
-        aria-label={c.pricingLabel}
-        className="solidarity-slider w-full block my-1.5"
-      />
-      <div className="flex justify-between font-body text-[12.5px] text-muted-foreground">
-        <span>{money(min)}</span>
-        <span>{money(max)}</span>
-      </div>
-      <p className="font-body text-[13.5px] text-muted-foreground leading-relaxed mt-2.5 min-h-[44px]">
-        {bandNote}
-      </p>
-    </div>
-  );
-};
 
 const Services = () => {
   const { language } = useLanguage();
   const c = language === "ru" ? servicesRU : servicesEN;
-
-  /* The scale comes from the same rows the booking pages price from, and the
-     same derivation that builds their AggregateOffer — see src/lib/pricing.ts.
-     It used to be €40–€100 written here, which nothing kept in step with the
-     database and which structured data could not confirm.
-
-     No scale published means no block: a reader sees nothing rather than a
-     figure the markup would contradict. */
-  const { sessionTypes } = useSessionTypes();
-  const scale = publishedScale(sessionTypes);
 
   return (
     <section id="services" className="section-padding">
@@ -139,26 +68,10 @@ const Services = () => {
           {c.paymentMethods}
         </p>
 
-        {/* Solidarity pricing — compact slider block (2 col → stacked < md).
-            Rendered only when the database publishes a scale. */}
-        {scale && (
-        <div className="p-6 sm:px-8 sm:py-[26px] rounded-[20px] bg-secondary/50 border border-border grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-8 md:gap-9 md:items-center">
-          {/* Intro */}
-          <div>
-            <div className="flex items-center gap-2 mb-2.5">
-              <CreditCard className="w-[17px] h-[17px] text-primary" />
-              <p className="font-body text-[13px] uppercase tracking-[0.2em] text-primary">
-                {c.pricingLabel}
-              </p>
-            </div>
-            <p className="font-body text-[14.5px] text-muted-foreground leading-relaxed">
-              {c.pricingIntro}
-            </p>
-          </div>
-
-          <SolidaritySlider c={c} min={scale.min} max={scale.max} currency={scale.currency} />
-        </div>
-        )}
+        {/* Solidarity pricing — the published scale. Lives in its own
+            component because the service pages show the same one; it renders
+            nothing when the database publishes no scale. */}
+        <SolidarityScale />
       </div>
     </section>
   );

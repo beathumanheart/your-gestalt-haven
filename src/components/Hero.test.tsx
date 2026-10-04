@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Hero from "./Hero";
-import { navigationEN, navigationRU } from "@/content/navigation";
+import { ctaLabel, navigationEN, navigationRU } from "@/content/navigation";
 import { heroEN, heroRU } from "@/content/hero";
 
 // ── Mocks ──────────────────────────────────────────────────────
@@ -44,30 +44,30 @@ describe("Hero – CTA buttons", () => {
     expect(screen.getByRole("button", { name: heroEN.learnMore })).toBeInTheDocument();
   });
 
-  it("renders the Book a Session button (EN)", () => {
+  it("renders the contact CTA (EN)", () => {
     render(<Hero />);
-    expect(screen.getByRole("button", { name: navigationEN.bookSession })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: ctaLabel(navigationEN) })).toBeInTheDocument();
   });
 
-  it("renders the Book a Session button (RU) with the same label as the nav (RU)", () => {
+  it("renders the contact CTA (RU) with the same label as the nav (RU)", () => {
     (useLanguage as ReturnType<typeof vi.fn>).mockReturnValue({
       language: "ru",
       langPath: (path: string) => `/ru${path}`,
     });
     render(<Hero />);
-    expect(screen.getByRole("button", { name: navigationRU.bookSession })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: ctaLabel(navigationRU) })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: heroRU.learnMore })).toBeInTheDocument();
   });
 
-  it("clicking Book a Session fires trackBookNowClick('hero')", () => {
+  it("clicking the contact CTA fires trackBookNowClick('hero')", () => {
     render(<Hero />);
-    fireEvent.click(screen.getByRole("button", { name: navigationEN.bookSession }));
+    fireEvent.click(screen.getByRole("button", { name: ctaLabel(navigationEN) }));
     expect(trackBookNowClick).toHaveBeenCalledWith("hero");
   });
 
-  it("clicking Book a Session navigates to /#contact", () => {
+  it("clicking the contact CTA navigates to /#contact", () => {
     render(<Hero />);
-    fireEvent.click(screen.getByRole("button", { name: navigationEN.bookSession }));
+    fireEvent.click(screen.getByRole("button", { name: ctaLabel(navigationEN) }));
     expect(mockNavigate).toHaveBeenCalledWith("/en/#contact");
   });
 

@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import TermsBlock from "./TermsBlock";
 import type { Language } from "@/contexts/LanguageContext";
 import { TERMS_VERSION } from "@/content/offerAgreement";
+import { BOOKING_ENABLED } from "@/config/booking";
 
 interface Props {
   /** The sticky action bar submits this form by id, so the primary action can
@@ -63,6 +64,21 @@ const BookingForm = ({ formId, booking, t, language, onBooked, onChange, onSubmi
       const endTime = localEnd.toISOString();
 
       const isOfferBooking = !!booking.hiddenOfferId;
+
+      /* The public calendar being off must close the booking *path*, not just
+         hide the button that starts it. With BOOKING_ENABLED false this form
+         is never rendered for a public session, so reaching here means
+         something re-mounted the wizard — and a booking created that way
+         would be a client who never had the conversation the flag exists to
+         require.
+
+         A hidden offer is exempt: those are private invite links Genia sends
+         to a particular person, the conversation has already happened, and
+         they are not what came off the site. */
+      if (!BOOKING_ENABLED && !isOfferBooking) {
+        throw new Error("Booking is disabled: BOOKING_ENABLED is false");
+      }
+
       const { data: result, error } = await supabase.functions.invoke("process-booking", {
         body: {
           ...(isOfferBooking

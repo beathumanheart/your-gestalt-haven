@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { navigationEN, navigationRU } from "@/content/navigation";
+import { ctaLabel, navigationEN, navigationRU } from "@/content/navigation";
 import { trackBookNowClick } from "@/hooks/useBookingAnalytics";
 
 const Header = ({ hideSwitcher = false }: { hideSwitcher?: boolean } = {}) => {
@@ -90,7 +90,7 @@ const Header = ({ hideSwitcher = false }: { hideSwitcher?: boolean } = {}) => {
               onClick={() => { trackBookNowClick("header_desktop"); navigateToSection("contact"); }}
               className="hidden md:block btn-primary text-sm py-2.5 px-6"
             >
-              {c.bookSession}
+              {ctaLabel(c)}
             </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -127,7 +127,7 @@ const Header = ({ hideSwitcher = false }: { hideSwitcher?: boolean } = {}) => {
               onClick={() => { trackBookNowClick("header_mobile"); navigateToSection("contact"); }}
               className="btn-primary text-base py-3 px-8 mt-4"
             >
-              {c.bookSession}
+              {ctaLabel(c)}
             </button>
           </div>
         </div>,

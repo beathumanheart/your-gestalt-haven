@@ -14,6 +14,14 @@ vi.mock("posthog-js", () => ({
   default: { capture: vi.fn() },
 }));
 
+/* These cases are about the booking flow, which only exists with the flag on.
+   The flag's own two states are exercised in src/__tests__/bookingFlag.test.tsx;
+   here it is pinned on so the error handling under test is reachable. Without
+   this, every case below would pass by hitting the disabled guard instead of
+   the path it means to exercise — the "not found is not a pass" shape from
+   docs/writing-guards.md. */
+vi.mock("@/config/booking", () => ({ BOOKING_ENABLED: true }));
+
 vi.mock("@/hooks/useBookingAnalytics", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/hooks/useBookingAnalytics")>();
   return {

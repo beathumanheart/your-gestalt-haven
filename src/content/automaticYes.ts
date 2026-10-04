@@ -92,7 +92,18 @@ export interface AutomaticYesContent {
     savedOn: string; savedOff: string;
   };
   letter: { kicker: string; title: string; text: string; button: string; small: string; done: string };
-  closing: { quote: string; attribution: string; name: string; role: string; sessions: string; book: string; watch: string; fine: string };
+  closing: {
+    quote: string;
+    attribution: string;
+    name: string;
+    role: string;
+    sessions: string;
+    /** CTA beside "Watch on YouTube". Chosen by BOOKING_ENABLED. */
+    book: string;
+    getInTouch: string;
+    watch: string;
+    fine: string;
+  };
   sourcesTitle: string;
   sources: string[];
 }
@@ -561,6 +572,7 @@ export const automaticYesEN: AutomaticYesContent = {
     role: "Gestalt Counsellor · Human Heart",
     sessions: "Sessions online, in English and Russian.",
     book: "Book a Session",
+    getInTouch: "Get in touch",
     watch: "Watch on YouTube",
     fine: "For reflection and self-study. This worksheet is not counselling and does not replace it.",
   },

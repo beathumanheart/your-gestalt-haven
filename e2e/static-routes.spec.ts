@@ -34,6 +34,14 @@ const INDEXABLE = [
     path: "/ru/take/feelings-map",
     title: "Что со мной происходит — карта чувств | Human Heart",
   },
+  {
+    path: "/en/take/first-session",
+    title: "The first session: what it costs and how it goes | Human Heart",
+  },
+  {
+    path: "/ru/take/first-session",
+    title: "Первая встреча: сколько стоит и как проходит | Human Heart",
+  },
   { path: "/en/letter", title: "The monthly letter | Human Heart" },
   { path: "/en/offer-agreement", title: "Offer Agreement | Human Heart" },
   { path: "/ru/offer-agreement", title: "Договор оферты | Human Heart" },
@@ -409,5 +417,79 @@ test.describe("the monthly letter", () => {
   test("/ru/letter sends the reader to the English page", async ({ page }) => {
     await page.goto("/ru/letter");
     await expect(page).toHaveURL(/\/en\/letter$/);
+  });
+});
+
+/**
+ * "The first session" — the shelf's first bilingual article.
+ *
+ * The head sweep above covers its title and canonical in both languages. What
+ * is left is the part a head cannot show: that the served bytes carry the
+ * article's own words, in the right language, before any JavaScript runs.
+ */
+test.describe("the first-session article", () => {
+  const CASES = [
+    { path: "/en/take/first-session", lang: "en", opener: "What it costs", other: "Сколько стоит" },
+    { path: "/ru/take/first-session", lang: "ru", opener: "Сколько стоит", other: "What it costs" },
+  ] as const;
+
+  for (const { path, lang, opener, other } of CASES) {
+    test(`${path} serves its own words without JavaScript`, async ({ request }) => {
+      const html = await (await request.get(path)).text();
+      const body = html.match(/<div id="root">([\s\S]*?)<\/div>\s*<!-- prerendered -->/);
+
+      expect(body, `${path} was not prerendered`).toBeTruthy();
+      expect(body![1], `${path} is missing its first heading`).toContain(opener);
+      // And it is this language's article, not the other one's.
+      expect(body![1], `${path} served the other language's text`).not.toContain(other);
+      // Substantial: the whole article, not just a heading.
+      expect(body![1].length, `${path} looks truncated`).toBeGreaterThan(4000);
+    });
+
+    test(`${path} declares the right lang on <html>`, async ({ request }) => {
+      // Russian prose under lang="en" is an accessibility fault, and it is
+      // invisible in a browser — only the served bytes show it.
+      const html = await (await request.get(path)).text();
+      expect(html).toContain(`<html lang="${lang}">`);
+    });
+
+    test(`${path} offers nothing to fill in`, async ({ request }) => {
+      // The page is reading. Asserted on the served markup so a form added
+      // later is caught even if it only appears after hydration.
+      const html = await (await request.get(path)).text();
+      const body = html.match(/<div id="root">([\s\S]*?)<\/div>\s*<!-- prerendered -->/)![1];
+
+      expect(body).not.toContain("<input");
+      expect(body).not.toContain("<textarea");
+      expect(body).not.toContain("<form");
+    });
+  }
+
+  test("both languages are in the sitemap", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+
+    expect(xml).toContain("<loc>https://humanheart.life/en/take/first-session</loc>");
+    expect(xml).toContain("<loc>https://humanheart.life/ru/take/first-session</loc>");
+  });
+
+  test("each shelf links to the article in its own language", async ({ page }) => {
+    for (const { path, lang } of CASES) {
+      await page.goto(`/${lang}/take`);
+      const card = page.locator(`a[href="${path}"]`);
+      await expect(card, `/${lang}/take does not link to ${path}`).toHaveCount(1);
+    }
+  });
+
+  test("the article's links resolve, and Telegram is the configured handle", async ({ page }) => {
+    await page.goto("/ru/take/first-session");
+
+    // Scoped to the article's text column: the footer links to the agreement
+    // and publishes the address too, so an unscoped count matches both.
+    const article = page.locator(".fs-col");
+
+    // The Russian article must reach the Russian agreement.
+    await expect(article.locator('a[href="/ru/offer-agreement"]')).toHaveCount(1);
+    await expect(article.locator('a[href="mailto:be@humanheart.life"]')).toHaveCount(1);
+    await expect(article.locator('a[href*="t.me/"]')).toHaveCount(1);
   });
 });

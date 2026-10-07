@@ -117,6 +117,15 @@ export const AUTOMATIC_YES_TEXT: RouteText = {
     "A free worksheet on people-pleasing through Ferenczi, Winnicott and Gestalt: catch one yes, trace where it began, and try one small experiment.",
 };
 
+export const FIRST_SESSION_TEXT: RouteText = {
+  titleEn: "The first session: what it costs and how it goes | Human Heart",
+  descriptionEn:
+    "What a first counselling session with Genia costs (€40–100, your choice), what happens in the fifty minutes, and how it works if you are 16 or 17.",
+  titleRu: "Первая встреча: сколько стоит и как проходит | Human Heart",
+  descriptionRu:
+    "Сколько стоит первая встреча с Женей (40–100 €, сумму выбираете вы), что происходит за пятьдесят минут и как всё устроено, если вам 16 или 17.",
+};
+
 export const LETTER_TEXT: RouteText = {
   titleEn: "The monthly letter | Human Heart",
   descriptionEn:
@@ -164,6 +173,14 @@ export const STATIC_ROUTES: readonly StaticRoute[] = [
     changefreq: "monthly",
     langs: ["en"],
     ...AUTOMATIC_YES_TEXT,
+  },
+  // Bilingual, unlike the worksheet above: no `langs`, so both files are
+  // written and each head names the other as its alternate.
+  {
+    path: "/take/first-session",
+    priority: "0.7",
+    changefreq: "monthly",
+    ...FIRST_SESSION_TEXT,
   },
   { path: "/letter", priority: "0.5", changefreq: "monthly", langs: ["en"], ...LETTER_TEXT },
   { path: "/offer-agreement", priority: "0.3", changefreq: "yearly", ...OFFER_AGREEMENT_TEXT },

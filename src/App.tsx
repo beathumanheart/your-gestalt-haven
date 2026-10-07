@@ -33,6 +33,7 @@ const Feelings = lazy(() => import("./pages/Feelings"));
 const TakeIndex = lazy(() => import("./pages/TakeIndex"));
 const TakeItemSoon = lazy(() => import("./pages/TakeItemSoon"));
 const TakeAutomaticYes = lazy(() => import("./pages/TakeAutomaticYes"));
+const TakeFirstSession = lazy(() => import("./pages/TakeFirstSession"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Letter = lazy(() => import("./pages/Letter"));
 const FeelingsLegacyRedirect = lazy(() => import("./pages/FeelingsLegacyRedirect"));
@@ -212,6 +213,15 @@ const App = () => (
               element={
                 <LangLayout>
                   <TakeAutomaticYes />
+                </LangLayout>
+              }
+            />
+            {/* Also before /:lang/take/:slug, and bilingual. */}
+            <Route
+              path="/:lang/take/first-session"
+              element={
+                <LangLayout>
+                  <TakeFirstSession />
                 </LangLayout>
               }
             />

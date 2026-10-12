@@ -81,7 +81,7 @@ export const HOME_TEXT: RouteText = {
 
 export const TAKE_TEXT: RouteText = {
   titleEn: "Take with you — free material | Human Heart",
-  titleRu: "С собой — бесплатные материалы | Human Heart",
+  titleRu: "Материалы — бесплатно | Human Heart",
   descriptionEn:
     "Free material, here if it is useful to you. No session, no account, nothing to sign up for.",
   descriptionRu:

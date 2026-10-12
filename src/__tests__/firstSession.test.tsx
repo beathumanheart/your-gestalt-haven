@@ -30,6 +30,7 @@ import FirstSession from "@/components/first-session/FirstSession";
 import TakeIndex from "@/pages/TakeIndex";
 import { firstSessionEN, firstSessionRU, SECTION_IDS } from "@/content/firstSession";
 import { takeEN, takeRU } from "@/content/take";
+import { navigationEN, navigationRU } from "@/content/navigation";
 import { SOCIAL_URLS } from "@/config/social";
 import { CONTACT_EMAIL } from "@/content/contact";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -200,10 +201,37 @@ describe("the three links come from config", () => {
     });
   }
 
+  it("each shelf has exactly one name, used by its page, its footer link and this crumb", () => {
+    /* The invariant this episode produced. The Russian shelf used to be
+       «С собой» on its own page, in its nav label and in its indexed title,
+       and «Материалы» in the footer — so a reader followed one name and
+       arrived at another, and the new breadcrumb had to pick a side. It is
+       «Материалы» in all four places now.
+
+       Asserted as equality between the three independent sources rather than
+       against a literal, so renaming the shelf stays a one-line change — but
+       renaming it in only one place fails here. */
+    for (const [label, take, nav, crumb] of [
+      ["en", takeEN, navigationEN, firstSessionEN.crumb],
+      ["ru", takeRU, navigationRU, firstSessionRU.crumb],
+    ] as const) {
+      expect(take.navLabel, `${label}: the shelf's nav label and its title disagree`).toBe(
+        take.title,
+      );
+      expect(nav.footerTakeWithYou, `${label}: the footer calls the shelf something else`).toBe(
+        take.title,
+      );
+      expect(crumb, `${label}: the article's crumb calls the shelf something else`).toBe(
+        take.title,
+      );
+    }
+  });
+
   it("the crumb matches what each shelf calls itself", () => {
-    // The Russian shelf's own title is «С собой», not «Материалы» — the latter
-    // is the footer's label for the same page. A breadcrumb names the place it
-    // returns to as that place names itself.
+    // One name per shelf, per language. The Russian shelf was called «С собой»
+    // by its own page and «Материалы» by the footer; it is «Материалы»
+    // everywhere now, and this is what keeps the crumb from drifting off it
+    // again.
     expect(firstSessionEN.crumb).toBe(takeEN.title);
     expect(firstSessionRU.crumb).toBe(takeRU.title);
   });

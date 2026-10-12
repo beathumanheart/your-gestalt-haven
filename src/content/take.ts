@@ -95,8 +95,8 @@ export const takeEN: TakeContent = {
 };
 
 export const takeRU: TakeContent = {
-  navLabel: "С собой",
-  title: "С собой",
+  navLabel: "Материалы",
+  title: "Материалы",
   intro:
     "Бесплатные материалы. Что-то может пригодиться, что-то нет. Ни сессии, ни регистрации не нужно.",
   statuses: {

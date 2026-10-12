@@ -25,7 +25,7 @@ const INDEXABLE = [
   { path: "/en", title: "Genia | Counselling &amp; Accompaniment" },
   { path: "/ru", title: "Genia | Психолог-консультант" },
   { path: "/en/take", title: "Take with you — free material | Human Heart" },
-  { path: "/ru/take", title: "С собой — бесплатные материалы | Human Heart" },
+  { path: "/ru/take", title: "Материалы — бесплатно | Human Heart" },
   {
     path: "/en/take/feelings-map",
     title: "What is going on with me — a map of feelings | Human Heart",

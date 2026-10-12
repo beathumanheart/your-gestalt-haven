@@ -126,12 +126,13 @@ export const firstSessionEN: FirstSessionContent = {
 };
 
 export const firstSessionRU: FirstSessionContent = {
-  /* «С собой» rather than «Материалы»: this is what the Russian shelf calls
-     itself (takeRU.title and takeRU.navLabel). «Материалы» is the footer's
-     label for the same page, in navigation.ts — a breadcrumb names the place
-     it returns to as that place names itself, which is also what the English
-     crumb does (it equals takeEN.title). */
-  crumb: "С собой",
+  /* «Материалы», which is now the shelf's one Russian name: its own title and
+     nav label (takeRU), the footer's link to it (navigationRU), and this
+     crumb. It used to be called «С собой» in three of those four places and
+     «Материалы» in the footer, so a reader met the same page under two names.
+     A breadcrumb names the place it returns to as that place names itself —
+     the rule the English crumb follows too (it equals takeEN.title). */
+  crumb: "Материалы",
   crumbHere: "Первая встреча",
   kicker: "Статья",
   title: "Первая встреча",

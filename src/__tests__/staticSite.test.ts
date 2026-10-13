@@ -468,3 +468,98 @@ describe("the six service routes", () => {
     expect(() => assertNoForbiddenPaths(routes.map((r) => r.path))).not.toThrow();
   });
 });
+
+/**
+ * "The first session" — the shelf's first bilingual article.
+ *
+ * Every other /take/ item is either bilingual-by-default or English-only, and
+ * the English-only ones carry `langs`. This route deliberately carries none,
+ * so the failure to guard against is someone adding `langs: ["en"]` out of
+ * habit and silently dropping the Russian page from dist and from the sitemap.
+ */
+describe("the first-session route", () => {
+  const route = STATIC_ROUTES.find((r) => r.path === "/take/first-session");
+
+  it("is in the route list at all", () => {
+    expect(route, "no /take/first-session route — every case below would be vacuous").toBeTruthy();
+  });
+
+  it("is bilingual, claiming no single-language restriction", () => {
+    // `langs` absent is what makes it bilingual. Asserted directly, because
+    // this is the one property a well-meaning edit would get wrong.
+    expect(route!.langs, "/take/first-session must not restrict its languages").toBeUndefined();
+  });
+
+  it("is generated for both languages, each with its own head", () => {
+    for (const lang of LANGS) {
+      const html = renderRoutePage(template, {
+        canonicalPath: `/${lang}/take/first-session`,
+        lang,
+        text: route!,
+      });
+
+      const title = lang === "ru" ? route!.titleRu : route!.titleEn;
+      expect(html).toContain(`<title>${title}</title>`);
+      // Russian text under lang="en" is an accessibility fault, not a detail.
+      expect(html).toContain(`<html lang="${lang}">`);
+      expect(html).toContain(
+        `<link rel="canonical" href="https://humanheart.life/${lang}/take/first-session" />`,
+      );
+    }
+  });
+
+  it("names the other language as its alternate, plus x-default", () => {
+    for (const lang of LANGS) {
+      const html = renderRoutePage(template, {
+        canonicalPath: `/${lang}/take/first-session`,
+        lang,
+        text: route!,
+      });
+
+      expect(html).toContain(
+        '<link rel="alternate" hreflang="en" href="https://humanheart.life/en/take/first-session" />',
+      );
+      expect(html).toContain(
+        '<link rel="alternate" hreflang="ru" href="https://humanheart.life/ru/take/first-session" />',
+      );
+      expect(html).toContain(
+        '<link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/take/first-session" />',
+      );
+    }
+  });
+
+  it("does not serve the Russian head to the English page, or the reverse", () => {
+    // The discriminator: an un-generated path falls back to index.html and
+    // carries the homepage's head, so asserting each language's own title is
+    // what distinguishes a real file from the fallback.
+    const en = renderRoutePage(template, {
+      canonicalPath: "/en/take/first-session",
+      lang: "en",
+      text: route!,
+    });
+    const ru = renderRoutePage(template, {
+      canonicalPath: "/ru/take/first-session",
+      lang: "ru",
+      text: route!,
+    });
+
+    expect(en).not.toContain(route!.titleRu);
+    expect(ru).not.toContain(route!.titleEn);
+    expect(en).not.toContain(`<title>${HOME_TEXT.titleEn}</title>`);
+    expect(ru).not.toContain(`<title>${HOME_TEXT.titleEn}</title>`);
+  });
+
+  it("carries two sitemap entries, one per language", () => {
+    const xml = renderSitemap(STATIC_ROUTES, "2026-01-01");
+    const locs = [...xml.matchAll(/<loc>([^<]+first-session)<\/loc>/g)].map((m) => m[1]);
+
+    expect(locs).toHaveLength(2);
+    expect(locs).toContain("https://humanheart.life/en/take/first-session");
+    expect(locs).toContain("https://humanheart.life/ru/take/first-session");
+  });
+
+  it("is weighted like the rest of the shelf", () => {
+    expect(route!.priority).toBe("0.7");
+    expect(route!.changefreq).toBe("monthly");
+  });
+});

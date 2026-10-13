@@ -1,0 +1,33 @@
+# The approved copy of "The first session", one paragraph per line.
+#
+# This file is the record, not a convenience. The guard in firstSession.test.tsx
+# renders the article and compares it against these lines, so a reworded,
+# reordered or dropped paragraph fails the build.
+#
+# An earlier version of that guard compared the rendered page against
+# src/content/firstSession.ts — which is self-referential: editing the content
+# moved both sides of the assertion together, and the guard passed when a
+# section was renamed and when a paragraph was deleted. Verified: both breaks
+# passed before this file existed. That is the "not found is not a pass" shape
+# docs/writing-guards.md records, in its purest form.
+#
+# To change the copy deliberately: edit src/content/firstSession.ts and this
+# file together. The diff on this file is what a reviewer reads.
+# Lines starting with # are ignored; blank lines are ignored.
+The first session costs the same as every session after it: between €40 and €100 for fifty minutes. You choose the amount, and I don’t ask for a reason.
+The range is a solidarity scale. Those who can pay more make the lower end possible for those who can’t. The lower end is there if you are studying, between jobs, carrying debt or medical costs, or supporting other people.
+You pay after the session, within 24 hours, by bank transfer, Wise, Revolut or cryptocurrency. Nothing is paid in advance. If your plans change, tell me 24 hours ahead; a session cancelled later than that, or missed, is paid in full.
+It starts with a few lines from you, by email or Telegram: what brings you, and three times that would suit you, with your time zone. I reply within two working days.
+Once we have agreed a time, I send a link for the video call. I may ask where you will be during the session, and for the contact of someone I could reach in an emergency. We work online, so I am not in the room with you; this is what lets me act if you are ever in danger.
+For the call itself, two things help: a place where nobody can overhear you, and ten free minutes afterwards if you can manage them.
+Nothing needs preparing. You can begin with the thing that made you write, with something that happened this morning, or with “I don’t know where to start”. Each of these is a beginning.
+There is no questionnaire and no test, and I don’t diagnose. I listen and I ask. Sometimes I suggest slowing down to notice what is happening as you speak: a feeling that arrives, a breath held, a sentence that trails off. Gestalt work pays attention to what is here right now.
+How far to go is yours to decide. Something can be named and left for another time, or not said at all. Silence is fine. So are tears, and so is laughing.
+Toward the end we stop and look at how it was. You can ask me anything about the way I work. Then the practical part: whether to meet again, and when.
+One session commits you to nothing. Sometimes a person comes once, gets what they came for, and the work is complete. If we continue, the usual rhythm is weekly, at the same hour: up to ten sessions when one thing needs attention, or from six months onward when the question is how your life as a whole is taking shape.
+A first session can leave you tired, lighter, or unsettled for a day or two. That happens when something kept inside for a long time is said aloud.
+Everything said in our work is confidential. Two limits apply: a serious risk to life or safety, yours or another person’s, and cases where the law requires disclosure. I discuss my work in supervision, without names or recognisable details; supervision is bound by confidentiality too. The full terms are in the offer agreement.
+I work with people from the age of 16. Until you are 18, one of your parents or guardians needs to know that we are meeting and to agree to it in writing; a short email from them is enough. That adult is also the emergency contact, and usually the one who pays.
+What you say in a session stays between you and me. I don’t pass our conversations on to your parents, and if one of them writes to me, you will know about it. The exception is the same one adults have: a serious risk to your life or to someone’s safety.
+If you are a parent writing for your son or daughter: I am glad to answer your questions by email before we meet. The session itself I hold with them alone, and it matters that the wish to come is at least partly their own.
+Write to be@humanheart.life, or say hello on Telegram. A few lines are plenty.

@@ -61,6 +61,13 @@ export const takeEN: TakeContent = {
       description: "Five short parts, for the yes that arrives before you do.",
     },
     {
+      slug: "first-session",
+      status: "live",
+      kind: "Article",
+      title: "The first session",
+      description: "What it costs, how the fifty minutes go, and how it works at 16 or 17.",
+    },
+    {
       // Title is provisional — the page itself is not written yet.
       slug: "safety-plan",
       status: "prep",
@@ -88,8 +95,8 @@ export const takeEN: TakeContent = {
 };
 
 export const takeRU: TakeContent = {
-  navLabel: "С собой",
-  title: "С собой",
+  navLabel: "Материалы",
+  title: "Материалы",
   intro:
     "Бесплатные материалы. Что-то может пригодиться, что-то нет. Ни сессии, ни регистрации не нужно.",
   statuses: {
@@ -104,6 +111,13 @@ export const takeRU: TakeContent = {
       kind: "Интерактивная карта",
       title: "Что со мной происходит",
       description: "Шесть кругов, которые читают снаружи внутрь. В середине — потребность.",
+    },
+    {
+      slug: "first-session",
+      status: "live",
+      kind: "Статья",
+      title: "Первая встреча",
+      description: "Сколько стоит, как проходят пятьдесят минут и как всё устроено в 16 и 17 лет.",
     },
     {
       slug: "safety-plan",

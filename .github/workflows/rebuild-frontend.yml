@@ -30,8 +30,7 @@ concurrency:
 jobs:
   rebuild:
     name: Build & publish (no backend steps)
-    # Pinned, not ubuntu-latest: Playwright 1.58 cannot install Chromium on 26.04.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:

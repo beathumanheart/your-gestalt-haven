@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon: heart-pulse SVG matching site header (terracotta #D17147) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#D17147" />
+
+    <title>Первая встреча: сколько стоит и как проходит | Human Heart</title>
+
+    <meta name="description" content="Сколько стоит первая встреча с Женей (40–100 €, сумму выбираете вы), что происходит за пятьдесят минут и как всё устроено, если вам 16 или 17." />
+    <meta name="author" content="Genia" />
+
+    <!-- Open Graph
+         Static fallback read by Telegram, Twitter, WhatsApp (bots don't run JS).
+         React-side PageMeta overrides these for Google and JS-capable crawlers. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Human Heart" />
+    <meta property="og:title" content="Первая встреча: сколько стоит и как проходит | Human Heart" />
+    <meta property="og:description" content="Сколько стоит первая встреча с Женей (40–100 €, сумму выбираете вы), что происходит за пятьдесят минут и как всё устроено, если вам 16 или 17." />
+    <meta property="og:url" content="https://humanheart.life/ru/take/first-session" />
+    <meta property="og:image" content="https://humanheart.life/og-image-ru.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Женя — психолог-консультант" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Первая встреча: сколько стоит и как проходит | Human Heart" />
+    <meta name="twitter:description" content="Сколько стоит первая встреча с Женей (40–100 €, сумму выбираете вы), что происходит за пятьдесят минут и как всё устроено, если вам 16 или 17." />
+    <meta name="twitter:image" content="https://humanheart.life/og-image-ru.jpg" />
+    <meta name="twitter:image:alt" content="Женя — психолог-консультант" />
+
+    <!-- Site-wide JSON-LD (static, so non-JS crawlers see it).
+         Both nodes are built from src/config/identity.ts and injected by the
+         siteJsonLd plugin in vite.config.ts — edit the module, not this file.
+
+         The nodes here are the English ones, which is what "/" serves. The
+         staticSite plugin rewrites them in Russian for the /ru pages it
+         generates — see setJsonLd in scripts/static-site/render.ts. -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://humanheart.life/#genia",
+  "name": "Genia",
+  "jobTitle": "гештальт-терапевт",
+  "url": "https://humanheart.life/en",
+  "image": "https://humanheart.life/og-image-en.jpg",
+  "knowsAbout": [
+    "гештальт-терапия",
+    "работа с горем",
+    "экзистенциальная терапия",
+    "терапия отношений"
+  ],
+  "knowsLanguage": [
+    "en",
+    "ru"
+  ],
+  "sameAs": [
+    "https://www.youtube.com/@beathumanheart"
+  ],
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "KU Leuven",
+      "url": "https://www.kuleuven.be/",
+      "sameAs": "https://www.wikidata.org/wiki/Q833670"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "University of Tartu",
+      "url": "https://ut.ee/",
+      "sameAs": "https://www.wikidata.org/wiki/Q204181"
+    },
+    {
+      "@type": "EducationalOrganization",
+      "url": "https://education-psy.ru/"
+    }
+  ],
+  "hasCredential": [
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "diploma",
+      "name": "Diploma in Psychological Counselling",
+      "educationalLevel": "Diploma",
+      "recognizedBy": {
+        "@type": "EducationalOrganization",
+        "url": "https://education-psy.ru/"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "degree",
+      "name": "MSc in Bioethics",
+      "educationalLevel": "Master's degree",
+      "recognizedBy": {
+        "@type": "CollegeOrUniversity",
+        "name": "KU Leuven",
+        "url": "https://www.kuleuven.be/",
+        "sameAs": "https://www.wikidata.org/wiki/Q833670"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "degree",
+      "name": "MA in Philosophy",
+      "educationalLevel": "Master's degree",
+      "recognizedBy": {
+        "@type": "CollegeOrUniversity",
+        "name": "University of Tartu",
+        "url": "https://ut.ee/",
+        "sameAs": "https://www.wikidata.org/wiki/Q204181"
+      }
+    }
+  ],
+  "worksFor": {
+    "@id": "https://humanheart.life/#service"
+  }
+}</script>
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": "https://humanheart.life/#service",
+  "name": "Human Heart — гештальт-терапия",
+  "description": "Тёплое пространство для индивидуальной гештальт-терапии. Работа с горем, отношениями и экзистенциальными вопросами.",
+  "url": "https://humanheart.life/en",
+  "areaServed": "Весь мир (онлайн)",
+  "knowsLanguage": [
+    "en",
+    "ru"
+  ]
+}</script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script type="module" crossorigin src="/assets/index-DSIc-2oW.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-oo9V2cD4.css">
+    <link rel="canonical" href="https://humanheart.life/ru/take/first-session" />
+    <link rel="alternate" hreflang="ru" href="https://humanheart.life/ru/take/first-session" />
+    <link rel="alternate" hreflang="en" href="https://humanheart.life/en/take/first-session" />
+    <link rel="alternate" hreflang="x-default" href="https://humanheart.life/en/take/first-session" />
+  </head>
+
+  <body>
+    <div id="root"><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;"><ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol></div><section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section><header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-transparent py-6"><nav class="mx-auto max-w-4xl md:max-w-5xl grid grid-cols-[auto_1fr_auto] items-center px-6 gap-x-[clamp(1.5rem,4vw,3.5rem)] md:gap-x-[max(32px,clamp(1.5rem,4vw,3.5rem))]"><button class="col-start-1 min-w-max flex items-center gap-2 font-display text-xl md:text-2xl font-medium text-foreground hover:text-primary transition-colors"><svg viewBox="0 0 40 40" class="w-8 h-8 md:w-10 md:h-10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 35L17.5 32.75C9 25.1 4 20.6 4 15C4 10.5 7.5 7 12 7C14.6 7 17.1 8.2 19 10.1L20 11.1L21 10.1C22.9 8.2 25.4 7 28 7C32.5 7 36 10.5 36 15C36 20.6 31 25.1 22.5 32.75L20 35Z" class="fill-terracotta"></path><path d="M8 20H14L16 16L20 24L24 18L26 20H32" class="stroke-cream" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="hidden sm:inline">Human Heart</span></button><div class="col-start-2 hidden md:flex items-center gap-8"><button class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors">Обо мне</button><button class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors">Услуги</button><button class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors">Квалификация</button><button class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors">Контакты</button></div><div class="col-start-3 justify-self-end flex items-center gap-3"><div role="group" aria-label="Language" class="inline-flex items-center gap-0.5 p-1 rounded-full border border-border/50 bg-background/50 backdrop-blur-sm font-body text-[13px]"><button type="button" aria-pressed="false" aria-label="English" class="px-3 py-[5px] rounded-full text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-colors cursor-pointer">EN</button><button type="button" aria-pressed="true" aria-label="Русский" class="px-3 py-[5px] rounded-full bg-background text-foreground font-medium shadow-[0_1px_3px_hsl(var(--foreground)/0.08)]">RU</button></div><button class="hidden md:block btn-primary text-sm py-2.5 px-6">Написать мне</button><button class="md:hidden p-2 text-foreground" aria-label="Toggle menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu w-6 h-6"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button></div></nav></header><main class="min-h-screen bg-background pt-24 md:pt-28"><div class="fs-root"><style>
+.fs-root { max-width: 980px; margin: 0 auto; padding: clamp(26px,4vw,60px) clamp(18px,4vw,40px) 80px; }
+.fs-col { max-width: 720px; }
+.fs-crumb { font-family: Lora,Georgia,serif; font-size: 14.5px; line-height: 1.6; margin: 0 0 22px; color: #5c554e; }
+.fs-crumb a { font-weight: 600; color: #437059; text-decoration: underline; text-underline-offset: 3px; }
+.fs-crumb span { color: #8A8075; }
+.fs-kicker { font-family: Lora,Georgia,serif; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: #C2603A; margin: 0 0 10px; }
+.fs-title { font-family: 'Cormorant Garamond',Georgia,serif; font-weight: 300; font-size: clamp(28px,5vw,34px); line-height: 1.12; margin: 0; color: #464039; }
+.fs-h2 { font-family: 'Cormorant Garamond',Georgia,serif; font-weight: 400; font-size: clamp(20px,3.6vw,22px); line-height: 1.2; margin: 44px 0 0; color: #464039; }
+.fs-p { font-family: Lora,Georgia,serif; font-size: 17px; line-height: 1.7; margin: 14px 0 0; color: #5c554e; }
+.fs-col a { color: #437059; text-decoration: underline; text-underline-offset: 3px; }
+.fs-col a:hover { text-decoration-color: #437059; }
+.fs-col a:focus-visible, .fs-crumb a:focus-visible { outline: 2px solid #437059; outline-offset: 2px; border-radius: 2px; }
+</style><div class="fs-col"><nav class="fs-crumb" aria-label="Breadcrumb"><a href="/ru/take">Материалы</a> <span>· Первая встреча</span></nav><p class="fs-kicker">Статья</p><h1 class="fs-title">Первая встреча</h1><section id="cost"><h2 class="fs-h2">Сколько стоит</h2><p class="fs-p">Первая встреча стоит столько же, сколько любая следующая: от 40 до 100 € за пятьдесят минут. Сумму выбираете вы, и объяснять свой выбор не нужно.</p><p class="fs-p">Это солидарная оплата. Те, кто может платить больше, делают встречи доступными для тех, кому сейчас трудно. Нижняя граница — для вас, если вы учитесь, ищете работу, выплачиваете долги, оплачиваете лечение или поддерживаете близких деньгами.</p><p class="fs-p">Оплата — после сессии, в течение 24 часов: банковским переводом, через Wise, Revolut или криптовалютой. Заранее платить ничего не нужно. Если планы меняются, предупредите меня за 24 часа; при более поздней отмене и при пропуске сессия оплачивается полностью.</p></section><section id="before"><h2 class="fs-h2">До встречи</h2><p class="fs-p">Всё начинается с вашего письма или сообщения в Telegram. Нескольких строк достаточно: что вас привело и три удобных варианта времени с вашим часовым поясом. Я отвечаю в течение двух рабочих дней.</p><p class="fs-p">Когда мы договорились о времени, я присылаю ссылку на видеозвонок. Я могу спросить, где вы будете во время сессии, и попросить контакт близкого человека для экстренной связи. Мы работаем онлайн, меня нет с вами в одной комнате — так я смогу помочь, если вам будет угрожать опасность.</p><p class="fs-p">Для самой встречи пригодятся место, где вас никто не услышит, и, если получится, десять свободных минут после.</p></section><section id="session"><h2 class="fs-h2">Пятьдесят минут</h2><p class="fs-p">Готовиться не нужно. Начать можно с того, из-за чего вы написали, с того, что случилось сегодня утром, или со слов «не знаю, с чего начать». Любое из этих начал подходит.</p><p class="fs-p">Анкет и тестов нет, диагнозов я не ставлю. Я слушаю и спрашиваю. Иногда предлагаю замедлиться и заметить, что происходит, пока вы говорите: какое чувство поднялось, где замерло дыхание, на каком слове фраза оборвалась. Гештальт-подход внимателен к тому, что есть прямо сейчас.</p><p class="fs-p">Как далеко идти, решаете вы. Что-то можно назвать и отложить, о чём-то не говорить вовсе. Молчать можно. Плакать и смеяться — тоже.</p><p class="fs-p">Ближе к концу мы останавливаемся и смотрим, как это было. Вы можете спросить меня о том, как я работаю. После этого — практическое: встречаться ли снова и когда.</p></section><section id="afterwards"><h2 class="fs-h2">После</h2><p class="fs-p">Одна встреча ни к чему не обязывает. Бывает, что человек приходит один раз, получает то, за чем пришёл, и на этом работа закончена. Если мы продолжаем, обычный ритм — раз в неделю в одно и то же время: до десяти встреч, когда внимания требует что-то одно, или от полугода и дальше, когда вопрос в том, как складывается жизнь целиком.</p><p class="fs-p">После первой сессии бывает усталость, бывает облегчение, а иногда день-два внутри неспокойно. Так случается, когда вслух звучит то, что долго оставалось внутри.</p></section><section id="confidentiality"><h2 class="fs-h2">Что остаётся между нами</h2><p class="fs-p">Всё, о чём мы говорим, конфиденциально. Ограничений два: серьёзная угроза жизни или безопасности, вашей или другого человека, и случаи, когда раскрытия требует закон. Свою работу я обсуждаю на супервизии, без имён и узнаваемых деталей; супервизия тоже связана конфиденциальностью. Полные условия — в <a href="/ru/offer-agreement">договоре оферты</a>.</p></section><section id="under-18"><h2 class="fs-h2">Если вам 16 или 17</h2><p class="fs-p">Я работаю с людьми с 16 лет. Пока вам нет 18, кто-то из родителей или опекунов должен знать о наших встречах и письменно на них согласиться — достаточно короткого письма. Этот же взрослый становится контактом для экстренной связи и чаще всего оплачивает сессии.</p><p class="fs-p">То, что вы говорите на сессии, остаётся между нами. Родителям я наши разговоры не пересказываю, а если кто-то из них мне напишет, вы об этом узнаете. Исключение то же, что и у взрослых: серьёзная угроза вашей жизни или чьей-то безопасности.</p><p class="fs-p">Если вы родитель и пишете за сына или дочь: на ваши вопросы я с радостью отвечу в письме до встречи. Саму сессию я провожу с подростком наедине, и важно, чтобы желание прийти было хотя бы отчасти его собственным.</p></section><section id="begin"><h2 class="fs-h2">Как начать</h2><p class="fs-p">Напишите на <a href="mailto:be@humanheart.life">be@humanheart.life</a> или поздоровайтесь в <a href="https://t.me/humanheartbeat" target="_blank" rel="noopener noreferrer">Telegram</a>. Нескольких строк достаточно.</p></section></div></div></main><footer class="py-12 px-6 bg-cream-dark border-t border-border"><div class="container-narrow"><div class="flex flex-col md:flex-row items-center justify-between gap-6"><div class="text-center md:text-left"><a class="font-display text-2xl text-foreground hover:text-primary transition-colors mb-2 block" href="/ru">Human Heart</a><p class="font-body text-sm text-muted-foreground">Терапия с Женей</p></div><div class="flex flex-wrap items-center justify-center gap-4 md:gap-6"><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/ru/#about">Обо мне</a><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/ru/#services">Услуги</a><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/ru/#contact">Контакты</a><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/ru/offer-agreement">Договор оферты</a><a class="font-body text-sm text-muted-foreground hover:text-foreground transition-colors" href="/ru/take">Материалы</a></div><div class="text-center md:text-right"><a href="mailto:be@humanheart.life" class="font-body text-sm text-primary hover:text-foreground transition-colors">be@humanheart.life</a><p class="font-body text-xs text-muted-foreground mt-2">© 2026 Human Heart. Все права защищены.</p></div></div><div class="mt-7 pt-6 border-t border-border flex flex-wrap items-center justify-center gap-3"><a href="https://www.youtube.com/@beathumanheart" target="_blank" rel="noopener noreferrer" title="YouTube" aria-label="YouTube" class="group flex items-center justify-center w-11 h-11"><span class="flex items-center justify-center w-[38px] h-[38px] rounded-full border border-border text-muted-foreground group-hover:text-terracotta group-hover:border-terracotta/45 group-hover:bg-terracotta/10 group-hover:-translate-y-0.5 transition-all duration-200"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube w-4 h-4"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><path d="m10 15 5-3-5-3z"></path></svg></span></a><a title="The monthly letter" aria-label="The monthly letter" class="group flex items-center justify-center w-11 h-11" href="/en/letter"><span class="flex items-center justify-center w-[38px] h-[38px] rounded-full border border-border text-muted-foreground group-hover:text-terracotta group-hover:border-terracotta/45 group-hover:bg-terracotta/10 group-hover:-translate-y-0.5 transition-all duration-200"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-4 h-4"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg></span></a></div></div></footer></div>
+    <!-- prerendered -->
+  </body>
+</html>

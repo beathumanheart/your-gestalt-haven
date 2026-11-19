@@ -37,7 +37,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 vi.mock("@/contexts/LanguageContext", () => ({ useLanguage: vi.fn() }));
 
-vi.mock("posthog-js", () => ({ default: { capture: vi.fn(), init: vi.fn() } }));
+vi.mock("@/lib/posthog", () => ({ default: { capture: vi.fn(), init: vi.fn() } }));
 
 const asLanguage = (language: "en" | "ru") =>
   (useLanguage as ReturnType<typeof vi.fn>).mockReturnValue({

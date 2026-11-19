@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client";
-import posthog from "posthog-js";
-import { PostHogProvider } from "@posthog/react";
+import posthog from "@/lib/posthog";
 import { HelmetProvider } from "react-helmet-async";
 import { isTakePath, siteConfig, takeConfig } from "./config/analytics";
 import App from "./App.tsx";
@@ -35,8 +34,6 @@ posthog.init(
 
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
-    <PostHogProvider client={posthog}>
-      <App />
-    </PostHogProvider>
+    <App />
   </HelmetProvider>
 );

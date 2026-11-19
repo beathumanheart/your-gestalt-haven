@@ -19,7 +19,7 @@ import { STORAGE_KEY } from "@/components/automatic-yes/useWorksheetAnswers";
 import TakeAutomaticYes from "@/pages/TakeAutomaticYes";
 import { automaticYesEN } from "@/content/automaticYes";
 
-vi.mock("posthog-js", () => ({ default: { capture: vi.fn() } }));
+vi.mock("@/lib/posthog", () => ({ default: { capture: vi.fn() } }));
 
 const mockLanguage = vi.hoisted(() => ({ current: "en" }));
 vi.mock("@/contexts/LanguageContext", () => ({

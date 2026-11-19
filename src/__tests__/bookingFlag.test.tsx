@@ -175,7 +175,7 @@ vi.mock("@/integrations/supabase/client", () => {
   };
 });
 
-vi.mock("posthog-js", () => ({ default: { capture: vi.fn(), init: vi.fn() } }));
+vi.mock("@/lib/posthog", () => ({ default: { capture: vi.fn(), init: vi.fn() } }));
 
 vi.mock("@/hooks/useBookingAnalytics", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/hooks/useBookingAnalytics")>()),

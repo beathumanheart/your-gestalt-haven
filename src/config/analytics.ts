@@ -1,4 +1,5 @@
-import type { PostHogConfig } from "posthog-js";
+import type { PostHogConfig } from "posthog-js/dist/module.slim";
+import { AnalyticsExtensions } from "posthog-js/dist/extension-bundles";
 
 /**
  * Two PostHog configurations, chosen once per page load by path.
@@ -20,12 +21,15 @@ export const isTakePath = (pathname: string): boolean =>
  * capture behaviours on by date, so an unset flag is not a safe assumption
  * about what this page does.
  *
- * `capture_pageview: "history_change"` (posthog-js >= 1.235; installed 1.374.2)
+ * `capture_pageview: "history_change"` (posthog-js >= 1.235; installed 1.453.0)
  * fires the initial $pageview and one more per History API path change, so each
  * /take/* route entry is counted exactly once. Plain `true` would fire only on
  * the initial load and leave every /take/* page indistinguishable in the data.
  */
 export const takeConfig: Partial<PostHogConfig> = {
+  /* historyAutocapture, inside this bundle, is what fires the
+     "history_change" pageviews below. See src/lib/posthog.ts. */
+  __extensionClasses: AnalyticsExtensions,
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com",
   persistence: "memory",
   autocapture: false,
@@ -55,6 +59,11 @@ export const takeConfig: Partial<PostHogConfig> = {
  * a setting in the PostHog UI has to be stated below.
  */
 export const siteConfig: Partial<PostHogConfig> = {
+  /* Autocapture, pageviews, heatmaps, dead clicks and web vitals — the
+     features the project enables. Anything outside this bundle (replay,
+     surveys, error tracking, flags) cannot run here whatever the PostHog UI
+     says. See src/lib/posthog.ts. */
+  __extensionClasses: AnalyticsExtensions,
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com",
   autocapture: true,
   capture_performance: true,

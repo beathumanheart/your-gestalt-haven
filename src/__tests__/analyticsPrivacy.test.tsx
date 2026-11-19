@@ -28,7 +28,7 @@ import type { BookingData } from "@/components/booking/BookingWidget";
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: { functions: { invoke: vi.fn() } },
 }));
-vi.mock("posthog-js", () => ({ default: { capture: vi.fn() } }));
+vi.mock("@/lib/posthog", () => ({ default: { capture: vi.fn() } }));
 
 const booking = {
   sessionTypeId: "s1",

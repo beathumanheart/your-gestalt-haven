@@ -27,7 +27,7 @@ const capture = vi.hoisted(() => vi.fn());
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: { functions: { invoke } },
 }));
-vi.mock("posthog-js", () => ({ default: { capture } }));
+vi.mock("@/lib/posthog", () => ({ default: { capture } }));
 vi.mock("@/contexts/LanguageContext", () => ({
   useLanguage: () => ({ language: "en", setLanguage: vi.fn(), langPath: (p: string) => `/en${p}` }),
 }));

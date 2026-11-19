@@ -15,13 +15,13 @@ import {
 } from "../useBookingAnalytics";
 
 // Mock posthog-js
-vi.mock("posthog-js", () => ({
+vi.mock("@/lib/posthog", () => ({
   default: {
     capture: vi.fn(),
   },
 }));
 
-import posthog from "posthog-js";
+import posthog from "@/lib/posthog";
 
 describe("FUNNEL_STEPS constants", () => {
   it("has the correct event names", () => {

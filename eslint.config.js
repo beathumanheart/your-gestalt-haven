@@ -21,6 +21,22 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
+      /* One stray `import posthog from "posthog-js"` puts every PostHog
+         product back in the entry chunk, and a second client beside the one
+         src/lib/posthog.ts initialises. The bundle-size e2e would catch the
+         weight after a full build; this catches it at the import. */
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "posthog-js",
+              message:
+                "This entry bundles every PostHog product (~390 KB). Import the client from @/lib/posthog.",
+            },
+          ],
+        },
+      ],
     },
   },
 );

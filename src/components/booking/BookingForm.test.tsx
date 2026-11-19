@@ -10,7 +10,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   supabase: { functions: { invoke: vi.fn() } },
 }));
 
-vi.mock("posthog-js", () => ({
+vi.mock("@/lib/posthog", () => ({
   default: { capture: vi.fn() },
 }));
 

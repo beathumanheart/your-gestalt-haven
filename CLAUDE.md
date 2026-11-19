@@ -148,6 +148,13 @@ editing one.** The short version: make a guard fail before trusting it, and
   and stores nothing. Verified in a browser, and described in the privacy
   notice — if any of this changes, `src/content/privacy.ts` changes with it
   (`privacyNotice.test.ts` fails otherwise).
+- The client is the **slim** build, imported from `src/lib/posthog.ts`; ESLint
+  rejects `import ... from "posthog-js"`, because that entry bundles every
+  PostHog product (~390 KB). Features are opted in via `__extensionClasses` in
+  `src/config/analytics.ts` — `AnalyticsExtensions` only. Replay and surveys
+  are not in the bundle, so enabling them in the PostHog UI does nothing
+  (verified: with the pin removed and replay on remotely, no recorder loads).
+  Adding a product means adding its extension bundle there.
 - All tracking functions exported from `src/hooks/useBookingAnalytics.ts` — use these, don't call `posthog.capture` directly
 - 8 funnel events defined in `FUNNEL_STEPS` constant; booking form inputs carry `data-ph-no-capture`
 - PostHog key set via `VITE_PUBLIC_POSTHOG_KEY` / `VITE_PUBLIC_POSTHOG_HOST` env vars

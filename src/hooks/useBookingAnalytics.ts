@@ -1,4 +1,4 @@
-import posthog from "posthog-js";
+import posthog from "@/lib/posthog";
 
 export const FUNNEL_STEPS = {
   HOMEPAGE_VIEWED: "booking_funnel_homepage_viewed",

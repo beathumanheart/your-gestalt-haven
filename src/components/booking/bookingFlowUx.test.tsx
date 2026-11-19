@@ -77,7 +77,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   supabase: { functions: { invoke: vi.fn() } },
 }));
 
-vi.mock("posthog-js", () => ({ default: { capture: vi.fn() } }));
+vi.mock("@/lib/posthog", () => ({ default: { capture: vi.fn() } }));
 
 vi.mock("@/hooks/useBookingAnalytics", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/hooks/useBookingAnalytics")>();

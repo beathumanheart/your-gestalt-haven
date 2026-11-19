@@ -18,7 +18,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # First, so a missing credential costs two seconds rather than failing
       # deep in a CLI error after the full test and build run — and so the
@@ -42,10 +42,10 @@ jobs:
           fi
           echo "Both deploy secrets are present."
 
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -92,7 +92,7 @@ jobs:
       # Schema and function go to the SAME project used by the staging branch,
       # which is why these steps live only in the production workflow.
       - name: Set up Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v3
         with:
           # Pinned, not latest: a major release changed the default target of
           # `db push` under us once (v3), and a deploy is no place to find out.
@@ -126,7 +126,7 @@ jobs:
         run: cp dist/index.html dist/404.html
 
       - name: Deploy to GitHub Pages (production)
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist

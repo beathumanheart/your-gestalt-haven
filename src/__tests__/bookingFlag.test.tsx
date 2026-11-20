@@ -37,7 +37,7 @@
  * without duplicating the module graph.
  */
 
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
@@ -346,7 +346,11 @@ describe("with BOOKING_ENABLED off", () => {
     renderAt(<BookSession />);
     await screen.findByText(/A regular hour for one person/);
 
-    expect(document.head.querySelector(SERVICE_NODE_SELECTOR)).toBeTruthy();
+    // Waited for, not read straight after the text: the node is written in a
+    // passive effect, and the session row arrives from a promise outside
+    // act(), so the text can be in the DOM before the effect has run. On a
+    // slow runner that gap failed the production deploy for #90's merge.
+    await waitFor(() => expect(document.head.querySelector(SERVICE_NODE_SELECTOR)).toBeTruthy());
   });
 
   it('says "Book a Session" nowhere, in either language', async () => {
